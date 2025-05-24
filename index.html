@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Phone Gadget</title>
+        <link rel="stylesheet" href="css/Style.css">
+        <script src="js/script.js"></script>
+        <body>
+
+            <header>
+                <div class="logo">
+                    <img src="logo.png" alt="Logo" width="100" height="100">
+                </div>
+            </header>
+                <style>
+                    #O, #N, #G, #D {
+                        font-size: 100px;
+                        font-weight: bold;
+                        animation: fadeIn 2s ease-in-out;
+                        text-align: left;
+                        align-self: left;
+                    }
+                    @keyframes fadeIn {
+                        from { opacity: 0; }
+                        to { opacity: 1; }
+                    }
+                </style>
+            </header>
+            <!---MAIN CONTENT(HIDDEN BY DEFAULT)-->
+            <main>
+                <section class="phone-gadget">
+                    <h2>Latest Phone Gadgets</h2>
+                    <div class="gadget">
+                        <img src="phone1.webp" alt="Gadget 1">
+                        <h3>#219,152.00</h3>
+                        <p>Redmi Note 14</p>
+                        <button onclick="buyNow('Redmi Note 14', 219152)">Buy Now</button>
+                        <button onclick="addToCart('Redmi Note 14', 219152)">Add to Cart</button>
+                    </div>
+                    <div class="gadget">
+                        <img src="phone2.jpeg" alt="Gadget 2">
+                        <h3>#231,899.00</h3>
+                        <p>iPhone 14</p>
+                        <button onclick="buyNow('iPhone 14', 231899)">Buy Now</button>
+                        <button onclick="addToCart('iPhone 14', 231899)">Add to Cart</button>
+                    </div>
+                    <div class="gadget">
+                        <img src="phone4.webp" alt="Gadget 3">
+                        <h3>#245,000.00</h3>
+                        <p>Samsung Galaxy S22</p>
+                        <button onclick="buyNow('Samsung Galaxy S22', 245000)">Buy Now</button>
+                        <button onclick="addToCart('Samsung Galaxy S22', 245000)">Add to Cart</button>
+                    </div>
+                    <div class="gadget">
+                        <img src="phone5.jpeg" alt="Gadget 4">
+                        <h3>#259,000.00</h3>
+                        <p>Google Pixel 6</p>
+                        <button onclick="buyNow('Google Pixel 6', 259000)">Buy Now</button>
+                        <button onclick="addToCart('Google Pixel 6', 259000)">Add to Cart</button>
+                    </div>
+                    <div class="gadget">
+                        <img src="phone6.jpg" alt="Gadget 5" width="200" height="200">
+                        <h3>#270,000.00</h3>
+                        <p>OnePlus 9 Pro</p>
+                        <button onclick="buyNow('OnePlus 9 Pro', 270000)">Buy Now</button>
+                        <button onclick="addToCart('OnePlus 9 Pro', 270000)">Add to Cart</button>
+                    </div>
+                   <style>
+                        body {
+                            font-family: Arial, sans-serif;
+                            background-color: #f4f4f4;
+                            margin: 0;
+                            padding: 0;
+                            animation: fadeIn 5s;
+                        }
+                        @keyframes fadeIn {
+                            from { opacity: 0; }
+                            to { opacity: 1; }
+                        }
+                        header {
+                            background-color: #333;
+                            color: white;
+                            padding: 6 px 0;
+                            text-align: left;
+                        }
+                        nav ul {
+                            list-style-type: none;
+                            padding: 0;
+                        }
+                        nav ul li {
+                            display: inline;
+                            margin-right: 20px;
+                        }
+                        nav ul li a {
+                            color: white;
+                            text-decoration: none;
+                        }
+                        .phone-gadget {
+                            display: flex;
+                            flex-wrap: wrap;
+                            justify-content: space-around;
+                            padding: 20px;
+                        }
+                        .gadget {
+                            background-color: white;
+                            border-radius: 5px;
+                            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+                            margin-bottom: 20px;
+                            padding: 10px;
+                            text-align: center;
+                        }
+                        .gadget img {
+                            max-width: 100%;
+                            height: auto;
+                        }
+                        button {
+                                background-color: #28a745;
+                                color: white;
+                                border: none;
+                                padding: 10px 20px;
+                                text-align: center;
+                                text-decoration: none;
+                                display: inline-block;
+                                font-size: 16px;
+                                margin-top: 10px;
+                            }
+                            /* i want the style to look go on mobile */
+                        button:hover {
+                                background-color: #218838;
+                            }
+                        .cart {
+                            background-color: #fff;
+                            border-radius: 5px;
+                            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+                            padding: 20px;
+                            margin-top: 20px;
+                        }
+                        .cart h2 {
+                            margin-top: 0;
+                        }
+                        .cart ul {
+                            list-style-type: none;
+                            padding: 0;
+                        }
+                        .cart ul li {
+                            margin-bottom: 10px;
+                        }
+                        .cart button {
+                            background-color: #007bff;
+                            color: white;
+                            border: none;
+                            padding: 10px 20px;
+                            text-align: center;
+                            text-decoration: none;
+                            display: inline-block;
+                            font-size: 16px;
+                            margin-top: 10px;
+                        }
+                        .cart button:hover {
+                            background-color: #0056b3;
+                        }
+                        .laptop-list h2 {
+                            text-align: center;
+                            margin-top: 20px;
+                        }
+                        .laptop-list {
+                            display: flex;
+                            flex-wrap: wrap;
+                            justify-content: space-around;
+                            padding: 20px;
+                        }
+                        .laptop {
+                            background-color: white;
+                            border-radius: 5px;
+                            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+                            margin-bottom: 20px;
+                            padding: 10px;
+                            text-align: center;
+                        }
+                        .laptop img {
+                            max-width: 100%;
+                            height: auto;
+                        }
+                        .laptop h3 {
+                            margin: 10px 0;
+                        }
+                        .laptop button {
+                            background-color: #28a745;
+                            color: white;
+                            border: none;
+                            padding: 10px 20px;
+                            text-align: center;
+                            text-decoration: none;
+                            display: inline-block;
+                            font-size: 16px;
+                            margin-top: 10px;
+                        }
+                        .laptop button:hover {
+                            background-color: #218838;
+                        }
+                        @media (max-width: 600px) {
+                            header {
+                                text-align: center;
+                            }
+                            .phone-gadget, .laptop-list {
+                                flex-direction: column;
+                                align-items: center;
+                            }
+                            .gadget, .laptop {
+                                width: 90%;
+                                margin: 10px 0;
+                            }
+                            button {
+                                width: 100%;
+                                padding: 15px;
+                            }
+                        }
+                        
+                   </style>
+                </section>
+                <section class="laptop-list">
+                    <h2>Latest laptop gadgets</h2>
+                    <div class="laptop">
+                        <img src="laptop1.jpeg" alt="Laptop 1">
+                        <h3>#150,000.00</h3>
+                        <p>Dell Inspiron 15</p>
+                        <button onclick="buyNow('Dell Inspiron 15', 150000)">Buy Now</button>
+                        <button onclick="addToCart('Dell Inspiron 15', 150000)">Add to Cart</button>
+                    </div>
+                    <br>
+                    <div class="laptop">
+                        <img src="laptop2.jpeg" alt="Laptop 2">
+                        <h3>#200,000.00</h3>
+                        <p>HP Pavilion x360</p>
+                        <button onclick="buyNow('HP Pavilion x360', 200000)">Buy Now</button>
+                        <button onclick="addToCart('HP Pavilion x360', 200000)">Add to Cart</button>
+                    </div>
+                    <br>
+                    <div class="laptop">
+                        <img src="laptop3.jpeg" alt="Laptop 3">
+                        <h3>#250,000.00</h3>
+                        <p>Lenovo ThinkPad X1</p>
+                        <button onclick="buyNow('Lenovo ThinkPad X1', 250000)">Buy Now</button>
+                        <button onclick="addToCart('Lenovo ThinkPad X1', 250000)">Add to Cart</button>
+                    </div>
+                    <div class="laptop">
+                        <img src="laptop4.jpeg" alt="Laptop 4">
+                        <h3>#300,000.00</h3>
+                        <p>Asus ZenBook 14</p>
+                        <button onclick="buyNow('Asus ZenBook 14', 300000)">Buy Now</button>
+                        <button onclick="addToCart('Asus ZenBook 14', 300000)">Add to Cart</button>
+                    </div>
+                    <style>
+                        .laptop-list {
+                            display: flex;
+                            flex-wrap: wrap;
+                            justify-content: space-around;
+                            padding: 20px;
+                        }
+                        .laptop {
+                            background-color: white;
+                            border-radius: 5px;
+                            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+                            margin-bottom: 20px;
+                            padding: 10px;
+                            text-align: center;
+                        }
+                        .laptop img {
+                            max-width: 100%;
+                            height: auto;
+                        }
+                    </style>
+
+                </section>
+                <section class="cart">
+                    <h2>Your Cart</h2>
+                    <ul id="cart-items">
+                        <!-- Cart items will be displayed here -->
+                    </ul>
+                    <button onclick="checkout()">Checkout</button>
+                    <button onclick="clearCart()">Clear Cart</button>
+                </section>
+               <!-- Cart items will be displayed here -->
+                    </ul>
+                    <button onclick="checkout()">Checkout</button>
+                    <button onclick="clearCart()">Clear Cart</button>
+                </section>
+                    </form>
+            </main>
+        </body>
+        <script>
+           // Function to handle the "Buy Now" button click ask for pick or delivery make it option like 1 or 2 and show user form for delivery and pick up
+            function buyNow(itemName, itemPrice) {
+                const deliveryOption = prompt("Choose delivery option:\n1. Pick up\n2. Delivery");
+                if (deliveryOption === "1") {
+                    // Ask for pickup details
+                    const pickupLocation = prompt("Enter your pickup location:");
+                    const pickupTime = prompt("visit us at our nerby store.\n1. 2 hours\n2. 3 hours");
+                    if (pickupTime === "1") {
+                        alert("Your order will be ready for pickup in 2 hours.");
+                    } else if (pickupTime === "2") {
+                        alert("Your order will be ready for pickup in 3 hours.");
+                    } else {
+                        alert("Invalid option. Please choose 1 for 2 hours or 2 for 3 hours.");
+                    }
+                    // show all state that are available for pick up]
+                    const availableStates = ["Lagos", "Abuja", "Port Harcourt", "Ibadan", "Ogun", "Ekiti", "Osun", "Oyo"];
+                    const state = prompt(`Available states for pickup:\n${availableStates.join(", ")}\nEnter your state:`);
+                    if (availableStates.includes(state)) {
+                      //show  the user the area that are available for the state they choose
+                        const availableAreas = {
+                            Lagos: ["Ikeja", "Victoria Island", "Lekki"],
+                            Abuja: ["Wuse", "Garki", "Maitama"],
+                            PortHarcourt: ["GRA", "Obio-Akpor", "Eleme"],
+                            Ibadan: ["Jericho", "Ring Road", "Bodija"],
+                            Ogun: ["Abeokuta", "Ijebu-Ode", "Sagamu"],
+                            Ekiti: ["Ado-Ekiti", "Ikere-Ekiti", "Ise-Ekiti"],
+                            Osun: ["Osogbo", "Ilesa", "Ife"],
+                            Oyo: ["Ibadan", "Oyo", "Saki"]
+                        };
+                        const areas = availableAreas[state];
+                        alert(`Available areas in ${state}:\n${areas.join(", ")}\nYour order will be ready for pickup in ${pickupTime === "1" ? "2 hours" : "3 hours"}.`);
+                    } else {
+                        alert("Invalid state. Please choose from the available states.");
+                    }
+                    // show the user the street that are available for the area they choose and the adress that are available for the street they choose for each state the user choose like if ibandan it will show all the street that are available for ibadan and the adress that are available for the street they choose
+                    if (state === "Lagos") {
+                        const availableStreets = ["Ikorodu", "Ikeja", "Victoria Island"];
+                        const street = prompt(`Available streets in ${state}:\n${availableStreets.join(", ")}\nEnter your street:`);
+                        if (availableStreets.includes(street)) {
+                            const availableAddresses = {
+                                Ikorodu: ["Ikorodu Road", "Ikorodu Town"],
+                                Ikeja: ["Ikeja GRA", "Ikeja City Mall"],
+                                VictoriaIsland: ["Ozumba Mbadiwe", "Adetokunbo Ademola"]
+                            };
+                            const addresses = availableAddresses[street];
+                            alert(`Available addresses in ${street}:\n${addresses.join(", ")}`);
+                        } else {
+                            alert("Invalid street. Please choose from the available streets.");
+                        }
+                    }
+                    if (state === "Abuja") {
+                        const availableStreets = ["Wuse", "Garki", "Maitama"];
+                        const street = prompt(`Available streets in ${state}:\n${availableStreets.join(", ")}\nEnter your street:`);
+                        if (availableStreets.includes(street)) {
+                            const availableAddresses = {
+                                Wuse: ["Wuse Market", "Wuse Zone 4"],
+                                Garki: ["Garki Market", "Garki Area 11"],
+                                Maitama: ["Maitama Amusement Park", "Maitama District"]
+                            };
+                            const addresses = availableAddresses[street];
+                            alert(`Available addresses in ${street}:\n${addresses.join(", ")}`);
+                        } else {
+                            alert("Invalid street. Please choose from the available streets.");
+                        }
+                    }
+                    if (state === "PortHarcourt") {
+                        const availableStreets = ["GRA", "Obio-Akpor", "Eleme"];
+                        const street = prompt(`Available streets in ${state}:\n${availableStreets.join(", ")}\nEnter your street:`);
+                        if (availableStreets.includes(street)) {
+                            const availableAddresses = {
+                                GRA: ["GRA Phase 1", "GRA Phase 2"],
+                                ObioAkpor: ["Obio Akpor Road", "Obio Akpor Town"],
+                                Eleme: ["Eleme Junction", "Eleme Town"]
+                            };
+                            const addresses = availableAddresses[street];
+                            alert(`Available addresses in ${street}:\n${addresses.join(", ")}`);
+                        } else {
+                            alert("Invalid street. Please choose from the available streets.");
+                        }
+                    }
+                    if (state === "Ibadan") {
+                        const availableStreets = ["Jericho", "Ring Road", "Bodija"];
+                        const street = prompt(`Available streets in ${state}:\n${availableStreets.join(", ")}\nEnter your street:`);
+                        if (availableStreets.includes(street)) {
+                            const availableAddresses = {
+                                Jericho: ["Jericho Mall", "Jericho GRA"],
+                                RingRoad: ["Ring Road Junction", "Ring Road Area"],
+                                Bodija: ["Bodija Market", "Bodija Estate"]
+                            };
+                            const addresses = availableAddresses[street];
+                            alert(`Available addresses in ${street}:\n${addresses.join(", ")}`);
+                        } else {
+                            alert("Invalid street. Please choose from the available streets.");
+                        }
+                    }
+                    if (state === "Ogun") {
+                        const availableStreets = ["Abeokuta", "Ijebu-Ode", "Sagamu"];
+                        const street = prompt(`Available streets in ${state}:\n${availableStreets.join(", ")}\nEnter your street:`);
+                        if (availableStreets.includes(street)) {
+                            const availableAddresses = {
+                                Abeokuta: ["Abeokuta GRA", "Abeokuta Town"],
+                                IjebuOde: ["Ijebu Ode Road", "Ijebu Ode Town"],
+                                Sagamu: ["Sagamu Junction", "Sagamu Town"]
+                            };
+                            const addresses = availableAddresses[street];
+                            alert(`Available addresses in ${street}:\n${addresses.join(", ")}`);
+                        } else {
+                            alert("Invalid street. Please choose from the available streets.");
+                        }
+                    }
+                    if (state === "Ekiti") {
+                        const availableStreets = ["Ado-Ekiti", "Ikere-Ekiti", "Ise-Ekiti"];
+                        const street = prompt(`Available streets in ${state}:\n${availableStreets.join(", ")}\nEnter your street:`);
+                        if (availableStreets.includes(street)) {
+                            const availableAddresses = {
+                                AdoEkiti: ["Ado Ekiti GRA", "Ado Ekiti Town"],
+                                IkereEkiti: ["Ikere Ekiti Road", "Ikere Ekiti Town"],
+                                IseEkiti: ["Ise Ekiti Junction", "Ise Ekiti Town"]
+                            };
+                            const addresses = availableAddresses[street];
+                            alert(`Available addresses in ${street}:\n${addresses.join(", ")}`);
+                        } else {
+                            alert("Invalid street. Please choose from the available streets.");
+                        }
+                    }
+                    if (state === "Osun") {
+                        const availableStreets = ["Osogbo", "Ilesa", "Ife"];
+                        const street = prompt(`Available streets in ${state}:\n${availableStreets.join(", ")}\nEnter your street:`);
+                        if (availableStreets.includes(street)) {
+                            const availableAddresses = {
+                                Osogbo: ["Osogbo GRA", "Osogbo Town"],
+                                Ilesa: ["Ilesa Road", "Ilesa Town"],
+                                Ife: ["Ife Junction", "Ife Town"]
+                            };
+                            const addresses = availableAddresses[street];
+                            alert(`Available addresses in ${street}:\n${addresses.join(", ")}`);
+                        } else {
+                            alert("Invalid street. Please choose from the available streets.");
+                        }
+                    }
+                    if (state === "Oyo") {
+                        const availableStreets = ["Ibadan", "Oyo", "Saki"];
+                        const street = prompt(`Available streets in ${state}:\n${availableStreets.join(", ")}\nEnter your street:`);
+                        if (availableStreets.includes(street)) {
+                            const availableAddresses = {
+                                Ibadan: ["Ibadan GRA", "Ibadan Town"],
+                                Oyo: ["Oyo Road", "Oyo Town"],
+                                Saki: ["Saki Junction", "Saki Town"]
+                            };
+                            const addresses = availableAddresses[street];
+                            alert(`Available addresses in ${street}:\n${addresses.join(", ")}`);
+                        } else {
+                            alert("Invalid street. Please choose from the available streets.");
+                            return
+                        }
+                    }
+                    // show the place that we are in that street
+                    if (street === "Ikorodu") {
+                        const availablePlaces = ["Ikorodu Town Hall", "Ikorodu Market", "Ikorodu GRA"];
+                        alert(`Available places in ${street}:\n${availablePlaces.join(", ")}`);
+                    }
+                    if (street === "Ikeja") {
+                        const availablePlaces = ["Ikeja City Mall", "Ikeja GRA", "Ikeja Computer Village"];
+                        alert(`Available places in ${street}:\n${availablePlaces.join(", ")}`);
+                    }
+                    if (street === "Victoria Island") {
+                        const availablePlaces = ["Victoria Island Beach", "Victoria Island Mall", "Victoria Island GRA"];
+                        alert(`Available places in ${street}:\n${availablePlaces.join(", ")}`);
+                    }
+                    if (street === "Wuse") {
+                        const availablePlaces = ["Wuse Market", "Wuse Zone 4", "Wuse GRA"];
+                        alert(`Available places in ${street}:\n${availablePlaces.join(", ")}`);
+                    }
+                    if (street === "Garki") {
+                        const availablePlaces = ["Garki Market", "Garki Area 11", "Garki GRA"];
+                        alert(`Available places in ${street}:\n${availablePlaces.join(", ")}`);
+                    }
+                    if (street === "Maitama") {
+                        const availablePlaces = ["Maitama Amusement Park", "Maitama District", "Maitama GRA"];
+                        alert(`Available places in ${street}:\n${availablePlaces.join(", ")}`);
+                    }
+                    if (street === "GRA") {
+                        const availablePlaces = ["GRA Phase 1", "GRA Phase 2", "GRA GRA"];
+                        alert(`Available places in ${street}:\n${availablePlaces.join(", ")}`);
+                    }
+
+                    if (street === "Obio-Akpor") {
+                        const availablePlaces = ["Obio Akpor Road", "Obio Akpor Town", "Obio Akpor GRA"];
+                        alert(`Available places in ${street}:\n${availablePlaces.join(", ")}`);
+                    }
+                    if (street === "Eleme") {
+                        const availablePlaces = ["Eleme Junction", "Eleme Town", "Eleme GRA"];
+                        alert(`Available places in ${street}:\n${availablePlaces.join(", ")}`);
+                    }
+                    if (street === "Jericho") {
+                        const availablePlaces = ["Jericho Mall", "Jericho GRA", "Jericho Town"];
+                        alert(`Available places in ${street}:\n${availablePlaces.join(", ")}`);
+                    }
+                    if (street === "Ring Road") {
+                        const availablePlaces = ["Ring Road Junction", "Ring Road Area", "Ring Road GRA"];
+                        alert(`Available places in ${street}:\n${availablePlaces.join(", ")}`);
+                    }
+                    if (street === "Bodija") {
+                        const availablePlaces = ["Bodija Market", "Bodija Estate", "Bodija GRA"];
+                        alert(`Available places in ${street}:\n${availablePlaces.join(", ")}`);
+                    }
+                    if (street === "Abeokuta") {
+                        const availablePlaces = ["Abeokuta GRA", "Abeokuta Town", "Abeokuta GRA"];
+                        alert(`Available places in ${street}:\n${availablePlaces.join(", ")}`);
+                    }
+                    if (street === "Ijebu-Ode") {
+                        const availablePlaces = ["Ijebu Ode Road", "Ijebu Ode Town", "Ijebu Ode GRA"];
+                        alert(`Available places in ${street}:\n${availablePlaces.join(", ")}`);
+                    }
+                    if (street === "Sagamu") {
+                        const availablePlaces = ["Sagamu Junction", "Sagamu Town", "Sagamu GRA"];
+                        alert(`Available places in ${street}:\n${availablePlaces.join(", ")}`);
+                    }
+                    if (street === "Ado-Ekiti") {
+                        const availablePlaces = ["Ado Ekiti GRA", "Ado Ekiti Town", "Ado Ekiti GRA"];
+                        alert(`Available places in ${street}:\n${availablePlaces.join(", ")}`);
+                    }
+                    if (street === "Ikere-Ekiti") {
+                        const availablePlaces = ["Ikere Ekiti Road", "Ikere Ekiti Town", "Ikere Ekiti GRA"];
+                        alert(`Available places in ${street}:\n${availablePlaces.join(", ")}`);
+                    }
+                    if (street === "Ise-Ekiti") {
+                        const availablePlaces = ["Ise Ekiti Junction", "Ise Ekiti Town", "Ise Ekiti GRA"];
+                        alert(`Available places in ${street}:\n${availablePlaces.join(", ")}`);
+                    }
+                    if (street === "Osogbo") {
+                        const availablePlaces = ["Osogbo GRA", "Osogbo Town", "Osogbo GRA"];
+                        alert(`Available places in ${street}:\n${availablePlaces.join(", ")}`);
+                    }
+                    if (street === "Ilesa") {
+                        const availablePlaces = ["Ilesa Road", "Ilesa Town", "Ilesa GRA"];
+                        alert(`Available places in ${street}:\n${availablePlaces.join(", ")}`);
+                    }
+                    if (street === "Ife") {
+                        const availablePlaces = ["Ife Junction", "Ife Town", "Ife GRA"];
+                        alert(`Available places in ${street}:\n${availablePlaces.join(", ")}`);
+                    }
+                    if (street === "Ibadan") {
+                        const availablePlaces = ["Ibadan GRA", "Ibadan Town", "Ibadan GRA"];
+                        alert(`Available places in ${street}:\n${availablePlaces.join(", ")}`);
+                    }
+                    if (street === "Oyo") {
+                        const availablePlaces = ["Oyo Road", "Oyo Town", "Oyo GRA"];
+                        alert(`Available places in ${street}:\n${availablePlaces.join(", ")}`);
+                    }
+                    if (street === "Saki") {
+                        const availablePlaces = ["Saki Junction", "Saki Town", "Saki GRA"];
+                        alert(`Available places in ${street}:\n${availablePlaces.join(", ")}`
+                    // display the user the total price of the item they choose and ask them to pay
+                        );
+                        alert(`You have chosen pickup for the ${itemName} for #${itemPrice}.\nPickup Location: ${pickupLocation}` +
+                        `\nYour order will be ready for pickup in ${pickupTime === "1" ? "2 hours" : "3 hours"}.` +
+                        `\nPlease transfer to this account number 1234567890`
+                        
+                    );
+                        
+                    
+                    }
+
+
+                } else if (deliveryOption === "2") {
+                    // Ask for delivery details
+                    const deliveryAddress = prompt("Enter your delivery address:");
+                    const deliveryTime = prompt("we deliver within 24 hours.\n1.two days\n2. three days");
+                    alert(`You have chosen delivery for the ${itemName} for #${itemPrice}.\nDelivery Address: ${deliveryAddress}\nDelivery Time: ${deliveryTime}` +
+                    `\nYour order will be delivered to ${deliveryAddress} in ${deliveryTime === "1" ? "2 days" : "3 days"}.`);
+                    // Add 40% to the item price for delivery based on the item price and the state they choose and delivery time
+                    // Calculate the delivery fee based on the item price and the state they choose
+                    let deliveryFee = 0;
+                    if (deliveryTime === "1") {
+                        deliveryFee = itemPrice * 0.4; // 40% of the item price
+                    } else if (deliveryTime === "2") {
+                        deliveryFee = itemPrice * 0.3; // 30% of the item price
+                    } else {
+                        alert("Invalid delivery time option. Please choose 1 for two days or 2 for three days.");
+                        return;
+                    }
+                    // Calculate the total price including delivery fee
+                    const totalPrice = itemPrice + deliveryFee;
+                    alert(`Your total with delivery fee is #${totalPrice}. Please transfer to this account number 1234567890`);
+                    // display in the screen when the user have pay
+                    alert(`Thank you for your purchase of ${itemName} for #${totalPrice}. Your order will be delivered to ${deliveryAddress} in ${deliveryTime === "1" ? "2 days" : "3 days"}.`);
+                } else {
+                    alert("Invalid option. Please choose 1 for pickup or 2 for delivery.");
+                
+                }
+            }
+
+            function addToCart(itemName, itemPrice) {
+                const cartItems = document.getElementById('cart-items');
+                const listItem = document.createElement('li');
+                listItem.textContent = `${itemName} - #${itemPrice}`;
+                cartItems.appendChild(listItem);
+            }
+           // Function to handle the "Checkout" button click
+            function checkout() {
+                const cartItems = document.getElementById('cart-items');
+                if (cartItems.children.length === 0) {
+                    alert("Your cart is empty.");
+                    return;
+                }
+                const total = Array.from(cartItems.children).reduce((sum, item) => {
+                    const price = parseFloat(item.textContent.split('- #')[1]);
+                    return sum + price;
+                }, 0);
+                // ask for delivry or pickup
+                const deliveryOption = prompt(`Your total is #${total}. Choose delivery option:\n1. Pick up\n2. Delivery`);
+                if (deliveryOption === "1") {
+                    // Ask for pickup details
+                    const pickupLocation = prompt("Enter your pickup location:");
+                    alert(`Your order will be ready for pickup at ${pickupLocation} in 2 hours.`);
+                } else if (deliveryOption === "2") {
+                    // Ask for delivery details
+                    const deliveryAddress = prompt("Enter your delivery address:");
+                    alert(`Your order will be delivered to ${deliveryAddress} in 24 hours.`);
+                } else {
+                    alert("Invalid option. Please choose 1 for pickup or 2 for delivery.");
+                }
+            }
+        //show all the state that are available for pick up
+            const availableStates = ["Lagos", "Abuja", "Port Harcourt", "Ibadan", "Ogun", "Ekiti", "Osun", "Oyo"];
+            function showAvailableStates() {
+                alert(`Available states for pickup:\n${availableStates.join(", ")}`);
+            }
+            //show all the area that are available for the state they choose
+            const availableAreas = {
+                Lagos: ["Ikeja", "Victoria Island", "Lekki"],
+                Abuja: ["Wuse", "Garki", "Maitama"],
+                PortHarcourt: ["GRA", "Obio-Akpor", "Eleme"],
+                Ibadan: ["Jericho", "Ring Road", "Bodija"],
+                Ogun: ["Abeokuta", "Ijebu-Ode", "Sagamu"],
+                Ekiti: ["Ado-Ekiti", "Ikere-Ekiti", "Ise-Ekiti"],
+                Osun: ["Osogbo", "Ilesa", "Ife"],
+                Oyo: ["Ibadan", "Oyo", "Saki"]
+            };
+
+            function showAvailableAreas(state) {
+                const areas = availableAreas[state];
+                if (areas) {
+                    alert(`Available areas in ${state}:\n${areas.join(", ")}`);
+                } else {
+                    alert("Invalid state.");
+                }
+            }
+            // show all the street that are available for the area they choose
+            const availableStreets = {
+                Ikorodu: ["Ikorodu Road", "Ikorodu Town"],
+                Ikeja: ["Ikeja GRA", "Ikeja City Mall"],
+                VictoriaIsland: ["Ozumba Mbadiwe", "Adetokunbo Ademola"],
+                Wuse: ["Wuse Market", "Wuse Zone 4"],
+                Garki: ["Garki Market", "Garki Area 11"],
+                Maitama: ["Maitama Amusement Park", "Maitama District"],
+                GRA: ["GRA Phase 1", "GRA Phase 2"],
+                ObioAkpor: ["Obio Akpor Road", "Obio Akpor Town"],
+                Eleme: ["Eleme Junction", "Eleme Town"],
+                Jericho: ["Jericho Mall", "Jericho GRA"],
+                RingRoad: ["Ring Road Junction", "Ring Road Area"],
+                Bodija: ["Bodija Market", "Bodija Estate"],
+                Abeokuta: ["Abeokuta GRA", "Abeokuta Town"],
+                IjebuOde: ["Ijebu Ode Road", "Ijebu Ode Town"],
+                Sagamu: ["Sagamu Junction", "Sagamu Town"],
+                AdoEkiti: ["Ado Ekiti GRA", "Ado Ekiti Town"],
+                IkereEkiti: ["Ikere Ekiti Road", "Ikere Ekiti Town"],
+                IseEkiti: ["Ise Ekiti Junction", "Ise Ekiti Town"],
+                Osogbo: ["Osogbo GRA", "Osogbo Town"],
+                Ilesa: ["Ilesa Road", "Ilesa Town"],
+                Ife: ["Ife Junction", "Ife Town"],
+                Ibadan: ["Ibadan GRA", "Ibadan Town"],
+                Oyo: ["Oyo Road", "Oyo Town"],
+                Saki: ["Saki Junction", "Saki Town"]
+            };
+        
+
+            function clearCart() {
+                const cartItems = document.getElementById('cart-items');
+                cartItems.innerHTML = '';
+            }
+            function toggleCart() {
+                const cart = document.querySelector('.cart');
+                cart.style.display = cart.style.display === 'none' ? 'block' : 'none';
+            }
+            function toggleLaptopList() {
+                const laptopList = document.querySelector('.laptop-list');
+                laptopList.style.display = laptopList.style.display === 'none' ? 'block' : 'none';
+            }
+            function togglePhoneGadget() {
+                const phoneGadget = document.querySelector('.phone-gadget');
+                phoneGadget.style.display = phoneGadget.style.display === 'none' ? 'block' : 'none';
+            }
+
+
+            
+            
+        </script>
+        
+        <address>
+            <p>Contact us at: 
+                <a href="tel:+2349138154963">+234 913 815 4963</a></p>
+                <a href="mailto:ayomideoluniyi49@gmail.com">ayomideoluniyi49@gmail.com</a></p>
+        </address>
+            <p>&copy; 2025  Phone Gadget. All rights reserved.</p>
+    </head>
+</html>
