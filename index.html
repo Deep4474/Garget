@@ -15,7 +15,7 @@
 <body>
   <header class="lamar-header">
     <div class="lamar-header-left">
-      <button id="menuBtn" class="lamar-menu-btn" title="Open menu" aria-label="Open menu">&#9776; Menu</button>
+  <button id="menuBtn" class="lamar-menu-btn" title="Open menu" aria-label="Open menu">&#9776;</button>
       </button>
       <span class="lamar-header-logo">Lamar Phone and Gadget</span>
     </div>
@@ -24,7 +24,6 @@
     </div>
     <!-- Live Advert Section -->
     <section class="live-advert">
-      <span class="live-advert-label">LIVE ADVERT: </span>
       <div class="live-advert-scroll">
         <span class="live-advert-text">Get the best deals on phones, gadgets, and accessories! Limited time offers. Shop now and save big at Lamar Phone & Gadget!</span>
       </div>
@@ -68,12 +67,16 @@
     <!-- Navigation items removed as requested -->
   </nav>
   <main>
-    <div class="section-title">TOP CATEGORIES</div>
-    <section class="categories-grid" id="categoriesGrid"></section>
-    <div class="section-title">COUPONS</div>
-    <section class="coupon-banner">VOUCHERS OF THE DAY</section>
-    <div class="section-title">PRODUCTS</div>
-    <section class="products-grid" id="productsGrid"></section>
+    <section class="live-advert" id="liveAdvertProduct">
+  <img id="liveAdvertProductImg" class="live-advert-img" src="" alt="Product" />
+      <span id="liveAdvertProductName" class="live-advert-product"></span>
+      <span id="liveAdvertProductPrice" class="live-advert-price"></span>
+    </section>
+  <div class="section-title">COUPONS</div>
+  <section class="coupon-banner">VOUCHERS OF THE DAY</section>
+  <div class="section-title">PRODUCTS</div>
+</main>
+<section class="products-grid" id="productsGrid"></section>
     <!-- Orders Grid (hidden by default) -->
     <div id="ordersGrid"></div>
     <!-- The display property will be controlled via CSS -->

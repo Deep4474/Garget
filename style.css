@@ -1,3 +1,157 @@
+/* Modal Overlay Styles */
+#buyModal.modal {
+  display: none;
+  position: fixed;
+  z-index: 9999;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: auto;
+  background: rgba(0,0,0,0.4);
+}
+#buyModal.modal.show {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+#buyModal .modal-content.buy-modal-content {
+  background: #fff;
+  margin: auto;
+  padding: 2.5em 2em 2em 2em;
+  border-radius: 16px;
+  max-width: 400px;
+  width: 95vw;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.18);
+  position: relative;
+}
+#buyModal .close {
+  position: absolute;
+  top: 10px;
+  right: 16px;
+  font-size: 1.5em;
+  color: #888;
+  cursor: pointer;
+}
+#buyModal .order-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 1em;
+}
+#buyModal .order-form input,
+#buyModal .order-form select {
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 1em;
+  outline: none;
+  transition: border 0.2s;
+}
+#buyModal .order-form input:focus,
+#buyModal .order-form select:focus {
+  border: 1.5px solid #ff9900;
+}
+#buyModal .order-form button[type="submit"] {
+  background: #ff9900;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 12px 0;
+  font-size: 1.1em;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: background 0.2s;
+}
+#buyModal .order-form button[type="submit"]:hover {
+  background: #e67c00;
+}
+#buyModal #orderStatus {
+  margin-top: 1em;
+  font-size: 1em;
+  color: #388e3c;
+  text-align: center;
+}
+body.modal-open {
+  overflow: hidden !important;
+}
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px 16px;
+  margin: 24px auto;
+  padding: 0 1em;
+  width: 100%;
+  max-width: 600px;
+  box-sizing: border-box;
+  background: transparent;
+  justify-content: center;
+}
+.product-card {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+  padding: 0.5em 0.3em;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 140px;
+  width: 100%;
+  margin: 0 0 12px 0;
+}
+/* --- COMPACT PRODUCT GRID OVERRIDE REMOVED --- */
+.product-img {
+  width: 70px !important;
+  height: 70px !important;
+  object-fit: contain !important;
+  border-radius: 8px !important;
+  margin-bottom: 0.3em !important;
+}
+.product-name {
+  font-size: 0.95em !important;
+  font-weight: bold !important;
+  margin-bottom: 0.15em !important;
+  text-align: center !important;
+}
+.price {
+  font-size: 0.95em !important;
+}
+
+/* Live Advert Product Section Styles */
+#liveAdvertProduct {
+  background: #ffe082;
+  padding: 10px 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 18px;
+  font-size: 1.1em;
+  margin-bottom: 1em;
+}
+.live-advert-img {
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  margin-left: 12px;
+}
+.live-advert-product {
+  color: #222;
+  font-weight: 600;
+  margin-left: 0;
+  min-width: 120px;
+  display: inline-block;
+}
+.live-advert-price {
+  color: #388e3c;
+  font-weight: bold;
+  margin-left: 8px;
+  font-size: 1.1em;
+}
 /* Hide all images and icons in the categories grid */
 #categoriesGrid img,
 #categoriesGrid .fa,
@@ -44,7 +198,8 @@
 }
 .live-advert-label {
   font-weight: bold;
-  font-size: 1.08em;
+    color: #000; /* Change text color to black for better contrast */
+    background: #fff; /* Change background color to white */
   color: #d84315;
   margin-right: 0;
   flex-shrink: 0;
@@ -134,7 +289,7 @@
   left: 0;
   width: 0;
   height: 100vh;
-  background: rgba(0,0,0,0.2);
+  background:white;
   z-index: 1001;
   overflow: hidden;
   transition: width 0.3s;
@@ -169,7 +324,7 @@
   display: flex;
   align-items: center;
   font-size: 1.08em;
-  color: #222;
+  color:#ad3939;
   text-decoration: none;
   padding: 0.7em 0;
   border-bottom: 1px solid #eee;
@@ -214,7 +369,7 @@
   max-width: 400px;
   border-radius: 10px;
   margin-top: 1em;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  box-shadow: white;
 }
 .lamar-menu-btn {
   background: none;
@@ -222,6 +377,7 @@
   padding: 0;
   margin-right: 8px;
   cursor: pointer;
+  color: #fff;
 }
 /* Category Grid Styles */
 .categories-grid {
@@ -427,11 +583,18 @@
   margin-bottom: 2px;
 }
 /* Product Card Styles */
+/* Enforce two columns for products grid */
 .products-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 18px;
-  margin-top: 1em;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 32px 16px;
+  margin: 24px 0;
+}
+
+@media (max-width: 700px) {
+  .products-grid {
+    grid-template-columns: 1fr !important;
+  }
 }
 .product-card {
   background: #fff;

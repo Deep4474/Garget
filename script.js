@@ -1,3 +1,57 @@
+// Force two products per row in the grid
+function enforceTwoPerRow() {
+  const grid = document.getElementById('productsGrid');
+  if (!grid) return;
+  // Remove all whitespace between product cards to avoid inline-block issues
+  grid.innerHTML = grid.innerHTML.replace(/>\s+</g, '><');
+}
+document.addEventListener('DOMContentLoaded', function() {
+  setTimeout(enforceTwoPerRow, 1000); // Wait for products to render
+});
+// Live Advert Product Rotator (Supabase version)
+document.addEventListener('DOMContentLoaded', async function() {
+  var nameElem = document.getElementById('liveAdvertProductName');
+  var priceElem = document.getElementById('liveAdvertProductPrice');
+  var imgElem = document.getElementById('liveAdvertProductImg');
+
+  async function fetchProductsForAdvert() {
+    // Adjust the select fields as per your Supabase 'products' table
+    const { data, error } = await supabase.from('products').select('name, price, image_url');
+    if (error) {
+      console.error('Error fetching products:', error);
+      return [];
+    }
+    return data;
+  }
+
+  let products = await fetchProductsForAdvert();
+  if (!products || products.length === 0) {
+    // fallback if no products
+    products = [
+      { name: 'No products available', price: '', image_url: '' }
+    ];
+  }
+  let idx = 0;
+  function showProduct(i) {
+    var p = products[i];
+    if (nameElem && priceElem && imgElem) {
+      nameElem.textContent = p.name || '';
+      priceElem.textContent = p.price ? `₦${p.price}` : '';
+      if (p.image_url) {
+        imgElem.src = p.image_url;
+        imgElem.style.display = 'inline-block';
+        imgElem.alt = p.name;
+      } else {
+        imgElem.style.display = 'none';
+      }
+    }
+  }
+  showProduct(idx);
+  setInterval(function() {
+    idx = (idx + 1) % products.length;
+    showProduct(idx);
+  }, 3500);
+});
 // Fetch and render orders for the current user
 async function fetchOrdersForUser(email) {
   // Adjust query if you want to filter by sender or other columns
@@ -152,6 +206,35 @@ document.addEventListener('DOMContentLoaded', function() {
         menuDrawer.classList.remove('open');
       }
     });
+    // Category menu links: close menu and show category products
+    document.querySelectorAll('.menu-link').forEach(function(link) {
+      link.addEventListener('click', function(e) {
+        const href = link.getAttribute('href');
+        if (href && href.startsWith('#') && href.length > 1) {
+          menuDrawer.classList.remove('open');
+          const category = href.substring(1).toLowerCase();
+          if (category) {
+            if (category === 'chips' || category === 'ankara-style' || category === 'ankara') {
+              filterProductsByCategory(category);
+            }
+            const productsSection = document.getElementById('productsGrid');
+            if (productsSection) productsSection.scrollIntoView({behavior: 'smooth'});
+          }
+        }
+      });
+    });
+    // Filtering function for chips and ankara style
+    window.filterProductsByCategory = function(category) {
+      // Fetch all products from Supabase and filter by category
+      supabase.from('products').select('*').then(({ data, error }) => {
+        if (error || !data) return;
+        const filtered = data.filter(p => {
+          const cat = (p.category || '').toLowerCase();
+          return cat.includes(category.replace('-', ' '));
+        });
+        renderProducts(filtered);
+      });
+    };
   }
 });
   // Fetch and render products from Supabase
@@ -203,7 +286,8 @@ function openBuyModal(product) {
   if (!modal) return;
   modal.querySelector('.buy-product-name').textContent = product.name;
   modal.querySelector('.buy-product-price').textContent = '₦' + Number(product.price).toLocaleString(undefined, {minimumFractionDigits:2});
-  modal.style.display = 'block';
+  modal.classList.add('show');
+  document.body.classList.add('modal-open');
   // Store product info for order
   modal.dataset.productId = product.id;
   modal.dataset.productName = product.name;
@@ -213,17 +297,31 @@ function openBuyModal(product) {
   if (orderForm) orderForm.reset();
   const orderStatus = document.getElementById('orderStatus');
   if (orderStatus) orderStatus.textContent = '';
+  // Autofill user name and email if logged in
+  setTimeout(async function() {
+    if (window.supabase && supabase.auth) {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const emailInput = document.getElementById('orderEmail');
+        if (emailInput) emailInput.value = user.email || '';
+        const nameInput = document.getElementById('orderUserName');
+        if (nameInput) nameInput.value = user.user_metadata && user.user_metadata.full_name ? user.user_metadata.full_name : (user.user_metadata && user.user_metadata.name ? user.user_metadata.name : '');
+      }
+    }
+  }, 100);
 }
 
 document.addEventListener('DOMContentLoaded', function() {
   const modal = document.getElementById('buyModal');
   if (modal) {
     modal.querySelector('.close').onclick = function() {
-      modal.style.display = 'none';
+      modal.classList.remove('show');
+      document.body.classList.remove('modal-open');
     };
     window.onclick = function(event) {
       if (event.target === modal) {
-        modal.style.display = 'none';
+        modal.classList.remove('show');
+        document.body.classList.remove('modal-open');
       }
     };
     // Handle order form submission
