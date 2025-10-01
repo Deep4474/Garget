@@ -282,8 +282,14 @@ document.addEventListener('DOMContentLoaded', function() {
 // Lamar Mobile JS (structure similar to desktop)
 // Ensure Supabase CORS settings include: https://glittery-torrone-d1184e.netlify.app
 // Add your product/category logic here as needed
-const supabaseUrl = 'https://jlwxkykznyjmstpjcgks.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impsd3hreWt6bnlqbXN0cGpjZ2tzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQzMTAxNDIsImV4cCI6MjA2OTg4NjE0Mn0.C86cvOOT5QI0PSHlPMujivWV8NLWMtgNiX8KrglzhIQ';
+// Supabase credentials must be provided securely via environment variables or backend API.
+// Remove public key from frontend for security. See README for setup instructions.
+let supabase = null;
+if (window.SUPABASE_URL && window.SUPABASE_KEY) {
+  supabase = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_KEY);
+} else {
+  console.warn('Supabase credentials are not set. Please provide them securely.');
+}
 // If deploying to Netlify, make sure CORS settings in Supabase dashboard include your Netlify URL
     // Add this function to update the account section
     function updateAccountSection() {
@@ -314,8 +320,7 @@ const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS
     }
 
     // Call this on page load
-    window.addEventListener('DOMContentLoaded', updateAccountSection);
-const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+  window.addEventListener('DOMContentLoaded', updateAccountSection);
 
 document.addEventListener('DOMContentLoaded', async function() {
   // Example: handle nav active state
