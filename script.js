@@ -345,52 +345,12 @@ document.addEventListener('DOMContentLoaded', async function() {
       return;
     }
     grid.innerHTML = categories.map(cat => {
-      // Use icon field for image, fallback to fontawesome SVGs if missing
-      // Map category names to SVG filenames in assets/fontawesome/
-      const iconMap = {
-        'Appliances': 'assets/images/appliances.png',
-        'Electronics': 'assets/images/computing.png',
-        'Supermarket': 'assets/images/grocery.png',
-        'Health & Beauty': 'assets/images/health.png',
-        'Home & Office': 'assets/fontawesome/home.svg',
-        'Power': 'assets/fontawesome/power.svg',
-        'Computing': 'assets/images/computing.png',
-        "Women's Fashion": 'assets/images/fashion.png',
-        "Men's Fashion": 'assets/images/fashion.png',
-        'Baby Products': 'assets/images/baby.png',
-        'Gaming': 'assets/images/appliances.png',
-        'Chips': 'assets/images/grocery.png',
-        'Ankara Style': 'assets/images/fashion.png',
-        'Phones': 'assets/images/smartphone.png',
-        'Tablet': 'assets/fontawesome/tablet.svg',
-        'Tablets': 'assets/fontawesome/tablet.svg',
-        'Wearables': 'assets/fontawesome/watch.svg',
-        'Accessories': 'assets/fontawesome/headphones.svg',
-        'Laptops': 'assets/fontawesome/laptop.svg',
-      };
-      let icon = cat.icon;
-      if (!icon || icon === '') {
-        icon = iconMap[cat.display_name || cat.name] ? `assets/fontawesome/${iconMap[cat.display_name || cat.name]}` : 'assets/images/grocery.png';
-      }
-      // For hover, use the same icon (or add hover logic if you have hover SVGs)
-      const hoverIcon = icon;
       return `
         <div class="category-card" data-category-id="${cat.id}" data-category-name="${cat.name}">
-          <img src="${icon}" data-icon="${icon}" data-hover="${hoverIcon}" alt="${cat.name}" class="category-icon" />
           <div>${cat.name}</div>
         </div>
       `;
     }).join('');
-    // Add hover effect to change image (if you add hover SVGs, update hoverIcon logic above)
-    grid.querySelectorAll('.category-card').forEach(card => {
-      const img = card.querySelector('.category-icon');
-      card.addEventListener('mouseenter', () => {
-        img.src = img.getAttribute('data-hover');
-      });
-      card.addEventListener('mouseleave', () => {
-        img.src = img.getAttribute('data-icon');
-      });
-    });
   }
 
   // On DOMContentLoaded, fetch and render categories and products

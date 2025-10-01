@@ -1,0 +1,3 @@
+/* Placeholder FontAwesome CSS */
+/* Replace with real FontAwesome CSS for icons */
+body:before { content: 'FontAwesome CSS Loaded'; display: none; }

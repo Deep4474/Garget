@@ -1,3 +1,79 @@
+/* Hide all images and icons in the categories grid */
+#categoriesGrid img,
+#categoriesGrid .fa,
+#categoriesGrid .fas,
+#categoriesGrid .menu-icon,
+#categoriesGrid .category-icon {
+  display: none !important;
+}
+
+/* Hide all images and icons in the menu drawer categories */
+.menu-section.menu-categories img,
+.menu-section.menu-categories .fa,
+.menu-section.menu-categories .fas,
+.menu-section.menu-categories .menu-icon {
+  display: none !important;
+}
+/* Hide all images in the menu drawer categories */
+.menu-section.menu-categories img {
+  display: none !important;
+}
+
+/* Add left padding to menu links in categories for alignment */
+.menu-section.menu-categories .menu-link {
+  padding-left: 32px;
+  position: relative;
+}
+/* Hide all images in the categories grid */
+#categoriesGrid img {
+  display: none !important;
+}
+/* Live Advert Styles */
+
+.live-advert {
+  background: #ffe082;
+  padding: 8px 0 8px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 2.2em;
+  border-bottom: 1px solid #e0b800;
+  position: relative;
+  z-index: 2;
+}
+.live-advert-label {
+  font-weight: bold;
+  font-size: 1.08em;
+  color: #d84315;
+  margin-right: 0;
+  flex-shrink: 0;
+  letter-spacing: 0.5px;
+}
+.live-advert-scroll {
+  flex: 1 1 0%;
+  min-width: 0;
+  overflow: hidden;
+  height: 1.5em;
+  display: flex;
+  align-items: center;
+}
+.live-advert-text {
+  display: inline-block;
+  white-space: nowrap;
+  font-size: 1em;
+  color: #333;
+  padding-left: 100%;
+  animation: liveAdvertScroll 14s linear infinite;
+}
+@keyframes liveAdvertScroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
 /* Order form styles */
 .order-form {
   margin-top: 16px;
