@@ -1,3 +1,53 @@
+/* Flying product animation */
+.flying-product {
+  position: fixed;
+  left: -80px;
+  top: 70px;
+  z-index: 99999;
+  width: 54px;
+  height: 54px;
+  pointer-events: none;
+  background: #fff;
+  border-radius: 50%;
+  border: 2px solid #ffa600;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: flyToTop 2.2s cubic-bezier(0.6,0.1,0.3,1.1) 1;
+}
+.flying-product img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+@keyframes flyToTop {
+  0% {
+    left: -80px;
+    top: 70vh;
+    opacity: 0.2;
+    transform: scale(0.7) rotate(-30deg);
+  }
+  60% {
+    left: 50vw;
+    top: 20vh;
+    opacity: 1;
+    transform: scale(1.1) rotate(10deg);
+  }
+  80% {
+    left: 60vw;
+    top: 10vh;
+    opacity: 1;
+    transform: scale(1.05) rotate(-5deg);
+  }
+  100% {
+    left: 50%;
+    top: 70px;
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+    margin-left: -24px;
+  }
+}
 /* Live Buyer Ticker Styles */
 .live-buyer-ticker {
   position: fixed;
@@ -189,6 +239,10 @@
 }
 body.modal-open {
   overflow: hidden !important;
+}
+body, html {
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 /* Make header fixed at the top */

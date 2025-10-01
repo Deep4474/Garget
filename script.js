@@ -1,3 +1,12 @@
+// Remove flying product after animation
+document.addEventListener('DOMContentLoaded', function() {
+  const flying = document.getElementById('flyingProduct');
+  if (flying) {
+    flying.addEventListener('animationend', function() {
+      flying.style.display = 'none';
+    });
+  }
+});
 // Live Buyer Ticker (bottom of page)
 document.addEventListener('DOMContentLoaded', async function() {
   const tickerInner = document.querySelector('.live-buyer-ticker-inner');
@@ -101,25 +110,24 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!category) return;
         // Only update the products section, never touch header elements
         // Fetch products from Supabase filtered by category (case-insensitive)
-  // console.log('[DEBUG] Fetching products for category:', category);
-  // console.log('[DEBUG] Fetching products for category (RPC):', category);
         const { data, error } = await supabase.rpc('fetch_products_by_category', { cat: category });
         if (error) {
           alert('Error fetching products for ' + category);
-          // console.log('[DEBUG] Supabase error:', error);
           return;
         }
-  // console.log('[DEBUG] Products fetched:', data);
-  renderProducts(data);
-  // console.log('[DEBUG] Called renderProducts with:', data);
+        renderProducts(data);
         // Optionally close the menu drawer if open
         const menuDrawer = document.getElementById('menuDrawer');
         if (menuDrawer) menuDrawer.classList.remove('open');
-        // Scroll to products section
-        const productsSection = document.getElementById('productsGrid');
-        if (productsSection) productsSection.scrollIntoView({behavior: 'smooth'});
-        // Guard: do not modify header or live advert elements
-        // (No code below this line should touch .lamar-header, .live-advert, or header children)
+        // Scroll to products section and allow full page scroll
+        setTimeout(() => {
+          const productsSection = document.getElementById('productsGrid');
+          if (productsSection) {
+            productsSection.scrollIntoView({behavior: 'smooth'});
+            document.body.style.overflow = 'auto';
+            document.documentElement.style.overflow = 'auto';
+          }
+        }, 100);
       });
     });
   }
