@@ -1,649 +1,243 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="GOD OWN PHONE GADGET - Premium mobile devices and accessories">
-    <meta name="keywords" content="phones, gadgets, mobile devices, accessories, technology">
-    <meta name="author" content="GOD OWN PHONE GADGET">
-    
-    <!-- Open Graph Meta Tags -->
-    <meta property="og:title" content="GOD OWN PHONE GADGET">
-    <meta property="og:description" content="Premium mobile devices and accessories">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://godownphonegadget.com">
-    
-    <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="public/favicon.ico">
-    
-    <!-- CSS -->
-    <link rel="stylesheet" href="public/styles.css">
-    
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Font Awesome for icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <title>GOD OWN PHONE GADGET - Premium Mobile Devices & Accessories</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lamar Phone & Gadget</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="assets/fontawesome/fontawesome.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 </head>
 <body>
-    <!-- Header -->
-    <header class="header">
-        <nav class="navbar">
-            <div class="nav-container">
-                <div class="nav-logo">
-                    <a href="#home">
-                        <i class="fas fa-mobile-alt"></i>
-                        <span>GOD OWN PHONE GADGET</span>
-                    </a>
-                </div>
-                
-                <ul class="nav-menu">
-                    <li class="nav-item">
-                        <a href="#home" class="nav-link">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#products" class="nav-link">Products</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#about" class="nav-link">About</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#services" class="nav-link">Services</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#contact" class="nav-link">Contact</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#" class="nav-link" id="adminLink">Admin</a>
-                    </li>
-                </ul>
-                
-                <div class="nav-actions">
-                    <button class="search-btn" aria-label="Search">
-                        <i class="fas fa-search"></i>
-                    </button>
-                    <button class="cart-btn" aria-label="Shopping Cart">
-                        <i class="fas fa-shopping-cart"></i>
-                        <span class="cart-count">0</span>
-                    </button>
-                    <button class="mobile-menu-btn" aria-label="Toggle Menu">
-                        <span></span>
-                        <span></span>
-                        <span></span>
-                    </button>
-                </div>
-            </div>
-        </nav>
-    </header>
-
-    <!-- Main Content -->
-    <main>
-        <!-- Hero Section -->
-        <section id="home" class="hero">
-            <div class="hero-container">
-                <div class="hero-content">
-                    <h1 class="hero-title">
-                        Welcome to <span class="highlight">GOD OWN PHONE GADGET</span>
-                    </h1>
-                    <p class="hero-subtitle">
-                        Your trusted destination for premium mobile devices, cutting-edge gadgets, and exceptional service
-                    </p>
-                    <div class="hero-buttons">
-                        <a href="#products" class="btn btn-primary">Explore Products</a>
-                        <a href="#about" class="btn btn-secondary">Learn More</a>
-                    </div>
-                </div>
-                <div class="hero-image">
-                    <img src="images/hero-image.jpg" alt="Latest mobile devices" loading="lazy">
-                </div>
-            </div>
-        </section>
-
-        <!-- Features Section -->
-        <section class="features">
-            <div class="container">
-                <div class="features-grid">
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <i class="fas fa-shipping-fast"></i>
-                        </div>
-                        <h3>Fast Delivery</h3>
-                        <p>Quick and reliable shipping to your doorstep</p>
-                    </div>
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <i class="fas fa-shield-alt"></i>
-                        </div>
-                        <h3>Warranty</h3>
-                        <p>Comprehensive warranty on all products</p>
-                    </div>
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <i class="fas fa-headset"></i>
-                        </div>
-                        <h3>24/7 Support</h3>
-                        <p>Round-the-clock customer service</p>
-                    </div>
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <i class="fas fa-credit-card"></i>
-                        </div>
-                        <h3>Secure Payment</h3>
-                        <p>Safe and secure payment options</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Products Section -->
-        <section id="products" class="products">
-            <div class="container">
-                <div class="section-header">
-                    <h2>Featured Products</h2>
-                    <p>Discover our latest collection of premium mobile devices and accessories</p>
-                </div>
-                
-                <div class="product-categories">
-                    <button class="category-btn active" data-category="all">All</button>
-                    <button class="category-btn" data-category="phones">Phones</button>
-                    <button class="category-btn" data-category="tablets">Tablets</button>
-                    <button class="category-btn" data-category="accessories">Accessories</button>
-                </div>
-                
-                <div class="products-grid">
-                    <div class="product-card">
-                        <div class="product-image">
-                            <img src="images/product1.jpg" alt="Smartphone" loading="lazy">
-                        </div>
-                        <div class="product-info">
-                            <h3>Premium Smartphone</h3>
-                            <p>Latest flagship smartphone with cutting-edge features</p>
-                            <div class="product-price">$999</div>
-                            <button class="btn btn-primary add-to-cart" data-id="1" data-name="Premium Smartphone" data-price="999">Add to Cart</button>
-                        </div>
-                    </div>
-                    
-                    <div class="product-card">
-                        <div class="product-image">
-                            <img src="images/product2.jpg" alt="Tablet" loading="lazy">
-                        </div>
-                        <div class="product-info">
-                            <h3>High-Performance Tablet</h3>
-                            <p>Perfect for work and entertainment on the go</p>
-                            <div class="product-price">$699</div>
-                            <button class="btn btn-primary add-to-cart" data-id="2" data-name="High-Performance Tablet" data-price="699">Add to Cart</button>
-                        </div>
-                    </div>
-                    
-                    <div class="product-card">
-                        <div class="product-image">
-                            <img src="images/product3.jpg" alt="Wireless Earbuds" loading="lazy">
-                        </div>
-                        <div class="product-info">
-                            <h3>Wireless Earbuds</h3>
-                            <p>Crystal clear sound with noise cancellation</p>
-                            <div class="product-price">$199</div>
-                            <button class="btn btn-primary add-to-cart" data-id="3" data-name="Wireless Earbuds" data-price="199">Add to Cart</button>
-                        </div>
-                    </div>
-                    
-                    <div class="product-card">
-                        <div class="product-image">
-                            <img src="images/product4.jpg" alt="Budget Phone" loading="lazy">
-                        </div>
-                        <div class="product-info">
-                            <h3>Budget-Friendly Phone</h3>
-                            <p>Great value for money with essential features</p>
-                            <div class="product-price">$299</div>
-                            <button class="btn btn-primary add-to-cart" data-id="4" data-name="Budget-Friendly Phone" data-price="299">Add to Cart</button>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="load-more">
-                    <button class="btn btn-outline">Load More Products</button>
-                </div>
-            </div>
-        </section>
-
-        <!-- About Section -->
-        <section id="about" class="about">
-            <div class="container">
-                <div class="about-content">
-                    <div class="about-text">
-                        <h2>About GOD OWN PHONE GADGET</h2>
-                        <p>We are passionate about providing the latest and greatest mobile technology to our customers. With years of experience in the industry, we understand what makes a great mobile device and we're committed to offering only the best products.</p>
-                        <p>Our mission is to make premium mobile technology accessible to everyone while providing exceptional customer service and support.</p>
-                        <div class="about-stats">
-                            <div class="stat">
-                                <h3>1000+</h3>
-                                <p>Happy Customers</p>
-                            </div>
-                            <div class="stat">
-                                <h3>500+</h3>
-                                <p>Products Sold</p>
-                            </div>
-                            <div class="stat">
-                                <h3>5+</h3>
-                                <p>Years Experience</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="about-image">
-                        <img src="images/about-image.jpg" alt="Our store" loading="lazy">
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Services Section -->
-        <section id="services" class="services">
-            <div class="container">
-                <div class="section-header">
-                    <h2>Our Services</h2>
-                    <p>Comprehensive mobile device services to meet all your needs</p>
-                </div>
-                
-                <div class="services-grid">
-                    <div class="service-card">
-                        <div class="service-icon">
-                            <i class="fas fa-tools"></i>
-                        </div>
-                        <h3>Device Repair</h3>
-                        <p>Professional repair services for all mobile devices with genuine parts and expert technicians.</p>
-                    </div>
-                    
-                    <div class="service-card">
-                        <div class="service-icon">
-                            <i class="fas fa-exchange-alt"></i>
-                        </div>
-                        <h3>Trade-In</h3>
-                        <p>Get value for your old device when you upgrade to a new one with our trade-in program.</p>
-                    </div>
-                    
-                    <div class="service-card">
-                        <div class="service-icon">
-                            <i class="fas fa-graduation-cap"></i>
-                        </div>
-                        <h3>Tech Support</h3>
-                        <p>Expert technical support and guidance to help you get the most out of your devices.</p>
-                    </div>
-                    
-                    <div class="service-card">
-                        <div class="service-icon">
-                            <i class="fas fa-mobile-alt"></i>
-                        </div>
-                        <h3>Device Setup</h3>
-                        <p>Professional device setup and data transfer services to get you up and running quickly.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Testimonials Section -->
-        <section class="testimonials">
-            <div class="container">
-                <div class="section-header">
-                    <h2>What Our Customers Say</h2>
-                    <p>Real feedback from satisfied customers</p>
-                </div>
-                
-                <div class="testimonials-slider">
-                    <div class="testimonial-card">
-                        <div class="testimonial-content">
-                            <p>"Excellent service and great products! The team at GOD OWN PHONE GADGET helped me find the perfect phone for my needs."</p>
-                        </div>
-                        <div class="testimonial-author">
-                            <img src="public/customer1.jpg" alt="Customer" loading="lazy">
-                            <div>
-                                <h4>John Smith</h4>
-                                <span>Verified Customer</span>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="testimonial-card">
-                        <div class="testimonial-content">
-                            <p>"Fast delivery and amazing customer support. I highly recommend their services to anyone looking for quality mobile devices."</p>
-                        </div>
-                        <div class="testimonial-author">
-                            <img src="public/customer2.jpg" alt="Customer" loading="lazy">
-                            <div>
-                                <h4>Sarah Johnson</h4>
-                                <span>Verified Customer</span>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="testimonial-card">
-                        <div class="testimonial-content">
-                            <p>"The repair service was quick and professional. My phone works perfectly now and the price was very reasonable."</p>
-                        </div>
-                        <div class="testimonial-author">
-                            <img src="public/customer3.jpg" alt="Customer" loading="lazy">
-                            <div>
-                                <h4>Mike Davis</h4>
-                                <span>Verified Customer</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Contact Section -->
-        <section id="contact" class="contact">
-            <div class="container">
-                <div class="contact-content">
-                    <div class="contact-info">
-                        <h2>Get In Touch</h2>
-                        <p>Have questions? We'd love to hear from you. Send us a message and we'll respond as soon as possible.</p>
-                        
-                        <div class="contact-details">
-                            <div class="contact-item">
-                                <i class="fas fa-map-marker-alt"></i>
-                                <div>
-                                    <h4>Address</h4>
-                                    <p>123 Tech Street, Digital City, DC 12345</p>
-                                </div>
-                            </div>
-                            
-                            <div class="contact-item">
-                                <i class="fas fa-phone"></i>
-                                <div>
-                                    <h4>Phone</h4>
-                                    <p>+1 (555) 123-4567</p>
-                                </div>
-                            </div>
-                            
-                            <div class="contact-item">
-                                <i class="fas fa-envelope"></i>
-                                <div>
-                                    <h4>Email</h4>
-                                    <p>info@godownphonegadget.com</p>
-                                </div>
-                            </div>
-                            
-                            <div class="contact-item">
-                                <i class="fas fa-clock"></i>
-                                <div>
-                                    <h4>Hours</h4>
-                                    <p>Mon-Fri: 9AM-6PM<br>Sat: 10AM-4PM<br>Sun: Closed</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="contact-form">
-                        <form id="contactForm">
-                            <div class="form-group">
-                                <label for="name">Full Name</label>
-                                <input type="text" id="name" name="name" required>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="email">Email Address</label>
-                                <input type="email" id="email" name="email" required>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="phone">Phone Number</label>
-                                <input type="tel" id="phone" name="phone">
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="subject">Subject</label>
-                                <select id="subject" name="subject" required>
-                                    <option value="">Select a subject</option>
-                                    <option value="general">General Inquiry</option>
-                                    <option value="product">Product Information</option>
-                                    <option value="support">Technical Support</option>
-                                    <option value="repair">Repair Service</option>
-                                    <option value="other">Other</option>
-                                </select>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="message">Message</label>
-                                <textarea id="message" name="message" rows="5" required></textarea>
-                            </div>
-                            
-                            <button type="submit" class="btn btn-primary">Send Message</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-section">
-                    <div class="footer-logo">
-                        <i class="fas fa-mobile-alt"></i>
-                        <span>GOD OWN PHONE GADGET</span>
-                    </div>
-                    <p>Your trusted destination for premium mobile devices and exceptional service.</p>
-                    <div class="social-links">
-                        <a href="#" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
-                        <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
-                        <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-                        <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
-                    </div>
-                </div>
-                
-                <div class="footer-section">
-                    <h3>Quick Links</h3>
-                    <ul>
-                        <li><a href="#home">Home</a></li>
-                        <li><a href="#products">Products</a></li>
-                        <li><a href="#about">About</a></li>
-                        <li><a href="#services">Services</a></li>
-                        <li><a href="#contact">Contact</a></li>
-                    </ul>
-                </div>
-                
-                <div class="footer-section">
-                    <h3>Products</h3>
-                    <ul>
-                        <li><a href="#phones">Smartphones</a></li>
-                        <li><a href="#tablets">Tablets</a></li>
-                        <li><a href="#accessories">Accessories</a></li>
-                        <li><a href="#repair">Repair Services</a></li>
-                        <li><a href="#trade-in">Trade-In</a></li>
-                    </ul>
-                </div>
-                
-                <div class="footer-section">
-                    <h3>Support</h3>
-                    <ul>
-                        <li><a href="#help">Help Center</a></li>
-                        <li><a href="#warranty">Warranty</a></li>
-                        <li><a href="#shipping">Shipping Info</a></li>
-                        <li><a href="#returns">Returns</a></li>
-                        <li><a href="#privacy">Privacy Policy</a></li>
-                    </ul>
-                </div>
-                
-                <div class="footer-section">
-                    <h3>Newsletter</h3>
-                    <p>Subscribe to get updates on new products and special offers.</p>
-                    <form class="newsletter-form">
-                        <input type="email" placeholder="Enter your email" required>
-                        <button type="submit">Subscribe</button>
-                    </form>
-                </div>
-            </div>
-            
-            <div class="footer-bottom">
-                <p>&copy; 2024 GOD OWN PHONE GADGET. All rights reserved.</p>
-                <div class="payment-methods">
-                    <i class="fab fa-cc-visa"></i>
-                    <i class="fab fa-cc-mastercard"></i>
-                    <i class="fab fa-cc-amex"></i>
-                    <i class="fab fa-cc-paypal"></i>
-                </div>
-            </div>
-        </div>
-    </footer>
-
-    <!-- Back to Top Button -->
-    <button class="back-to-top" aria-label="Back to top">
-        <i class="fas fa-arrow-up"></i>
-    </button>
-
-    <!-- Admin Modal -->
-    <div id="adminModal" class="modal">
-        <div class="modal-content admin-modal">
-            <div class="modal-header">
-                <h2><i class="fas fa-mobile-alt"></i> GOD OWN PHONE GADGET - Admin Panel</h2>
-                <button class="close-modal" id="closeAdminModal">&times;</button>
-            </div>
-            
-            <!-- Admin Login Section -->
-            <div id="adminLoginSection" class="admin-section">
-                <div class="admin-login">
-                    <h3>Admin Login</h3>
-                    <form id="adminLoginForm" class="admin-form">
-                        <div class="form-group">
-                            <label for="adminEmail">Email</label>
-                            <input type="email" id="adminEmail" name="email" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="adminPassword">Password</label>
-                            <input type="password" id="adminPassword" name="password" required>
-                        </div>
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-sign-in-alt"></i> Login
-                        </button>
-                    </form>
-                    <div id="adminLoginError" class="error-message"></div>
-                </div>
-            </div>
-
-            <!-- Admin Dashboard Section -->
-            <div id="adminDashboardSection" class="admin-section hidden">
-                <div class="admin-nav">
-                    <button class="admin-nav-btn active" data-section="dashboard">
-                        <i class="fas fa-tachometer-alt"></i> Dashboard
-                    </button>
-                    <button class="admin-nav-btn" data-section="orders">
-                        <i class="fas fa-shopping-cart"></i> Orders
-                    </button>
-                    <button class="admin-nav-btn" data-section="users">
-                        <i class="fas fa-users"></i> Users
-                    </button>
-                    <button class="admin-nav-btn" id="adminLogoutBtn">
-                        <i class="fas fa-sign-out-alt"></i> Logout
-                    </button>
-                </div>
-
-                <!-- Dashboard Content -->
-                <div id="adminDashboardContent" class="admin-content active">
-                    <div class="admin-stats">
-                        <div class="stat-card">
-                            <div class="stat-icon">
-                                <i class="fas fa-shopping-cart"></i>
-                            </div>
-                            <div class="stat-content">
-                                <h3 id="adminTotalOrders">0</h3>
-                                <p>Total Orders</p>
-                            </div>
-                        </div>
-                        
-                        <div class="stat-card">
-                            <div class="stat-icon">
-                                <i class="fas fa-dollar-sign"></i>
-                            </div>
-                            <div class="stat-content">
-                                <h3 id="adminTotalRevenue">$0</h3>
-                                <p>Total Revenue</p>
-                            </div>
-                        </div>
-                        
-                        <div class="stat-card">
-                            <div class="stat-icon">
-                                <i class="fas fa-users"></i>
-                            </div>
-                            <div class="stat-content">
-                                <h3 id="adminTotalUsers">0</h3>
-                                <p>Total Users</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="admin-recent">
-                        <h3>Recent Orders</h3>
-                        <div id="adminRecentOrders" class="admin-list">
-                            <!-- Recent orders will be loaded here -->
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Orders Content -->
-                <div id="adminOrdersContent" class="admin-content">
-                    <div class="admin-header">
-                        <h3>Order Management</h3>
-                        <div class="admin-actions">
-                            <select id="orderStatusFilter">
-                                <option value="">All Status</option>
-                                <option value="pending">Pending</option>
-                                <option value="processing">Processing</option>
-                                <option value="shipped">Shipped</option>
-                                <option value="delivered">Delivered</option>
-                                <option value="cancelled">Cancelled</option>
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <div id="adminOrdersList" class="admin-orders-list">
-                        <!-- Orders will be loaded here -->
-                    </div>
-                </div>
-
-                <!-- Users Content -->
-                <div id="adminUsersContent" class="admin-content">
-                    <div class="admin-header">
-                        <h3>User Management</h3>
-                    </div>
-                    
-                    <div id="adminUsersList" class="admin-users-list">
-                        <!-- Users will be loaded here -->
-                    </div>
-                </div>
-            </div>
-        </div>
+  <header class="lamar-header">
+    <div class="lamar-header-left">
+      <button id="menuBtn" class="lamar-menu-btn">
+    <img src="assets/fontawesome/menu.svg" alt="Menu" class="lamar-menu-icon" />
+      </button>
+      <span class="lamar-header-logo">Lamar Phone and Gadget</span>
     </div>
-
-    <!-- Order Details Modal -->
-    <div id="orderDetailsModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Order Details</h2>
-                <button class="close-modal">&times;</button>
-            </div>
-            <div id="orderDetailsContent" class="order-details">
-                <!-- Order details will be loaded here -->
-            </div>
-            <div class="modal-actions">
-                <button class="btn btn-success" id="confirmOrderBtn">
-                    <i class="fas fa-check"></i> Confirm Order
-                </button>
-                <button class="btn btn-danger" id="rejectOrderBtn">
-                    <i class="fas fa-times"></i> Reject Order
-                </button>
-                <button class="btn btn-secondary" id="closeOrderDetails">Close</button>
-            </div>
-        </div>
+    <div class="lamar-header-right">
+  <!-- Removed search, user, and more icons as requested -->
     </div>
+    <section class="promo-banner">
+  <img src="assets/images/promo-banner.png" alt="Promo Banner" class="promo-banner-img">
+    </section>
+  </header>
+  <!-- Slide-out Menu Drawer -->
+  <div id="menuDrawer" class="menu-drawer">
+    <div class="menu-drawer-content">
+      <span class="close" id="closeMenuDrawer">&times;</span>
+      <div class="menu-section">
+  <a href="#account" class="menu-link account-menu" id="accountMenuLink"><img src="assets/fontawesome/user.svg" class="menu-icon" alt="Account Icon"> Account</a>
+  <a href="#orders" class="menu-link"><i class="fas fa-shopping-bag menu-icon"></i> My Orders</a>
+  <a href="#reviews" class="menu-link"><i class="fas fa-star menu-icon"></i> Pending Reviews</a>
+  <a href="#voucher" class="menu-link"><i class="fas fa-ticket-alt menu-icon"></i> Voucher</a>
+  <a href="#wishlist" class="menu-link"><img src="assets/fontawesome/heart.svg" class="menu-icon" alt="Wishlist Icon"> Wishlist</a>
+      </div>
+      <div class="menu-section menu-categories">
+        <div class="menu-categories-title">OUR CATEGORIES <span class="see-all">See All</span></div>
+  <a href="#phone" class="menu-link"><img src="assets/images/smartphone.png" class="menu-icon" alt="Phone Icon"> Phone</a>
+  <a href="#tablet" class="menu-link"><i class="fas fa-tablet-alt menu-icon"></i> Tablet</a>
+  <a href="#laptop" class="menu-link"><i class="fas fa-laptop menu-icon"></i> Laptop</a>
+  <a href="#wearables" class="menu-link"><i class="fas fa-watch menu-icon"></i> Wearables</a>
+  <a href="#accessories" class="menu-link"><i class="fas fa-headphones menu-icon"></i> Accessories</a>
+  <a href="#appliances" class="menu-link"><img src="assets/images/appliances.png" class="menu-icon" alt="Appliances Icon"> Appliances</a>
+  <a href="#electronics" class="menu-link"><img src="assets/images/computing.png" class="menu-icon" alt="Electronics Icon"> Electronics</a>
+  <a href="#supermarket" class="menu-link"><img src="assets/images/grocery.png" class="menu-icon" alt="Supermarket Icon"> Supermarket</a>
+  <a href="#health" class="menu-link"><img src="assets/images/health.png" class="menu-icon" alt="Health & Beauty Icon"> Health & Beauty</a>
+  <a href="#home" class="menu-link"><img src="assets/fontawesome/home.svg" class="menu-icon" alt="Home & Office Icon"> Home & Office</a>
+  <a href="#power" class="menu-link"><i class="fas fa-bolt menu-icon"></i> Power</a>
+  <a href="#computing" class="menu-link"><img src="assets/images/computing.png" class="menu-icon" alt="Computing Icon"> Computing</a>
+  <a href="#womens-fashion" class="menu-link"><img src="assets/images/fashion.png" class="menu-icon" alt="Women's Fashion Icon"> Women's Fashion</a>
+  <a href="#mens-fashion" class="menu-link"><img src="assets/images/fashion.png" class="menu-icon" alt="Men's Fashion Icon"> Men's Fashion</a>
+  <a href="#baby" class="menu-link"><img src="assets/images/baby.png" class="menu-icon" alt="Baby Products Icon"> Baby Products</a>
+  <a href="#gaming" class="menu-link"><img src="assets/images/appliances.png" class="menu-icon" alt="Gaming Icon"> Gaming</a>
+  <a href="#chips" class="menu-link"><img src="assets/images/grocery.png" class="menu-icon" alt="Chips Icon"> Chips</a>
+  <a href="#ankara-style" class="menu-link"><img src="assets/images/fashion.png" class="menu-icon" alt="Ankara Style Icon"> Ankara Style</a>
+      </div>
+    </div>
+  </div>
+  <nav class="lamar-nav">
+    <a href="#" class="lamar-nav-item active">
+  <img src="assets/fontawesome/home.svg" alt="Home" class="lamar-nav-icon" />
+      <span>Home</span>
+    </a>
+    <a href="#" class="lamar-nav-item">
+  <img src="assets/fontawesome/heart.svg" alt="Saved" class="lamar-nav-icon" />
+      <span>Saved</span>
+    </a>
+    <a href="#" class="lamar-nav-item">
+  <img src="assets/fontawesome/cart.svg" alt="Cart" class="lamar-nav-icon" />
+      <span>Cart</span>
+    </a>
+  </nav>
+  <main>
+    <div class="section-title">TOP CATEGORIES</div>
+    <section class="categories-grid" id="categoriesGrid"></section>
+    <div class="section-title">COUPONS</div>
+    <section class="coupon-banner">VOUCHERS OF THE DAY</section>
+    <div class="section-title">PRODUCTS</div>
+    <section class="products-grid" id="productsGrid"></section>
+    <!-- Orders Grid (hidden by default) -->
+    <div id="ordersGrid"></div>
+    <!-- The display property will be controlled via CSS -->
 
-    <!-- JavaScript -->
-    <script src="public/script.js"></script>
+    <!-- Buy Modal -->
+    <div id="buyModal" class="modal">
+      <div class="modal-content buy-modal-content">
+        <span class="close">&times;</span>
+        <h2 class="buy-product-name">Buy Product</h2>
+        <div class="buy-product-price"></div>
+  <form id="orderForm" class="order-form">
+          <input type="number" id="orderQuantity" placeholder="Quantity" required>
+          <input type="text" id="orderUserName" placeholder="Your Name" required>
+          <input type="email" id="orderEmail" placeholder="Your Email" required>
+          <input type="text" id="orderPhone" placeholder="Phone" required>
+          <input type="text" id="orderAddress" placeholder="Address" required>
+          <label for="orderPickOption">Pick Option</label>
+          <select id="orderPickOption" required title="Pick Option">
+            <option value="">Pick Option</option>
+            <option value="hub_to_hub">Hub to Hub</option>
+            <option value="hub_to_door">Hub to Door</option>
+          </select>
+          <button type="submit">Place Order</button>
+        </form>
+        <div id="orderStatus"></div>
+      </div>
+    </div>
+  </main>
+  <script src="script.js"></script>
+<script>
+// Initialize Supabase client ONCE and reuse
+// Supabase client is initialized only once at the top of this script.
+
+// Supabase Auth logic for Account menu
+document.addEventListener('DOMContentLoaded', async function() {
+  const accountLink = document.getElementById('accountMenuLink');
+  if (accountLink) {
+    accountLink.addEventListener('click', async function(e) {
+      e.preventDefault();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        // Start Google OAuth sign-in
+        supabase.auth.signInWithOAuth({ provider: 'google' });
+      } else {
+        // Show user info in the menu drawer
+        const menuDrawerContent = document.querySelector('.menu-drawer-content');
+        if (menuDrawerContent) {
+          let profileHtml = `<div style="display:flex;align-items:center;padding:1em 0;border-bottom:1px solid #eee;">
+            <img src="${user.user_metadata.avatar_url || 'assets/profile.jpg'}" style="width:40px;height:40px;border-radius:50%;margin-right:10px;" alt="Profile" />
+            <div>
+              <div style="font-weight:bold;">${user.user_metadata.full_name || user.user_metadata.name || 'User'}</div>
+              <div style="font-size:0.9em;color:#555;">${user.email}</div>
+            </div>
+          </div>`;
+          let oldProfile = menuDrawerContent.querySelector('.account-profile-info');
+          if (oldProfile) oldProfile.remove();
+          menuDrawerContent.insertAdjacentHTML('afterbegin', `<div class="account-profile-info">${profileHtml}</div>`);
+        }
+      }
+    });
+  }
+    async function showUserProfile(user) {
+      const menuDrawerContent = document.querySelector('.menu-drawer-content');
+      if (menuDrawerContent && user) {
+        let profileHtml = `<div style="display:flex;align-items:center;padding:1em 0;border-bottom:1px solid #eee;">
+          <img src="${user.user_metadata.avatar_url || 'assets/profile.jpg'}" style="width:40px;height:40px;border-radius:50%;margin-right:10px;" alt="Profile" />
+          <div>
+            <div style="font-weight:bold;">${user.user_metadata.full_name || user.user_metadata.name || 'User'}</div>
+            <div style="font-size:0.9em;color:#555;">${user.email}</div>
+          </div>
+        </div>`;
+        let oldProfile = menuDrawerContent.querySelector('.account-profile-info');
+        if (oldProfile) oldProfile.remove();
+        menuDrawerContent.insertAdjacentHTML('afterbegin', `<div class="account-profile-info">${profileHtml}</div>`);
+      }
+    }
+
+    // Restore session and show user info if already logged in
+    if (supabase && supabase.auth && typeof supabase.auth.getUser === 'function') {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        showUserProfile(user);
+      }
+    }
+    // My Orders click event: fetch and show 'ordersend' from Supabase
+    const ordersLink = document.querySelector('.menu-link[href="#orders"]');
+    if (ordersLink) {
+      ordersLink.addEventListener('click', async function(e) {
+        e.preventDefault();
+        // Get current user
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+          alert('Please sign in to view your orders.');
+          return;
+        }
+        const userEmail = user.email;
+        // Fetch both 'orders' and 'order_sender' table data for this user
+        const [ordersRes, senderRes] = await Promise.all([
+          supabase.from('orders').select('*').eq('email', userEmail),
+          supabase.from('order_sender').select('*').eq('email', userEmail)
+        ]);
+        const ordersData = ordersRes.data || [];
+        const senderData = senderRes.data || [];
+        const ordersError = ordersRes.error;
+        const senderError = senderRes.error;
+        const ordersGrid = document.getElementById('ordersGrid');
+        ordersGrid.style.display = 'block';
+        let html = '';
+        if (ordersError || senderError) {
+          html += `<div style="color:red;">Error fetching data: ${ordersError?.message || ''} ${senderError?.message || ''}</div>`;
+        }
+        // Create modal for orders
+        let modalHtml = `<div id="ordersModal" class="modal" style="display:block;z-index:9999;">
+          <div class="modal-content" style="width:99vw;max-width:1200px;margin:8px auto;background:#fff;border-radius:12px;box-shadow:0 4px 24px rgba(0,0,0,0.12);padding:8px;position:relative;overflow-x:auto;">
+            <span class="close" id="closeOrdersModal" style="position:absolute;top:12px;right:16px;font-size:1.5em;cursor:pointer;">&times;</span>
+            <h2 style='text-align:center;font-size:1.3em;font-weight:700;margin-bottom:8px;'>My Orders</h2>
+            ${ordersData.length > 0 ? `<div style='text-align:center;color:#2e7d32;font-size:1.1em;font-weight:600;margin-bottom:4px;'>Your order has been successful!</div>
+            <div style='text-align:center;color:#1565c0;font-size:1em;margin-bottom:8px;'>Order Status:</div>
+            <ul style='text-align:left;max-width:400px;margin:0 auto 16px auto;padding:0;list-style:none;'>
+              ${ordersData.map((order, idx) => {
+                let dateStr = order.created_at ? new Date(order.created_at).toLocaleString() : 'N/A';
+                return `<li style='margin-bottom:4px;border-bottom:1px solid #eee;padding-bottom:2px;'><span style='font-weight:600;'>Order ${idx+1}:</span> <span style='color:#1565c0;'>${order.status || 'N/A'}</span> <span style='color:#444;font-size:0.97em;'>(Placed: ${dateStr})</span></li>`;
+              }).join('')}
+            </ul>` : ''}
+
+            ${senderData.length > 0 ? `<div style='text-align:center;color:#2e7d32;font-size:1.1em;font-weight:600;margin-bottom:4px;'>Your order sender has been successful!</div>
+            <div style='text-align:center;color:#1565c0;font-size:1em;margin-bottom:8px;'>Order Sender Status:</div>
+            <ul style='text-align:left;max-width:400px;margin:0 auto 16px auto;padding:0;list-style:none;'>
+              ${senderData.map((sender, idx) => {
+                let dateStr = sender.created_at ? new Date(sender.created_at).toLocaleString() : 'N/A';
+                return `<li style='margin-bottom:4px;border-bottom:1px solid #eee;padding-bottom:2px;'><span style='font-weight:600;'>Order Sender ${idx+1}:</span> <span style='color:#1565c0;'>${sender.status || 'N/A'}</span> <span style='color:#444;font-size:0.97em;'>(Placed: ${dateStr})</span></li>`;
+              }).join('')}
+            </ul>` : ''}
+              <!-- Orders table removed as requested -->
+          </div>
+        </div>`;
+        // Hide menu drawer
+        const menuDrawer = document.getElementById('menuDrawer');
+        if (menuDrawer) menuDrawer.style.display = 'none';
+        // Remove any previous modal
+        let oldModal = document.getElementById('ordersModal');
+        if (oldModal) oldModal.remove();
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+        // Add close event
+        document.getElementById('closeOrdersModal').onclick = function() {
+          document.getElementById('ordersModal').remove();
+        };
+        // Show order senders below the modal as before
+        let sendersHtml = '<h3>Order Senders</h3>';
+        if (senderData.length === 0) {
+          sendersHtml += '<div class="no-orders-message">No order senders found for this user</div>';
+        } else {
+          sendersHtml += '<ul style="list-style:none;padding:0;">' +
+            senderData.map(sender => `<li>Order ID: ${sender.order_id || ''}, Phone: ${sender.phone || ''}, Address: ${sender.address || ''}, Quantity: ${sender.quantity || ''}, Total: ${sender.order_total || ''}, Status: ${sender.status || ''}, Created: ${sender.created_at || ''}, Pick Option: ${sender.pick_option || ''}</li>`).join('') + '</ul>';
+        }
+        ordersGrid.innerHTML = sendersHtml;
+      });
+    }
+});
+</script>
 </body>
 </html>
+
