@@ -5,14 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Lamar Phone & Gadget</title>
   <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="assets/fontawesome/fontawesome.min.css">
+  <!-- <link rel="stylesheet" href="assets/fontawesome/fontawesome.min.css"> -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 </head>
 <body>
   <header class="lamar-header">
     <div class="lamar-header-left">
-      <button id="menuBtn" class="lamar-menu-btn">
-    <img src="assets/fontawesome/menu.svg" alt="Menu" class="lamar-menu-icon" />
+      <button id="menuBtn" class="lamar-menu-btn" title="Open menu" aria-label="Open menu">&#9776; Menu</button>
       </button>
       <span class="lamar-header-logo">Lamar Phone and Gadget</span>
     </div>
@@ -32,11 +31,11 @@
     <div class="menu-drawer-content">
       <span class="close" id="closeMenuDrawer">&times;</span>
       <div class="menu-section">
-  <a href="#account" class="menu-link account-menu" id="accountMenuLink"><img src="assets/fontawesome/user.svg" class="menu-icon" alt="Account Icon"> Account</a>
-  <a href="#orders" class="menu-link"><i class="fas fa-shopping-bag menu-icon"></i> My Orders</a>
-  <a href="#reviews" class="menu-link"><i class="fas fa-star menu-icon"></i> Pending Reviews</a>
-  <a href="#voucher" class="menu-link"><i class="fas fa-ticket-alt menu-icon"></i> Voucher</a>
-  <a href="#wishlist" class="menu-link"><img src="assets/fontawesome/heart.svg" class="menu-icon" alt="Wishlist Icon"> Wishlist</a>
+  <a href="#account" class="menu-link account-menu" id="accountMenuLink">Account</a>
+  <a href="#orders" class="menu-link">My Orders</a>
+  <a href="#reviews" class="menu-link">Pending Reviews</a>
+  <a href="#voucher" class="menu-link">Voucher</a>
+  <a href="#wishlist" class="menu-link">Wishlist</a>
       </div>
       <div class="menu-section menu-categories">
     <div class="menu-categories-title">OUR CATEGORIES <span class="see-all">See All</span></div>
