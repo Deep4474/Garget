@@ -117,11 +117,25 @@ function renderOrders(orders) {
       modal.querySelectorAll('div')[6].innerHTML = `<strong>Address:</strong> ${order.address}`;
     }
     modal.style.display = 'block';
+    // Prevent background scroll
+    document.body.classList.add('modal-open');
     // Close modal when clicking outside
     window.onclick = function(event) {
       if (event.target === modal) {
         modal.style.display = 'none';
+        document.body.classList.remove('modal-open');
+        // Hide ordersGrid, show main screen
+        const ordersGrid = document.getElementById('ordersGrid');
+        if (ordersGrid) ordersGrid.style.display = 'none';
       }
+    };
+    // Close modal on X click
+    modal.querySelector('.close').onclick = function() {
+      modal.style.display = 'none';
+      document.body.classList.remove('modal-open');
+      // Hide ordersGrid, show main screen
+      const ordersGrid = document.getElementById('ordersGrid');
+      if (ordersGrid) ordersGrid.style.display = 'none';
     };
   }
 // Make Orders menu item clickable to show user's orders
@@ -197,13 +211,16 @@ document.addEventListener('DOMContentLoaded', function() {
   if (menuBtn && menuDrawer && closeMenuDrawer) {
     menuBtn.onclick = function() {
       menuDrawer.classList.add('open');
+      document.body.classList.add('modal-open');
     };
     closeMenuDrawer.onclick = function() {
       menuDrawer.classList.remove('open');
+      document.body.classList.remove('modal-open');
     };
     window.addEventListener('click', function(e) {
       if (e.target === menuDrawer) {
         menuDrawer.classList.remove('open');
+        document.body.classList.remove('modal-open');
       }
     });
     // Category menu links: close menu and show category products
