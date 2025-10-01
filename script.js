@@ -1,3 +1,62 @@
+// Live Buyer Ticker (bottom of page)
+document.addEventListener('DOMContentLoaded', async function() {
+  const tickerInner = document.querySelector('.live-buyer-ticker-inner');
+  if (!tickerInner) return;
+  // Simulate fetching recent buyers (replace with Supabase fetch if needed)
+  let buyers = [
+    { name: 'Ayo', product: 'iPhone 15 Pro Max' },
+    { name: 'Chika', product: 'Samsung Galaxy S24' },
+    { name: 'Emeka', product: 'MacBook Pro 14"' },
+    { name: 'Fatima', product: 'Apple Magic Keyboard' },
+    { name: 'Tunde', product: 'Samsung Galaxy Z Flip 6' },
+    { name: 'Ngozi', product: 'Infinix Hot 40' },
+    { name: 'Bola', product: 'Oraimo Power Bank' },
+    { name: 'Ada', product: 'Tecno Camon 20' }
+  ];
+  let idx = 0;
+  function showBuyer(i) {
+    const b = buyers[i];
+    // Mark previous message as old to animate out
+    const oldMsg = tickerInner.querySelector('.live-buyer-ticker-message');
+    if (oldMsg) {
+      oldMsg.classList.add('old');
+      setTimeout(() => oldMsg.remove(), 500);
+    }
+    // Add new message
+    const msg = document.createElement('div');
+    msg.className = 'live-buyer-ticker-message';
+    msg.textContent = `${b.name} just bought ${b.product}!`;
+    tickerInner.appendChild(msg);
+  }
+  showBuyer(idx);
+  setInterval(function() {
+    idx = (idx + 1) % buyers.length;
+    showBuyer(idx);
+  }, 3500);
+});
+// Show the buy modal for a product (global for Buy Now button)
+function openBuyModal(product) {
+  const modal = document.getElementById('buyModal');
+  if (!modal) return;
+  // Set product info in modal
+  modal.dataset.productId = product.id;
+  modal.dataset.productPrice = product.price;
+  modal.dataset.productName = product.name;
+  // Update modal content
+  const nameElem = modal.querySelector('.buy-product-name');
+  const priceElem = modal.querySelector('.buy-product-price');
+  if (nameElem) nameElem.textContent = product.name || '';
+  if (priceElem) priceElem.textContent = product.price ? `₦${Number(product.price).toLocaleString(undefined, {minimumFractionDigits:2})}` : '';
+  // Show modal
+  modal.classList.add('show');
+  document.body.classList.add('modal-open');
+  // Clear previous status
+  const orderStatus = document.getElementById('orderStatus');
+  if (orderStatus) orderStatus.textContent = '';
+  // Optionally focus first input
+  const firstInput = modal.querySelector('input,select');
+  if (firstInput) firstInput.focus();
+}
 // Dynamically render menu categories
 document.addEventListener('DOMContentLoaded', function() {
   const categories = [

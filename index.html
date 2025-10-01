@@ -1,32 +1,43 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script>
     window.SUPABASE_URL = "https://jlwxkykznyjmstpjcgks.supabase.co";
     window.SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impsd3hreWt6bnlqbXN0cGpjZ2tzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQzMTAxNDIsImV4cCI6MjA2OTg4NjE0Mn0.C86cvOOT5QI0PSHlPMujivWV8NLWMtgNiX8KrglzhIQ";
   </script>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Lamar Phone & Gadget</title>
   <link rel="stylesheet" href="style.css">
   <!-- <link rel="stylesheet" href="assets/fontawesome/fontawesome.min.css"> -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 </head>
 <body>
+  <!-- Live Buyer Ticker at Bottom -->
+  <div id="liveBuyerTicker" class="live-buyer-ticker">
+    <div class="live-buyer-ticker-inner">
+      <div id="liveBuyerTickerText" class="live-buyer-ticker-message">Recent orders will appear here...</div>
+    </div>
+  </div>
   <header class="lamar-header">
     <div class="lamar-header-left">
-  <button id="menuBtn" class="lamar-menu-btn" title="Open menu" aria-label="Open menu">&#9776;</button>
-      </button>
+      <button id="menuBtn" class="lamar-menu-btn" title="Open menu" aria-label="Open menu">&#9776;</button>
       <span class="lamar-header-logo">Lamar Phone and Gadget</span>
     </div>
     <div class="lamar-header-right">
-  <!-- Removed search, user, and more icons as requested -->
+      <!-- Removed search, user, and more icons as requested -->
     </div>
-    <!-- Live Advert Section -->
+    <!-- Live Advert Section (scrolling text) -->
     <section class="live-advert">
       <div class="live-advert-scroll">
         <span class="live-advert-text">Get the best deals on phones, gadgets, and accessories! Limited time offers. Shop now and save big at Lamar Phone & Gadget!</span>
       </div>
+    </section>
+    <!-- Live Advert Product (yellow bar) -->
+    <section class="live-advert-product-bar" id="liveAdvertProduct">
+      <img id="liveAdvertProductImg" class="live-advert-img" src="" alt="Product" />
+      <span id="liveAdvertProductName" class="live-advert-product"></span>
+      <span id="liveAdvertProductPrice" class="live-advert-price"></span>
     </section>
   </header>
   <!-- Slide-out Menu Drawer -->
@@ -42,7 +53,24 @@
       </div>
       <div class="menu-section menu-categories">
     <div class="menu-categories-title">OUR CATEGORIES <span class="see-all">See All</span></div>
-  <div id="menuCategoriesContainer"></div>
+  <a href="#phone" class="menu-link">Phone</a>
+  <a href="#tablet" class="menu-link">Tablet</a>
+  <a href="#laptop" class="menu-link">Laptop</a>
+  <a href="#wearables" class="menu-link">Wearables</a>
+  <a href="#accessories" class="menu-link">Accessories</a>
+  <a href="#appliances" class="menu-link">Appliances</a>
+  <a href="#electronics" class="menu-link">Electronics</a>
+  <a href="#supermarket" class="menu-link">Supermarket</a>
+  <a href="#health" class="menu-link">Health & Beauty</a>
+  <a href="#home" class="menu-link">Home & Office</a>
+  <a href="#power" class="menu-link">Power</a>
+  <a href="#computing" class="menu-link">Computing</a>
+  <a href="#womens-fashion" class="menu-link">Women's Fashion</a>
+  <a href="#mens-fashion" class="menu-link">Men's Fashion</a>
+  <a href="#baby" class="menu-link">Baby Products</a>
+  <a href="#gaming" class="menu-link">Gaming</a>
+  <a href="#chips" class="menu-link">Chips</a>
+  <a href="#ankara-style" class="menu-link">Ankara Style</a>
       </div>
     </div>
   </div>
@@ -50,16 +78,12 @@
     <!-- Navigation items removed as requested -->
   </nav>
   <main>
-    <section class="live-advert" id="liveAdvertProduct">
-  <img id="liveAdvertProductImg" class="live-advert-img" src="" alt="Product" />
-      <span id="liveAdvertProductName" class="live-advert-product"></span>
-      <span id="liveAdvertProductPrice" class="live-advert-price"></span>
-    </section>
-  <div class="section-title">COUPONS</div>
-  <section class="coupon-banner">VOUCHERS OF THE DAY</section>
-  <div class="section-title">PRODUCTS</div>
-</main>
+    <div class="section-title">PRODUCTS</div>
+  </main>
 <section class="products-grid" id="productsGrid"></section>
+    <!-- Orders Grid (hidden by default) -->
+    <div id="ordersGrid"></div>
+    <!-- The display property will be controlled via CSS -->
 
     <!-- Buy Modal -->
     <div id="buyModal" class="modal">
@@ -163,9 +187,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         const ordersError = ordersRes.error;
         const senderError = senderRes.error;
         const ordersGrid = document.getElementById('ordersGrid');
-        if (ordersGrid) {
-          ordersGrid.style.display = 'block';
-        }
+        ordersGrid.style.display = 'block';
         let html = '';
         if (ordersError || senderError) {
           html += `<div style="color:red;">Error fetching data: ${ordersError?.message || ''} ${senderError?.message || ''}</div>`;
@@ -207,17 +229,14 @@ document.addEventListener('DOMContentLoaded', async function() {
           document.getElementById('ordersModal').remove();
         };
         // Show order senders below the modal as before
-        let sendersHtml = '<div class="order-senders-section"><h3>Order Senders</h3>';
+        let sendersHtml = '<h3>Order Senders</h3>';
         if (senderData.length === 0) {
           sendersHtml += '<div class="no-orders-message">No order senders found for this user</div>';
         } else {
           sendersHtml += '<ul style="list-style:none;padding:0;">' +
             senderData.map(sender => `<li>Order ID: ${sender.order_id || ''}, Phone: ${sender.phone || ''}, Address: ${sender.address || ''}, Quantity: ${sender.quantity || ''}, Total: ${sender.order_total || ''}, Status: ${sender.status || ''}, Created: ${sender.created_at || ''}, Pick Option: ${sender.pick_option || ''}</li>`).join('') + '</ul>';
         }
-        sendersHtml += '</div>';
-        if (ordersGrid) {
-          ordersGrid.innerHTML = sendersHtml;
-        }
+        ordersGrid.innerHTML = sendersHtml;
       });
     }
 });
