@@ -1,3 +1,61 @@
+/* Hide ordersGrid by default */
+#ordersGrid {
+  display: none;
+}
+/* Order Senders Section Styling */
+.order-senders-section {
+  background: #f9f9fb;
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  padding: 18px 16px 14px 16px;
+  margin: 24px auto 16px auto;
+  max-width: 700px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  color: #222;
+}
+.order-senders-section h3 {
+  margin-top: 0;
+  font-size: 1.2em;
+  font-weight: 700;
+  color: #2e7d32;
+  margin-bottom: 12px;
+}
+.order-senders-section ul {
+  margin: 0;
+  padding: 0;
+}
+.order-senders-section li {
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #ececec;
+  font-size: 1em;
+}
+.order-senders-section .no-orders-message {
+  color: #b71c1c;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+/* Add a small vertical scrollbar to the products section */
+#productsGrid {
+  max-height: 60vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  margin-top: 16px;
+}
+
+#productsGrid::-webkit-scrollbar {
+  width: 6px;
+  background: transparent;
+}
+#productsGrid::-webkit-scrollbar-thumb {
+  background: #e0e0e0;
+  border-radius: 4px;
+}
+#productsGrid:hover::-webkit-scrollbar-thumb {
+  background: #bdbdbd;
+}
+/* Make products grid vertically scrollable, hide horizontal scroll */
+
 /* Modal Overlay Styles */
 #buyModal.modal {
   display: none;
@@ -584,18 +642,18 @@ body.modal-open {
 }
 /* Product Card Styles */
 /* Enforce two columns for products grid */
+
+
 .products-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 32px 16px;
   margin: 24px 0;
+  padding-bottom: 10px;
 }
 
-@media (max-width: 700px) {
-  .products-grid {
-    grid-template-columns: 1fr !important;
-  }
-}
+
+
 .product-card {
   background: #fff;
   border-radius: 10px;

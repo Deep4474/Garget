@@ -1,3 +1,70 @@
+// Dynamically render menu categories
+document.addEventListener('DOMContentLoaded', function() {
+  const categories = [
+    { id: 'phones', name: 'Phones', icon: 'fa-mobile-alt' },
+    { id: 'tablets', name: 'Tablets', icon: 'fa-tablet-alt' },
+    { id: 'laptops', name: 'Laptops', icon: 'fa-laptop' },
+    { id: 'accessories', name: 'Accessories', icon: 'fa-headphones' },
+    { id: 'wearables', name: 'Wearables', icon: 'fa-watch' },
+  { id: 'appliances', name: 'Appliances', icon: '' },
+  { id: 'electronics', name: 'Electronics', icon: '' },
+  { id: 'supermarket', name: 'Supermarket', icon: '' },
+  { id: 'health', name: 'Health & Beauty', icon: '' },
+  { id: 'home', name: 'Home & Office', icon: '' },
+  { id: 'power', name: 'Power', icon: '' },
+  { id: 'computing', name: 'Computing', icon: '' },
+  { id: 'womens-fashion', name: "Women's Fashion", icon: '' },
+  { id: 'mens-fashion', name: "Men's Fashion", icon: '' },
+  { id: 'baby', name: 'Baby Products', icon: '' },
+  { id: 'gaming', name: 'Gaming', icon: '' },
+    { id: 'chips', name: 'Chips', icon: '' },
+    { id: 'ankara-style', name: 'Ankara Style', icon: '' }
+  ];
+  const container = document.getElementById('menuCategoriesContainer');
+  if (container) {
+    container.innerHTML = categories.map(cat => {
+      let iconHtml = '';
+      if (cat.icon) {
+        if (cat.icon.startsWith('fa-')) {
+          iconHtml = `<i class="fas ${cat.icon}" style="margin-right:8px;"></i>`;
+        } else if (cat.icon.endsWith('.svg')) {
+          iconHtml = `<img src="./assets/images/${cat.icon}" alt="${cat.name}" style="width:18px;height:18px;margin-right:8px;vertical-align:middle;" />`;
+        }
+      }
+      return `<a href="#${cat.id}" class="menu-link" data-category="${cat.name}">${iconHtml}${cat.name}</a>`;
+    }).join('');
+    // Add click event to fetch and show products for each category
+    container.querySelectorAll('.menu-link').forEach(link => {
+      link.addEventListener('click', async function(e) {
+        // Ensure clicking a category never affects the header or live advert
+        e.preventDefault();
+        const category = this.getAttribute('data-category');
+        if (!category) return;
+        // Only update the products section, never touch header elements
+        // Fetch products from Supabase filtered by category (case-insensitive)
+  // console.log('[DEBUG] Fetching products for category:', category);
+  // console.log('[DEBUG] Fetching products for category (RPC):', category);
+        const { data, error } = await supabase.rpc('fetch_products_by_category', { cat: category });
+        if (error) {
+          alert('Error fetching products for ' + category);
+          // console.log('[DEBUG] Supabase error:', error);
+          return;
+        }
+  // console.log('[DEBUG] Products fetched:', data);
+  renderProducts(data);
+  // console.log('[DEBUG] Called renderProducts with:', data);
+        // Optionally close the menu drawer if open
+        const menuDrawer = document.getElementById('menuDrawer');
+        if (menuDrawer) menuDrawer.classList.remove('open');
+        // Scroll to products section
+        const productsSection = document.getElementById('productsGrid');
+        if (productsSection) productsSection.scrollIntoView({behavior: 'smooth'});
+        // Guard: do not modify header or live advert elements
+        // (No code below this line should touch .lamar-header, .live-advert, or header children)
+      });
+    });
+  }
+});
 // Force two products per row in the grid
 function enforceTwoPerRow() {
   const grid = document.getElementById('productsGrid');
@@ -66,23 +133,10 @@ async function fetchOrdersForUser(email) {
 function renderOrders(orders) {
   const ordersGrid = document.getElementById('ordersGrid');
   if (!ordersGrid) return;
-  if (!orders || orders.length === 0) {
-    ordersGrid.innerHTML = '<div style="padding:2em;text-align:center;">No orders found</div>';
-    return;
-  }
-    // Show sender names as clickable items
-    ordersGrid.innerHTML = `<h3>Order Senders</h3><ul style='list-style:none;padding:0;'>` +
-      orders.map((order, idx) => `<li class='order-sender-item' data-order-idx='${idx}' style='cursor:pointer;'>${order.sender_name || 'N/A'}</li>`).join('') + '</ul>';
-    ordersGrid.style.display = 'block';
-    // Add click event to each sender item
-    const senderItems = ordersGrid.querySelectorAll('.order-sender-item');
-    senderItems.forEach(item => {
-      item.addEventListener('click', function() {
-        const idx = this.getAttribute('data-order-idx');
-        showOrderModal(orders[idx]);
-      });
-    });
-  }
+  // Remove the Order Senders section entirely
+  ordersGrid.innerHTML = '';
+  ordersGrid.style.display = 'none';
+}
 
   // Simple modal for order details
   function showOrderModal(order) {
@@ -117,22 +171,19 @@ function renderOrders(orders) {
       modal.querySelectorAll('div')[6].innerHTML = `<strong>Address:</strong> ${order.address}`;
     }
     modal.style.display = 'block';
-    // Prevent background scroll
-    document.body.classList.add('modal-open');
-    // Close modal when clicking outside
-    window.onclick = function(event) {
+    // Allow background scroll (do not add modal-open to body)
+    // Close modal when clicking outside the modal content
+    modal.addEventListener('mousedown', function(event) {
       if (event.target === modal) {
         modal.style.display = 'none';
-        document.body.classList.remove('modal-open');
         // Hide ordersGrid, show main screen
         const ordersGrid = document.getElementById('ordersGrid');
         if (ordersGrid) ordersGrid.style.display = 'none';
       }
-    };
+    });
     // Close modal on X click
     modal.querySelector('.close').onclick = function() {
       modal.style.display = 'none';
-      document.body.classList.remove('modal-open');
       // Hide ordersGrid, show main screen
       const ordersGrid = document.getElementById('ordersGrid');
       if (ordersGrid) ordersGrid.style.display = 'none';
@@ -142,24 +193,14 @@ function renderOrders(orders) {
 document.addEventListener('DOMContentLoaded', function() {
   const ordersMenuLink = document.querySelector('.menu-link[href="#orders"]');
   if (ordersMenuLink) {
-    ordersMenuLink.addEventListener('click', async function(e) {
+    ordersMenuLink.addEventListener('click', function(e) {
       e.preventDefault();
-      // Get current user email (from localStorage or Supabase auth)
-      let userEmail = localStorage.getItem('email');
-      if (!userEmail && window.supabase && supabase.auth) {
-        const { data: { user } } = await supabase.auth.getUser();
-        userEmail = user ? user.email : null;
-      }
-      if (!userEmail) {
-        alert('Please sign in to view your orders.');
-        return;
-      }
-      // Fetch and render orders
-      const orders = await fetchOrdersForUser(userEmail);
-      renderOrders(orders);
-      // Show orders grid
+      // Do nothing: orders grid is now disabled
       const ordersGrid = document.getElementById('ordersGrid');
-      if (ordersGrid) ordersGrid.style.display = 'block';
+      if (ordersGrid) {
+        ordersGrid.innerHTML = '';
+        ordersGrid.style.display = 'none';
+      }
     });
   }
 });
@@ -265,80 +306,69 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   function renderProducts(products, categoryMap) {
-      const grid = document.getElementById('productsGrid');
-      if (!grid) return;
-      if (!products || products.length === 0) {
-        grid.innerHTML = '<div style="padding:2em;text-align:center;">No products available</div>';
-        return;
-      }
-      grid.innerHTML = products.map(product => {
-        const categoryName = categoryMap && product.category_id ? categoryMap[product.category_id] : (product.category || 'N/A');
-        return `
-          <div class="product-card">
-            <img src="${product.image_url || 'https://placehold.co/180x180'}" alt="${product.name}" class="product-img">
-            <div class="product-name">${product.name}</div>
-            <div class="category">Category: ${categoryName}</div>
-            <div class="description">${product.description || 'No description available.'}</div>
-            <div class="stock">Stock: ${product.stock !== undefined ? product.stock : 'N/A'}</div>
-            <div class="price">₦${Number(product.price).toLocaleString(undefined, {minimumFractionDigits:2})}</div>
-            <button class="buy-btn" data-id="${product.id}" style="margin-top:10px;width:100%;">Buy Now</button>
-          </div>
-        `;
-      }).join('');
-      // Add event listeners for Buy Now buttons
-      grid.querySelectorAll('.buy-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-          const id = this.getAttribute('data-id');
-          const product = products.find(p => String(p.id) === String(id));
-          openBuyModal(product);
-        });
-      });
-
-  }
-
-// Modal logic for Buy Now
-function openBuyModal(product) {
-  if (!product) return;
-  const modal = document.getElementById('buyModal');
-  if (!modal) return;
-  modal.querySelector('.buy-product-name').textContent = product.name;
-  modal.querySelector('.buy-product-price').textContent = '₦' + Number(product.price).toLocaleString(undefined, {minimumFractionDigits:2});
-  modal.classList.add('show');
-  document.body.classList.add('modal-open');
-  // Store product info for order
-  modal.dataset.productId = product.id;
-  modal.dataset.productName = product.name;
-  modal.dataset.productPrice = product.price;
-  // Reset form and status
-  const orderForm = document.getElementById('orderForm');
-  if (orderForm) orderForm.reset();
-  const orderStatus = document.getElementById('orderStatus');
-  if (orderStatus) orderStatus.textContent = '';
-  // Autofill user name and email if logged in
-  setTimeout(async function() {
-    if (window.supabase && supabase.auth) {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        const emailInput = document.getElementById('orderEmail');
-        if (emailInput) emailInput.value = user.email || '';
-        const nameInput = document.getElementById('orderUserName');
-        if (nameInput) nameInput.value = user.user_metadata && user.user_metadata.full_name ? user.user_metadata.full_name : (user.user_metadata && user.user_metadata.name ? user.user_metadata.name : '');
-      }
+    const grid = document.getElementById('productsGrid');
+    if (!grid) {
+  // console.log('[DEBUG] productsGrid not found');
+      return;
     }
-  }, 100);
+    if (!products || products.length === 0) {
+  // console.log('[DEBUG] No products to render');
+      grid.innerHTML = '<div style="padding:2em;text-align:center;">No products available</div>';
+      return;
+    }
+    // Infinite scroll/load more logic
+    let shownCount = 0;
+    if (!grid) {
+  // console.log('[DEBUG] productsGrid not found');
+      return;
+    }
+    if (!products || products.length === 0) {
+  // console.log('[DEBUG] No products to render');
+      grid.innerHTML = '<div style="padding:2em;text-align:center;">No products available</div>';
+      return;
+    }
+    // Render all products at once, allow grid to scroll
+    grid.innerHTML = products.map(product => {
+      const categoryName = categoryMap && product.category_id ? categoryMap[product.category_id] : (product.category || 'N/A');
+      return `
+        <div class="product-card">
+          <img src="${product.image_url || 'https://placehold.co/180x180'}" alt="${product.name}" class="product-img">
+          <div class="product-name">${product.name}</div>
+          <div class="category">Category: ${categoryName}</div>
+          <div class="description">${product.description || 'No description available.'}</div>
+          <div class="stock">Stock: ${product.stock !== undefined ? product.stock : 'N/A'}</div>
+          <div class="price">₦${Number(product.price).toLocaleString(undefined, {minimumFractionDigits:2})}</div>
+          <button class="buy-btn" data-id="${product.id}" style="margin-top:10px;width:100%;">Buy Now</button>
+        </div>
+      `;
+    }).join('');
+    // Add event listeners for Buy Now buttons
+    grid.querySelectorAll('.buy-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const id = this.getAttribute('data-id');
+        const product = products.find(p => String(p.id) === String(id));
+  // console.log('[DEBUG] Buy Now clicked for product:', product);
+        openBuyModal(product);
+      });
+    });
 }
 
 document.addEventListener('DOMContentLoaded', function() {
   const modal = document.getElementById('buyModal');
+  const menuBtn = document.getElementById('menuBtn');
   if (modal) {
     modal.querySelector('.close').onclick = function() {
       modal.classList.remove('show');
       document.body.classList.remove('modal-open');
+      // Re-enable menu button after modal closes
+      if (menuBtn) menuBtn.disabled = false;
     };
     window.onclick = function(event) {
       if (event.target === modal) {
         modal.classList.remove('show');
         document.body.classList.remove('modal-open');
+        // Re-enable menu button after modal closes
+        if (menuBtn) menuBtn.disabled = false;
       }
     };
     // Handle order form submission
