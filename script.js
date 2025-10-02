@@ -1,28 +1,27 @@
 // Live Buyer Ticker (bottom of page)
 // Live Buyer Ticker now inside live advert bar
 document.addEventListener('DOMContentLoaded', async function() {
+  // Show a rotating live message (not from Supabase)
   const advertText = document.getElementById('liveAdvertText');
   if (!advertText) return;
-  // Simulate fetching recent buyers (replace with Supabase fetch if needed)
-  let buyers = [
-    { name: 'Ayo', product: 'iPhone 15 Pro Max', image: 'assets/images/smartphone.png' },
-    { name: 'Chika', product: 'Samsung Galaxy S24', image: 'assets/images/smartphone.png' },
-    { name: 'Emeka', product: 'MacBook Pro 14"', image: 'assets/images/computing.png' },
-    { name: 'Fatima', product: 'Apple Magic Keyboard', image: 'assets/images/computing.png' },
-    { name: 'Tunde', product: 'Samsung Galaxy Z Flip 6', image: 'assets/images/smartphone.png' },
-    { name: 'Ngozi', product: 'Infinix Hot 40', image: 'assets/images/smartphone.png' },
-    { name: 'Bola', product: 'Oraimo Power Bank', image: 'assets/images/appliances.png' },
-    { name: 'Ada', product: 'Tecno Camon 20', image: 'assets/images/smartphone.png' }
+  const messages = [
+    'Ayo just bought iPhone 15 Pro Max!',
+    'Chika just bought Samsung Galaxy S24!',
+    'Emeka just bought MacBook Pro 14"!',
+    'Fatima just bought Apple Magic Keyboard!',
+    'Tunde just bought Samsung Galaxy Z Flip 6!',
+    'Ngozi just bought Infinix Hot 40!',
+    'Bola just bought Oraimo Power Bank!',
+    'Ada just bought Tecno Camon 20!'
   ];
   let idx = 0;
-  function showBuyer(i) {
-    const b = buyers[i];
-    advertText.innerHTML = `<img src="${b.image}" alt="${b.product}" style="height:28px;width:28px;object-fit:contain;margin-right:10px;vertical-align:middle;border-radius:4px;"> <span>${b.name} just bought ${b.product}!</span>`;
+  function showMessage(i) {
+    advertText.textContent = messages[i];
   }
-  showBuyer(idx);
+  showMessage(idx);
   setInterval(function() {
-    idx = (idx + 1) % buyers.length;
-    showBuyer(idx);
+    idx = (idx + 1) % messages.length;
+    showMessage(idx);
   }, 3500);
 });
 // Show the buy modal for a product (global for Buy Now button)
@@ -41,6 +40,7 @@ function openBuyModal(product) {
   // Show modal
   modal.classList.add('show');
   document.body.classList.add('modal-open');
+  document.body.style.overflow = 'hidden';
   // Clear previous status
   const orderStatus = document.getElementById('orderStatus');
   if (orderStatus) orderStatus.textContent = '';
@@ -447,8 +447,9 @@ document.addEventListener('DOMContentLoaded', function() {
   const menuBtn = document.getElementById('menuBtn');
   if (modal) {
     modal.querySelector('.close').onclick = function() {
-      modal.classList.remove('show');
-      document.body.classList.remove('modal-open');
+  modal.classList.remove('show');
+  document.body.classList.remove('modal-open');
+  document.body.style.overflow = '';
       // Re-enable menu button after modal closes
       if (menuBtn) menuBtn.disabled = false;
     };
@@ -456,6 +457,7 @@ document.addEventListener('DOMContentLoaded', function() {
       if (event.target === modal) {
         modal.classList.remove('show');
         document.body.classList.remove('modal-open');
+        document.body.style.overflow = '';
         // Re-enable menu button after modal closes
         if (menuBtn) menuBtn.disabled = false;
       }

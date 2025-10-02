@@ -100,6 +100,22 @@
   </main>
   <script src="script.js"></script>
 <script>
+// Function to trigger the flying product animation
+function flyProduct() {
+  const flyingProduct = document.getElementById('flyingProduct');
+  if (!flyingProduct) return;
+  flyingProduct.style.display = 'block';
+  flyingProduct.classList.remove('fly-again');
+  // Force reflow to restart animation
+  void flyingProduct.offsetWidth;
+  flyingProduct.classList.add('fly-again');
+  setTimeout(() => {
+    flyingProduct.style.display = 'none';
+    flyingProduct.classList.remove('fly-again');
+  }, 2200);
+}
+</script>
+<script>
 // Initialize Supabase client ONCE and reuse
 // Supabase client is initialized only once at the top of this script.
 
