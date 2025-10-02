@@ -1,3 +1,38 @@
+/* Google sign-in style button for Account */
+.google-signin-btn {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  background: #fff;
+  border: 1px solid #dadce0;
+  border-radius: 4px;
+  box-shadow: 0 1px 2px rgba(60,64,67,.08), 0 1.5px 6px rgba(60,64,67,.12);
+  padding: 0.5em 1em;
+  font-size: 1em;
+  color: #3c4043;
+  font-weight: 500;
+  cursor: pointer;
+  margin-bottom: 12px;
+  transition: box-shadow 0.2s, border 0.2s;
+  text-decoration: none;
+  min-width: 220px;
+}
+.google-signin-btn:hover {
+  box-shadow: 0 2px 4px rgba(60,64,67,.18), 0 4px 12px rgba(60,64,67,.15);
+  border: 1.5px solid #4285f4;
+}
+.google-signin-btn .google-icon {
+  width: 22px;
+  height: 22px;
+  margin-right: 12px;
+  background: transparent;
+  border-radius: 50%;
+  display: inline-block;
+}
+.google-signin-btn span {
+  flex: 1;
+  text-align: left;
+}
 /* Account modal styles */
 #accountModal.modal {
   display: none;
@@ -40,7 +75,7 @@
 /* Products section without inner scrollbar */
 /* Highlight effect for products section when scrolled to */
 .highlight-products-section {
-  box-shadow: 0 0 0 4px #ffb300, 0 2px 16px rgba(0,0,0,0.08);
+  box-shadow: 0 0 0 4px #fff, 0 2px 16px rgba(0,0,0,0.08);
   transition: box-shadow 0.3s;
 }
 /* Flying product animation */
@@ -93,7 +128,7 @@
 /* Live Buyer Ticker as a block in products section */
 .live-buyer-ticker {
   width: 100%;
-  background: #ffe082;
+  background: #fff;
   color: #222;
   font-weight: 500;
   font-size: 1.1em;
@@ -131,7 +166,7 @@
   background: transparent;
   position: relative;
   opacity: 1;
-  transform: translateY(100%);
+  z-index: 12001;
   animation: liveBuyerSlideUp 0.5s forwards;
 }
 @keyframes liveBuyerSlideUp {
@@ -153,7 +188,7 @@
   left: 0;
   width: 100vw;
   z-index: 1001;
-  background: #ffa600;
+  background: #fff;
   color: #fff;
   font-weight: bold;
   font-size: 1.1em;
@@ -233,7 +268,7 @@
   top: 10px;
   right: 16px;
   font-size: 1.5em;
-  color: #888;
+  color: #fff;
   cursor: pointer;
 }
 body.modal-open {
@@ -256,10 +291,10 @@ body.modal-open {
 }
 #buyModal .order-form input:focus,
 #buyModal .order-form select:focus {
-  border: 1.5px solid #ff9900;
+  border: 1.5px solid #fff;
 }
 #buyModal .order-form button[type="submit"] {
-  background: #ff9900;
+  background: #fff;
   color: #fff;
   border: none;
   border-radius: 6px;
@@ -271,12 +306,12 @@ body.modal-open {
   transition: background 0.2s;
 }
 #buyModal .order-form button[type="submit"]:hover {
-  background: #e67c00;
+  background: #fff;
 }
 #buyModal #orderStatus {
   margin-top: 1em;
   font-size: 1em;
-  color: #388e3c;
+  color: #fff;
   text-align: center;
 }
 body.modal-open {
@@ -368,7 +403,7 @@ main, .products-grid, #productsGrid {
   display: inline-block;
 }
 .live-advert-price {
-  color: #388e3c;
+  color: #fff;
   font-weight: bold;
   margin-left: 8px;
   font-size: 1.1em;
@@ -413,7 +448,7 @@ main, .products-grid, #productsGrid {
   justify-content: center;
   gap: 10px;
   min-height: 2.2em;
-  border-bottom: 1px solid #e0b800;
+  border-bottom: 1px solid #fff;
   position: relative;
   z-index: 2;
 }
@@ -635,7 +670,7 @@ main, .products-grid, #productsGrid {
 .lamar-header-logo {
   font-size: 1.3em;
   font-weight: bold;
-  color: #ffa500;
+  color: #fff;
   letter-spacing: 1px;
 }
 .lamar-header-right {
@@ -749,7 +784,7 @@ main, .products-grid, #productsGrid {
 }
 .category {
   font-size: 0.95em;
-  color: #007bff;
+  color: blue;
   margin-bottom: 0.3em;
 }
 .description {
@@ -771,8 +806,8 @@ main, .products-grid, #productsGrid {
 }
 .buy-btn {
   display: block;
-  background: #007bff;
-  color: #fff;
+  background: blue;
+  color: white;
   border: none;
   
   margin: 2px;;
@@ -783,7 +818,7 @@ main, .products-grid, #productsGrid {
   
 }
 .buy-btn:hover {
-  background: #0056b3;
+  background: #fff;
 }
 
 /* Modal Styles */
@@ -899,7 +934,7 @@ main, .products-grid, #productsGrid {
 }
 .modal-close-btn {
   width: 10%;
-  background: #007bff;
+  background: #fff;
   color: #fff;
   padding: 10px;
   border: none;
@@ -909,7 +944,7 @@ main, .products-grid, #productsGrid {
   cursor: pointer;
 }
 .modal-close-btn:hover {
-  background: #0056b3;
+  background: #fff;
 }
 
 /* Product image: show well, centered, with white background and shadow */

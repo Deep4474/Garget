@@ -61,6 +61,8 @@ function openBuyModal(product) {
 }
 // Dynamically render menu categories
 document.addEventListener('DOMContentLoaded', function() {
+  // Show all categories at once, no see all/see less toggle
+  const container = document.getElementById('menuCategoriesContainer');
   const categories = [
     { id: 'phones', name: 'Phones', icon: 'fa-mobile-alt' },
     { id: 'tablets', name: 'Tablets', icon: 'fa-tablet-alt' },
@@ -81,18 +83,17 @@ document.addEventListener('DOMContentLoaded', function() {
     { id: 'chips', name: 'Chips', icon: '' },
     { id: 'ankara-style', name: 'Ankara Style', icon: '' }
   ];
-  const container = document.getElementById('menuCategoriesContainer');
   if (container) {
     container.innerHTML = categories.map(cat => {
       let iconHtml = '';
       if (cat.icon) {
         if (cat.icon.startsWith('fa-')) {
-          iconHtml = `<i class="fas ${cat.icon}" style="margin-right:8px;"></i>`;
+          iconHtml = `<i class=\"fas ${cat.icon}\" style=\"margin-right:8px;\"></i>`;
         } else if (cat.icon.endsWith('.svg')) {
-          iconHtml = `<img src="./assets/images/${cat.icon}" alt="${cat.name}" style="width:18px;height:18px;margin-right:8px;vertical-align:middle;" />`;
+          iconHtml = `<img src=\"./assets/images/${cat.icon}\" alt=\"${cat.name}\" style=\"width:18px;height:18px;margin-right:8px;vertical-align:middle;\" />`;
         }
       }
-      return `<a href="#${cat.id}" class="menu-link" data-category="${cat.name}">${iconHtml}${cat.name}</a>`;
+      return `<a href=\"#${cat.id}\" class=\"menu-link\" data-category=\"${cat.name}\">${iconHtml}${cat.name}</a>`;
     }).join('');
     // Add click event to fetch and show products for each category
     container.querySelectorAll('.menu-link').forEach(link => {
@@ -142,6 +143,28 @@ document.addEventListener('DOMContentLoaded', function() {
     menuBtn.addEventListener('click', function() {
       menuDrawer.classList.add('open');
       document.body.classList.add('menu-drawer-open');
+      // Scroll to the categories section in the menu drawer
+      setTimeout(function() {
+        var categoriesSection = menuDrawer.querySelector('.menu-categories');
+        if (categoriesSection) {
+          categoriesSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 200);
+    });
+  }
+  // Auto-scroll to categories if user scrolls up inside the menu drawer
+  if (menuDrawer) {
+    let lastScrollTop = 0;
+    menuDrawer.addEventListener('scroll', function() {
+      const st = menuDrawer.scrollTop;
+      // If user scrolls up (current scrollTop < lastScrollTop)
+      if (st < lastScrollTop) {
+        const categoriesSection = menuDrawer.querySelector('.menu-categories');
+        if (categoriesSection) {
+          categoriesSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }
+      lastScrollTop = st;
     });
   }
   if (closeMenuDrawer && menuDrawer) {
@@ -298,10 +321,8 @@ document.addEventListener('DOMContentLoaded', function() {
   // Remove Account menu if registered and show user info
   const menuDrawerContent = document.querySelector('.menu-drawer-content');
   function removeAccountLinks() {
-    // Remove all elements with id 'accountMenuLink' and class 'account-menu'
-    document.querySelectorAll('#accountMenuLink, .account-menu').forEach(function(el) {
-      if (el && el.parentNode) el.parentNode.removeChild(el);
-    });
+    // Do not hide or remove the Switch Account button
+    // Only remove other account links if needed (none in this case)
   }
   function showUserInfo(email) {
     if (!menuDrawerContent) return;
@@ -319,24 +340,42 @@ document.addEventListener('DOMContentLoaded', function() {
     // Remove any previous user info
     let oldUserInfo = menuDrawerContent.querySelector('.user-info');
     if (oldUserInfo) oldUserInfo.remove();
-    menuDrawerContent.insertBefore(userInfo, menuDrawerContent.firstChild);
+    // Insert user info after the close button
+    let closeBtn = menuDrawerContent.querySelector('.close');
+    if (closeBtn && closeBtn.nextSibling) {
+      menuDrawerContent.insertBefore(userInfo, closeBtn.nextSibling);
+    } else {
+      menuDrawerContent.insertBefore(userInfo, menuDrawerContent.firstChild);
+    }
   }
 
   if (localStorage.getItem('registeredEmail')) {
-    removeAccountLinks();
     showUserInfo(localStorage.getItem('registeredEmail'));
+    // Change Google button to 'Switch Account' and set Gmail link
+    var googleBtn = document.getElementById('accountMenuLink');
+    if (googleBtn) {
+      var span = googleBtn.querySelector('span');
+      if (span) span.textContent = 'Switch Account';
+      googleBtn.href = 'https://mail.google.com';
+      googleBtn.target = '_blank';
+      googleBtn.onclick = null;
+      googleBtn.style.display = '';
+    }
   } else {
-    // Attach mailto logic to all account links
+    // Attach logic to all account links, but do not show modal if not registered
     document.querySelectorAll('#accountMenuLink, .account-menu').forEach(function(accountLink) {
+      accountLink.style.display = '';
       accountLink.onclick = function(e) {
         e.preventDefault();
-        // Show email in modal instead of redirecting
+        // Only show modal if user is registered
         const modal = document.getElementById('accountModal');
         const emailDisplay = document.getElementById('accountEmailDisplay');
-        const email = localStorage.getItem('registeredEmail') || 'No email found';
-        if (emailDisplay) emailDisplay.textContent = email;
-        if (modal) modal.classList.add('show');
-        document.body.classList.add('modal-open');
+        const email = localStorage.getItem('registeredEmail');
+        if (email) {
+          if (emailDisplay) emailDisplay.textContent = email;
+          if (modal) modal.classList.add('show');
+          document.body.classList.add('modal-open');
+        }
       };
     });
     // Close modal logic

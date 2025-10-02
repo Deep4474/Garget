@@ -40,7 +40,11 @@
     <div class="menu-drawer-content">
       <span class="close" id="closeMenuDrawer">&times;</span>
       <div class="menu-section">
-  <a href="#account" class="menu-link account-menu" id="accountMenuLink">Account</a>
+  <a href="#account" class="menu-link account-menu google-signin-btn" id="accountMenuLink">
+    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" class="google-icon" />
+    <span>Continue with Google</span>
+  </a>
+  <!-- Google sign-in button is now handled by JavaScript and will only be shown if needed -->
   <div id="accountModal" class="modal">
     <div class="modal-content">
       <span class="close" id="closeAccountModal">&times;</span>
@@ -55,7 +59,9 @@
       </div>
       <div class="menu-section menu-categories">
     <div class="menu-categories-title">OUR CATEGORIES <span class="see-all">See All</span></div>
-    <div id="menuCategoriesContainer"></div>
+    <div class="categories-scroll-container">
+      <div id="menuCategoriesContainer"></div>
+    </div>
       </div>
     </div>
   </div>
@@ -265,4 +271,3 @@ document.addEventListener('DOMContentLoaded', async function() {
 </script>
 </body>
 </html>
-
