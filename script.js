@@ -481,25 +481,52 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
       `;
     }).join('');
-    // Add event listeners for Buy Now buttons
+    // Add event listeners for Buy Now buttons (delegated globally below as well)
     grid.querySelectorAll('.buy-btn').forEach(btn => {
       btn.addEventListener('click', function() {
         const id = this.getAttribute('data-id');
         const product = products.find(p => String(p.id) === String(id));
-  // console.log('[DEBUG] Buy Now clicked for product:', product);
         openBuyModal(product);
       });
     });
 }
 
+// Global event delegation for any .buy-btn (handles dynamically added buttons)
+document.addEventListener('click', function(e) {
+  const btn = e.target.closest('.buy-btn');
+  if (btn) {
+    // Try to find the product info from the current products rendered
+    // This assumes products are globally available or can be found from DOM
+    let product = null;
+    if (typeof window.products !== 'undefined' && Array.isArray(window.products)) {
+      const id = btn.getAttribute('data-id');
+      product = window.products.find(p => String(p.id) === String(id));
+    }
+    // Fallback: try to get info from data attributes if available
+    if (!product) {
+      product = {
+        id: btn.getAttribute('data-id'),
+        name: btn.getAttribute('data-name') || '',
+        price: btn.getAttribute('data-price') || '',
+      };
+    }
+    openBuyModal(product);
+    e.preventDefault();
+  }
+});
+
 document.addEventListener('DOMContentLoaded', function() {
   const modal = document.getElementById('buyModal');
   const menuBtn = document.getElementById('menuBtn');
+  // Always hide the modal on page load
   if (modal) {
+    modal.classList.remove('show');
+    document.body.classList.remove('modal-open');
+    document.body.style.overflow = '';
     modal.querySelector('.close').onclick = function() {
-  modal.classList.remove('show');
-  document.body.classList.remove('modal-open');
-  document.body.style.overflow = '';
+      modal.classList.remove('show');
+      document.body.classList.remove('modal-open');
+      document.body.style.overflow = '';
       // Re-enable menu button after modal closes
       if (menuBtn) menuBtn.disabled = false;
     };
