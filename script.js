@@ -5,19 +5,19 @@ document.addEventListener('DOMContentLoaded', async function() {
   if (!advertText) return;
   // Simulate fetching recent buyers (replace with Supabase fetch if needed)
   let buyers = [
-    { name: 'Ayo', product: 'iPhone 15 Pro Max' },
-    { name: 'Chika', product: 'Samsung Galaxy S24' },
-    { name: 'Emeka', product: 'MacBook Pro 14"' },
-    { name: 'Fatima', product: 'Apple Magic Keyboard' },
-    { name: 'Tunde', product: 'Samsung Galaxy Z Flip 6' },
-    { name: 'Ngozi', product: 'Infinix Hot 40' },
-    { name: 'Bola', product: 'Oraimo Power Bank' },
-    { name: 'Ada', product: 'Tecno Camon 20' }
+    { name: 'Ayo', product: 'iPhone 15 Pro Max', image: 'assets/images/smartphone.png' },
+    { name: 'Chika', product: 'Samsung Galaxy S24', image: 'assets/images/smartphone.png' },
+    { name: 'Emeka', product: 'MacBook Pro 14"', image: 'assets/images/computing.png' },
+    { name: 'Fatima', product: 'Apple Magic Keyboard', image: 'assets/images/computing.png' },
+    { name: 'Tunde', product: 'Samsung Galaxy Z Flip 6', image: 'assets/images/smartphone.png' },
+    { name: 'Ngozi', product: 'Infinix Hot 40', image: 'assets/images/smartphone.png' },
+    { name: 'Bola', product: 'Oraimo Power Bank', image: 'assets/images/appliances.png' },
+    { name: 'Ada', product: 'Tecno Camon 20', image: 'assets/images/smartphone.png' }
   ];
   let idx = 0;
   function showBuyer(i) {
     const b = buyers[i];
-    advertText.textContent = `${b.name} just bought ${b.product}!`;
+    advertText.innerHTML = `<img src="${b.image}" alt="${b.product}" style="height:28px;width:28px;object-fit:contain;margin-right:10px;vertical-align:middle;border-radius:4px;"> <span>${b.name} just bought ${b.product}!</span>`;
   }
   showBuyer(idx);
   setInterval(function() {
