@@ -1,7 +1,8 @@
 // Live Buyer Ticker (bottom of page)
+// Live Buyer Ticker now inside live advert bar
 document.addEventListener('DOMContentLoaded', async function() {
-  const tickerInner = document.querySelector('.live-buyer-ticker-inner');
-  if (!tickerInner) return;
+  const advertText = document.getElementById('liveAdvertText');
+  if (!advertText) return;
   // Simulate fetching recent buyers (replace with Supabase fetch if needed)
   let buyers = [
     { name: 'Ayo', product: 'iPhone 15 Pro Max' },
@@ -16,17 +17,7 @@ document.addEventListener('DOMContentLoaded', async function() {
   let idx = 0;
   function showBuyer(i) {
     const b = buyers[i];
-    // Mark previous message as old to animate out
-    const oldMsg = tickerInner.querySelector('.live-buyer-ticker-message');
-    if (oldMsg) {
-      oldMsg.classList.add('old');
-      setTimeout(() => oldMsg.remove(), 500);
-    }
-    // Add new message
-    const msg = document.createElement('div');
-    msg.className = 'live-buyer-ticker-message';
-    msg.textContent = `${b.name} just bought ${b.product}!`;
-    tickerInner.appendChild(msg);
+    advertText.textContent = `${b.name} just bought ${b.product}!`;
   }
   showBuyer(idx);
   setInterval(function() {
@@ -328,10 +319,24 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('#accountMenuLink, .account-menu').forEach(function(accountLink) {
       accountLink.onclick = function(e) {
         e.preventDefault();
-        // Direct user to their email client
-        window.location.href = 'mailto:';
+        // Show email in modal instead of redirecting
+        const modal = document.getElementById('accountModal');
+        const emailDisplay = document.getElementById('accountEmailDisplay');
+        const email = localStorage.getItem('registeredEmail') || 'No email found';
+        if (emailDisplay) emailDisplay.textContent = email;
+        if (modal) modal.classList.add('show');
+        document.body.classList.add('modal-open');
       };
     });
+    // Close modal logic
+    const closeAccountModal = document.getElementById('closeAccountModal');
+    if (closeAccountModal) {
+      closeAccountModal.onclick = function() {
+        const modal = document.getElementById('accountModal');
+        if (modal) modal.classList.remove('show');
+        document.body.classList.remove('modal-open');
+      };
+    }
   }
   if (menuBtn && menuDrawer && closeMenuDrawer) {
     menuBtn.onclick = function() {
