@@ -1,19 +1,18 @@
+/* Products section without inner scrollbar */
+/* Highlight effect for products section when scrolled to */
+.highlight-products-section {
+  box-shadow: 0 0 0 4px #ffb300, 0 2px 16px rgba(0,0,0,0.08);
+  transition: box-shadow 0.3s;
+}
 /* Flying product animation */
 .flying-product {
   position: fixed;
   left: -80px;
   top: 70px;
-  z-index: 99999;
-  width: 54px;
-  height: 54px;
+  z-index: 2000;
+  width: 48px;
+  height: 48px;
   pointer-events: none;
-  background: #fff;
-  border-radius: 50%;
-  border: 2px solid #ffa600;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.18);
-  display: flex;
-  align-items: center;
-  justify-content: center;
   animation: flyToTop 2.2s cubic-bezier(0.6,0.1,0.3,1.1) 1;
 }
 .flying-product img {
@@ -240,9 +239,10 @@
 body.modal-open {
   overflow: hidden !important;
 }
-body, html {
-  overflow-x: hidden;
-  overflow-y: auto;
+
+/* Ensure body is scrollable when menu is open */
+body.menu-drawer-open {
+  overflow: auto !important;
 }
 
 /* Make header fixed at the top */
@@ -258,37 +258,38 @@ body, html {
 
 main, .products-grid, #productsGrid {
   margin-top: 110px !important; /* adjust if header height changes */
+  height: auto !important;
+  overflow: visible !important;
 }
 
-/* Make products section scrollable if needed */
+/* Make products section scrollable with the page, not inside itself */
 
 .products-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr) !important;
-  gap: 10px 8px;
-  margin: 10px auto 0 auto;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin: 16px auto 0 auto;
   padding: 0;
   width: 100%;
-  max-width: 270px;
+  max-width: 800px;
   min-width: 0;
   box-sizing: border-box;
   background: transparent;
   justify-content: center;
 }
-.product-card {
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: none;
-  padding: 0.3em 0.1em 0.7em 0.1em;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  min-width: 0;
-  max-width: none;
-  width: 100%;
-  margin: 0;
-  font-size: 0.91em;
+
+@media (max-width: 600px) {
+  .products-grid {
+    grid-template-columns: 1fr;
+    max-width: 98vw;
+  }
+}
+
+@media (max-width: 600px) {
+  .products-grid {
+    grid-template-columns: 1fr;
+    max-width: 98vw;
+  }
 }
 /* --- COMPACT PRODUCT GRID OVERRIDE REMOVED --- */
 .product-img {
@@ -497,6 +498,9 @@ main, .products-grid, #productsGrid {
   padding: 1.2em 1em 1em 1em;
   display: flex;
   flex-direction: column;
+  /* Allow vertical scrolling if content overflows */
+  max-height: 100vh;
+  overflow-y: auto;
 }
 .menu-drawer .close {
   position: absolute;
@@ -569,34 +573,27 @@ main, .products-grid, #productsGrid {
   color: #fff;
 }
 /* Category Grid Styles */
-.categories-grid {
+/* --- PRODUCT GRID: TWO COLUMNS ON DESKTOP, ONE ON MOBILE --- */
+.products-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  grid-template-columns: repeat(2, 1fr);
   gap: 16px;
-  margin: 1em 0 1em 0;
-  padding: 0 1em;
+  margin: 16px auto 0 auto;
+  padding: 0;
+  width: 100%;
+  max-width: 800px;
+  min-width: 0;
+  box-sizing: border-box;
+  background: transparent;
+  justify-content: center;
 }
-.category-card {
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-  padding: 0.7em 0.5em;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  font-size: 1em;
-  transition: box-shadow 0.2s;
+
+@media (max-width: 700px) {
+  .products-grid {
+    grid-template-columns: 1fr;
+    max-width: 98vw;
+  }
 }
-.category-card:hover {
-  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
-}
-.category-icon {
-  width: 48px;
-  height: 48px;
-  object-fit: contain;
-  margin-bottom: 0.5em;
-}
-/* Tablet Responsive Styles */
 @media (min-width: 600px) and (max-width: 1024px) {
   .lamar-header {
     flex-direction: row;
@@ -781,8 +778,9 @@ main, .products-grid, #productsGrid {
 }
 @media (max-width: 700px) {
   .products-grid {
-    grid-template-columns: 1fr !important;
+    grid-template-columns: repeat(2, 1fr) !important;
     max-width: 98vw;
+    gap: 12px;
   }
   .product-card {
     min-width: 80px;

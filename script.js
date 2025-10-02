@@ -1,12 +1,3 @@
-// Remove flying product after animation
-document.addEventListener('DOMContentLoaded', function() {
-  const flying = document.getElementById('flyingProduct');
-  if (flying) {
-    flying.addEventListener('animationend', function() {
-      flying.style.display = 'none';
-    });
-  }
-});
 // Live Buyer Ticker (bottom of page)
 document.addEventListener('DOMContentLoaded', async function() {
   const tickerInner = document.querySelector('.live-buyer-ticker-inner');
@@ -119,16 +110,42 @@ document.addEventListener('DOMContentLoaded', function() {
         // Optionally close the menu drawer if open
         const menuDrawer = document.getElementById('menuDrawer');
         if (menuDrawer) menuDrawer.classList.remove('open');
-        // Scroll to products section and allow full page scroll
-        setTimeout(() => {
-          const productsSection = document.getElementById('productsGrid');
-          if (productsSection) {
-            productsSection.scrollIntoView({behavior: 'smooth'});
-            document.body.style.overflow = 'auto';
-            document.documentElement.style.overflow = 'auto';
-          }
-        }, 100);
+        document.body.classList.remove('menu-drawer-open');
+        // Scroll to products section and highlight
+        const productsSection = document.getElementById('productsGrid');
+        if (productsSection) {
+          // Get header height to offset scroll
+          const header = document.querySelector('.lamar-header');
+          const headerHeight = header ? header.offsetHeight : 0;
+          const sectionTop = productsSection.getBoundingClientRect().top + window.pageYOffset - headerHeight - 10;
+          window.scrollTo({ top: sectionTop, behavior: 'smooth' });
+          productsSection.classList.add('highlight-products-section');
+          setTimeout(() => {
+            productsSection.classList.remove('highlight-products-section');
+          }, 800);
+        }
+        // Guard: do not modify header or live advert elements
+        // (No code below this line should touch .lamar-header, .live-advert, or header children)
       });
+    });
+  }
+});
+
+// Add menu open/close logic to toggle scrollability
+document.addEventListener('DOMContentLoaded', function() {
+  const menuBtn = document.getElementById('menuBtn');
+  const menuDrawer = document.getElementById('menuDrawer');
+  const closeMenuDrawer = document.getElementById('closeMenuDrawer');
+  if (menuBtn && menuDrawer) {
+    menuBtn.addEventListener('click', function() {
+      menuDrawer.classList.add('open');
+      document.body.classList.add('menu-drawer-open');
+    });
+  }
+  if (closeMenuDrawer && menuDrawer) {
+    closeMenuDrawer.addEventListener('click', function() {
+      menuDrawer.classList.remove('open');
+      document.body.classList.remove('menu-drawer-open');
     });
   }
 });
