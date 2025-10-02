@@ -32,6 +32,17 @@ function openBuyModal(product) {
   modal.dataset.productId = product.id;
   modal.dataset.productPrice = product.price;
   modal.dataset.productName = product.name;
+  // Try to detect user name and email from Supabase auth
+  if (window.supabase && supabase.auth && typeof supabase.auth.getUser === 'function') {
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (user) {
+        const nameInput = modal.querySelector('#orderUserName');
+        const emailInput = modal.querySelector('#orderEmail');
+        if (nameInput) nameInput.value = user.user_metadata?.full_name || user.user_metadata?.name || '';
+        if (emailInput) emailInput.value = user.email || '';
+      }
+    });
+  }
   // Update modal content
   const nameElem = modal.querySelector('.buy-product-name');
   const priceElem = modal.querySelector('.buy-product-price');
@@ -644,5 +655,55 @@ document.addEventListener('DOMContentLoaded', async function() {
   const filtered = products.filter(p => (categoryId && String(p.category_id) === String(categoryId)) || (p.category && p.category.toLowerCase() === categoryName));
   renderProducts(filtered, categoryMap);
     });
+  });
+});
+// Show the orders modal and prevent background scroll
+function showOrdersModal() {
+  const modal = document.getElementById('ordersModal');
+  if (modal) {
+    modal.style.display = 'block';
+    document.body.classList.add('modal-open');
+    document.body.style.overflow = 'hidden';
+    // Hide modal if user clicks outside modal content
+    modal.addEventListener('mousedown', function(event) {
+      if (event.target === modal) {
+        modal.style.display = 'none';
+        document.body.classList.remove('modal-open');
+        document.body.style.overflow = '';
+      }
+    });
+  }
+}
+// When showing buy modal, also prevent scroll (already handled)
+// When closing buy modal, restore scroll
+function closeBuyModal() {
+  const modal = document.getElementById('buyModal');
+  if (modal) {
+    modal.classList.remove('show');
+    document.body.classList.remove('modal-open');
+    document.body.style.overflow = '';
+  }
+}
+// Ensure Buy Now modal can be closed and always shows/hides correctly
+// Add this after openBuyModal definition
+
+document.addEventListener('DOMContentLoaded', function() {
+  const modal = document.getElementById('buyModal');
+  if (!modal) return;
+  const closeBtn = modal.querySelector('.close');
+  if (closeBtn) {
+    closeBtn.onclick = function() {
+      modal.classList.remove('show');
+      document.body.classList.remove('modal-open');
+      document.body.style.overflow = '';
+    };
+  }
+  // Optional: close modal if user clicks outside modal content
+  modal.addEventListener('mousedown', function(event) {
+    if (event.target === modal) {
+      modal.classList.remove('show');
+      document.body.classList.remove('modal-open');
+      document.body.style.overflow = '';
+    }
   });
 });

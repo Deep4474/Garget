@@ -199,20 +199,33 @@ document.addEventListener('DOMContentLoaded', async function() {
           html += `<div style="color:red;">Error fetching data: ${ordersError?.message || ''} ${senderError?.message || ''}</div>`;
         }
         // Create modal for orders
+        // For each order, if there is a matching sender (by order_id), update the order status to the sender's status
+        let updatedOrdersData = ordersData.map(order => {
+          const matchingSender = senderData.find(sender => sender.order_id === order.id);
+          if (matchingSender && matchingSender.status) {
+            return {
+              ...order,
+              status: matchingSender.status
+            };
+          }
+          return order;
+        });
+        // Only show sender section if there are senders that do not match any order
+        let showSenderSection = senderData.some(sender => !ordersData.find(order => order.id === sender.order_id));
         let modalHtml = `<div id="ordersModal" class="modal" style="display:block;z-index:9999;">
           <div class="modal-content" style="width:99vw;max-width:1200px;margin:8px auto;background:#fff;border-radius:12px;box-shadow:0 4px 24px rgba(0,0,0,0.12);padding:8px;position:relative;overflow-x:auto;">
-            <span class="close" id="closeOrdersModal" style="position:absolute;top:12px;right:16px;font-size:1.5em;cursor:pointer;">&times;</span>
+            <span class="close" id="closeOrdersModal" style="position:absolute;top:12px;left:16px;font-size:2em;font-weight:bold;cursor:pointer;transition:color 0.2s;">&times;</span>
             <h2 style='text-align:center;font-size:1.3em;font-weight:700;margin-bottom:8px;'>My Orders</h2>
-            ${ordersData.length > 0 ? `<div style='text-align:center;color:#2e7d32;font-size:1.1em;font-weight:600;margin-bottom:4px;'>Your order has been successful!</div>
+            ${updatedOrdersData.length > 0 ? `<div style='text-align:center;color:#2e7d32;font-size:1.1em;font-weight:600;margin-bottom:4px;'>Your order has been successful!</div>
             <div style='text-align:center;color:#1565c0;font-size:1em;margin-bottom:8px;'>Order Status:</div>
             <ul style='text-align:left;max-width:400px;margin:0 auto 16px auto;padding:0;list-style:none;'>
-              ${ordersData.map((order, idx) => {
+              ${updatedOrdersData.map((order, idx) => {
                 let dateStr = order.created_at ? new Date(order.created_at).toLocaleString() : 'N/A';
                 return `<li style='margin-bottom:4px;border-bottom:1px solid #eee;padding-bottom:2px;'><span style='font-weight:600;'>Order ${idx+1}:</span> <span style='color:#1565c0;'>${order.status || 'N/A'}</span> <span style='color:#444;font-size:0.97em;'>(Placed: ${dateStr})</span></li>`;
               }).join('')}
             </ul>` : ''}
 
-            ${senderData.length > 0 ? `<div style='text-align:center;color:#2e7d32;font-size:1.1em;font-weight:600;margin-bottom:4px;'>Your order sender has been successful!</div>
+            ${showSenderSection && senderData.length > 0 ? `<div style='text-align:center;color:#2e7d32;font-size:1.1em;font-weight:600;margin-bottom:4px;'>Your order sender has been successful!</div>
             <div style='text-align:center;color:#1565c0;font-size:1em;margin-bottom:8px;'>Order Sender Status:</div>
             <ul style='text-align:left;max-width:400px;margin:0 auto 16px auto;padding:0;list-style:none;'>
               ${senderData.map((sender, idx) => {
@@ -233,16 +246,19 @@ document.addEventListener('DOMContentLoaded', async function() {
         // Add close event
         document.getElementById('closeOrdersModal').onclick = function() {
           document.getElementById('ordersModal').remove();
+          // Show menu drawer again when orders modal is closed
+          const menuDrawer = document.getElementById('menuDrawer');
+          if (menuDrawer) menuDrawer.style.display = '';
         };
         // Show order senders below the modal as before
-        let sendersHtml = '<h3>Order Senders</h3>';
-        if (senderData.length === 0) {
-          sendersHtml += '<div class="no-orders-message">No order senders found for this user</div>';
-        } else {
-          sendersHtml += '<ul style="list-style:none;padding:0;">' +
-            senderData.map(sender => `<li>Order ID: ${sender.order_id || ''}, Phone: ${sender.phone || ''}, Address: ${sender.address || ''}, Quantity: ${sender.quantity || ''}, Total: ${sender.order_total || ''}, Status: ${sender.status || ''}, Created: ${sender.created_at || ''}, Pick Option: ${sender.pick_option || ''}</li>`).join('') + '</ul>';
-        }
-        ordersGrid.innerHTML = sendersHtml;
+        // let sendersHtml = '<h3>Order Senders</h3>';
+        // if (senderData.length === 0) {
+        //   sendersHtml += '<div class="no-orders-message">No order senders found for this user</div>';
+        // } else {
+        //   sendersHtml += '<ul style="list-style:none;padding:0;">' +
+        //     senderData.map(sender => `<li>Order ID: ${sender.order_id || ''}, Phone: ${sender.phone || ''}, Address: ${sender.address || ''}, Quantity: ${sender.quantity || ''}, Total: ${sender.order_total || ''}, Status: ${sender.status || ''}, Created: ${sender.created_at || ''}, Pick Option: ${sender.pick_option || ''}</li>`).join('') + '</ul>';
+        // }
+        // ordersGrid.innerHTML = sendersHtml;
       });
     }
 });

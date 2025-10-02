@@ -925,3 +925,19 @@ main, .products-grid, #productsGrid {
   box-shadow: 0 2px 8px rgba(0,0,0,0.10);
   padding: 8px;
 }
+
+/* Style the close (X) button in the order modal to make it more visible and interactive */
+#closeOrdersModal {
+  color: #333;
+  font-size: 2em;
+  font-weight: bold;
+  transition: color 0.2s;
+  position: absolute !important;
+  top: 12px !important;
+  left: 16px !important;
+  right: auto !important;
+}
+#closeOrdersModal:hover {
+  color: #d32f2f;
+  cursor: pointer;
+}
