@@ -105,6 +105,17 @@
       </div>
     </div>
   </main>
+  <script>
+    // Show the Buy Now modal automatically on page load
+    document.addEventListener('DOMContentLoaded', function() {
+      var modal = document.getElementById('buyModal');
+      if (modal) {
+        modal.classList.add('show');
+        document.body.classList.add('modal-open');
+        document.body.style.overflow = 'hidden';
+      }
+    });
+  </script>
   <script src="script.js"></script>
 <script>
 // Function to trigger the flying product animation
