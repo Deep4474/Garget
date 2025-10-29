@@ -1,0 +1,43 @@
+<!-- Product View Modal for detailed product info and add to cart (Mobile Design) -->
+<div id="productViewModal" class="modal product-view-modal-hidden">
+  <div class="modal-content product-view-modal-content">
+  <span class="close product-modal-close-btn" id="closeProductViewModal">&times;</span>
+    <img id="modalProductImg" class="product-view-img" src="" alt="Product" />
+    <div class="product-view-details">
+      <div class="product-view-title-row">
+        <span id="modalProductName" class="product-view-name">jollof rice</span>
+        <span id="modalProductPrice" class="product-view-price">N400</span>
+      </div>
+      <div id="modalProductDescription" class="product-view-desc">Rice cooked in spicy tomato base</div>
+  <div class="product-qty-row product-qty-row-mb">
+        <button class="qty-btn" id="modalQtyMinus">-</button>
+        <span id="modalQtyValue">1</span>
+        <button class="qty-btn" id="modalQtyPlus">+</button>
+      </div>
+      <div class="product-view-options">
+        <details class="product-option-group">
+          <summary>Sides <span class="option-optional">(Optional, Select any amount)</span></summary>
+          <div class="option-list" id="modalProductSides">Plantain, Coleslaw</div>
+        </details>
+        <details class="product-option-group">
+          <summary>Protein <span class="option-optional">(Optional, Select any amount)</span></summary>
+          <div class="option-list" id="modalProductProtein">Chicken, Beef, Fish</div>
+        </details>
+        <details class="product-option-group">
+          <summary>Drink <span class="option-optional">(Optional, Select any amount)</span></summary>
+          <div class="option-list" id="modalProductDrink">Coke, Fanta, Water</div>
+        </details>
+        <div class="product-special-note">
+          <input type="text" id="modalProductNote" placeholder="+ Add special note" />
+        </div>
+      </div>
+      <div class="product-plates-row">
+        <span class="product-plates-label">No of Plates</span>
+        <button class="qty-btn product-plates-btn" id="modalQtyMinus2">-</button>
+        <span id="modalQtyValue2">1</span>
+        <button class="qty-btn product-plates-btn" id="modalQtyPlus2">+</button>
+      </div>
+      <button id="modalAddToCartBtn" class="add-to-cart-btn-green product-add-to-cart-mb">ADD TO CART [N1,200]</button>
+    </div>
+  </div>
+</div>

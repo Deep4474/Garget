@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Notifications — Lamar</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="notifications.css">
+</head>
+<body>
+  <header class="top-compact-header">
+    <div class="left">
+      <button id="menuBtn" class="hamburger" aria-label="Open menu">≡</button>
+      <span class="brand-text">Lamar Phone And Gadget</span>
+    </div>
+    <div class="header-actions">
+      <!-- search button removed -->
+    </div>
+  </header>
+
+  <main class="container notifications-page">
+    <nav class="breadcrumb"><a href="index.html">Home</a> <span>/</span> <strong>Notifications</strong></nav>
+
+    <div class="notifications-grid">
+      <section class="panel orders-panel">
+        <header class="panel-header">
+          <h2>Orders</h2>
+          <div class="panel-actions">
+            <button id="refreshOrders" class="btn small">Refresh</button>
+          </div>
+        </header>
+        <div id="ordersList" class="panel-body">
+          <div class="empty">Loading orders…</div>
+        </div>
+      </section>
+
+      <section class="panel admin-panel">
+        <header class="panel-header">
+          <div class="panel-title">
+            <h2>Admin Messages</h2>
+            <span id="adminUnreadBadge" class="badge hidden">0</span>
+          </div>
+          <div class="panel-actions">
+            <button id="markAllRead" class="btn small">Mark all read</button>
+          </div>
+        </header>
+        <div id="messagesList" class="panel-body">
+          <div class="empty">Loading messages…</div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="supabase-config.js"></script>
+  <script src="cart.js"></script>
+  <script src="script.js"></script>
+  <!-- Optional: set your admin/messages table name here to avoid discovery probing and 404s.
+       Example:
+       <script>window.NOTIFICATIONS_TABLE = 'admin_messages';</script>
+  -->
+  <script src="notifications.js" defer></script>
+  <!-- Bottom navigation bar (mobile) -->
+  <nav class="bottom-nav" aria-label="Bottom navigation">
+    <a href="index.html" class="bottom-nav-item">
+      <div class="nav-icon">🏠</div>
+      <div class="nav-label">Home</div>
+    </a>
+    <a href="categories.html" class="bottom-nav-item">
+      <div class="nav-icon">≡</div>
+      <div class="nav-label">Categories</div>
+    </a>
+    <a href="cart.html" class="bottom-nav-item">
+      <div class="nav-icon">🛒</div>
+      <div class="nav-label">Cart</div>
+    </a>
+    <a href="notifications.html" class="bottom-nav-item active">
+      <div class="nav-icon">🔔</div>
+      <div class="nav-label">Notifications</div>
+    </a>
+    <a href="login.html" class="bottom-nav-item">
+      <div class="nav-icon">👤</div>
+      <div class="nav-label">My Account</div>
+    </a>
+  </nav>
+</body>
+</html>

@@ -1,0 +1,35 @@
+/* Improved layout for laptops category page */
+.laptops-page { padding: 16px; max-width:1100px; margin: 8px auto 40px; }
+.laptops-page .section-header { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:14px; background:#0a84ff; color:white; padding:10px 12px; border-radius:6px; }
+.laptops-page h1 { margin:0; font-size:18px; }
+.laptops-page .muted { color:rgba(255,255,255,0.95); font-size:13px; margin-top:4px; }
+
+.controls { display:flex; align-items:center; gap:8px; }
+.controls select { padding:6px 8px; border-radius:4px; border:1px solid #ccc; }
+
+.product-grid { display:grid; grid-template-columns: repeat(auto-fill,minmax(200px,1fr)); gap:14px; }
+.product-card { background:#fff; border:1px solid #e6e6e6; border-radius:10px; padding:10px; display:flex; flex-direction:column; cursor:pointer; transition:transform .15s ease, box-shadow .15s ease; min-height:255px; }
+.product-card:hover { transform:translateY(-4px); box-shadow:0 8px 20px rgba(0,0,0,0.08); }
+.product-thumb-wrap { width:100%; height:150px; display:flex; align-items:center; justify-content:center; overflow:hidden; border-radius:6px; background:#fafafa; }
+.product-thumb { width:100%; height:100%; object-fit:contain; }
+.product-title { font-size:14px; margin:10px 0 8px 0; line-height:1.2; min-height:40px; }
+.product-price { font-weight:700; color:#0b6; margin-top:auto; }
+.ap-loading { padding:24px; text-align:center; color:#444; }
+
+@media (max-width:200px) {
+  .product-grid { grid-template-columns: repeat(auto-fill,minmax(200px,1fr)); }
+}
+
+@media (max-width:200px) {
+  .product-grid { grid-template-columns: repeat(2,1fr); gap:10px; }
+  .product-card { min-height:220px; }
+  .product-thumb-wrap { height:120px; }
+}
+
+/* Responsive override: single column under 432px, two columns from 432px up to 899px */
+@media (max-width:431px) {
+  .product-grid { grid-template-columns: 1fr !important; }
+}
+@media (min-width:432px) and (max-width:200px) {
+  .product-grid { grid-template-columns: repeat(2,1fr) !important; }
+}

@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Categories - Lamar Phone And Gadget</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="categories.css">
+</head>
+<body>
+  <a class="skip-link" href="#mainContent">Skip to main content</a>
+  <!-- Compact header matching index.html (hamburger + brand left-aligned) -->
+  <header class="top-compact-header">
+    <div class="left">
+      <span class="brand-text">Lamar Phone And Gadget</span>
+    </div>
+    <div class="header-actions">
+      <!-- reserved for future icons (cart/search) -->
+    </div>
+  </header>
+
+  <main id="mainContent" class="categories-main">
+    <section class="page-header" tabindex="-1">
+      <div class="breadcrumbs"><a href="index.html">Home</a> / <span class="category-name">All Categories</span></div>
+      <div class="page-title-row">
+        <h1 class="page-title">All Products</h1>
+        <div class="page-controls">
+          <button class="fav-btn" aria-label="Favorite">☆</button>
+          <select id="sortSelect" aria-label="Sort products">
+            <option>Newest</option>
+            <option>Price: Low to High</option>
+            <option>Price: High to Low</option>
+          </select>
+        </div>
+      </div>
+    </section>
+
+    <div class="categories-layout">
+      <aside class="categories-aside">
+        <div id="categoriesList" class="categories-list">Loading categories...</div>
+      </aside>
+      <section class="products-section">
+        <div id="productsGrid"></div>
+      </section>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <script src="supabase-config.js"></script>
+  <script src="cart.js"></script>
+  <script src="categories.js"></script>
+  <!-- Bottom navigation bar -->
+  <nav class="bottom-nav" aria-label="Bottom navigation">
+    <a href="index.html" class="bottom-nav-item">
+      <div class="nav-icon">🏠</div>
+      <div class="nav-label">Home</div>
+    </a>
+    <a href="categories.html" class="bottom-nav-item active">
+      <div class="nav-icon">≡</div>
+      <div class="nav-label">Categories</div>
+    </a>
+    <a href="cart.html" class="bottom-nav-item">
+      <div class="nav-icon">🛒</div>
+      <div class="nav-label">Cart</div>
+    </a>
+    <a href="#" class="bottom-nav-item">
+      <div class="nav-icon">🔔</div>
+      <div class="nav-label">Notifications</div>
+    </a>
+    <a href="login.html" class="bottom-nav-item">
+      <div class="nav-icon">👤</div>
+      <div class="nav-label">My Account</div>
+    </a>
+  </nav>
+</body>
+</html>

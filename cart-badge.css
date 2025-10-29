@@ -1,0 +1,19 @@
+.cart-count {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: #ff2d2d;
+  color: #fff;
+  border-radius: 50%;
+  padding: 2px 7px;
+  font-size: 14px;
+  font-weight: bold;
+  z-index: 10;
+  min-width: 22px;
+  text-align: center;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+  pointer-events: none;
+}
+#cartBtn {
+  position: relative;
+}

@@ -1,0 +1,679 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <style>
+    .newsletter-social-responsive {
+      background: #181818;
+      border-radius: 24px;
+      padding: 28px 24px 24px 24px;
+      color: #fff;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.10);
+      max-width: 370px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+    }
+    .newsletter-social-responsive .newsletter-title {
+      font-size: 1.6rem;
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: 18px;
+    }
+    .newsletter-social-responsive form {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+    .newsletter-social-responsive input[type="email"] {
+      flex:1;
+      padding: 12px 16px;
+      border-radius: 8px;
+      border: none;
+      font-size: 1rem;
+      outline: none;
+      color: #222;
+    }
+    .newsletter-social-responsive button[type="submit"] {
+      background: #e53935;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 0 22px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .newsletter-social-responsive button[type="submit"]:hover {
+      background: #b71c1c;
+    }
+    .newsletter-social-responsive .social-title {
+      font-weight: 700;
+      letter-spacing: 1px;
+      margin-bottom: 10px;
+    }
+    .newsletter-social-responsive .social-links {
+      display: flex;
+      gap: 12px;
+    }
+    .newsletter-social-responsive .footer-social-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 1.5rem;
+      text-decoration: none;
+      transition: transform 0.15s;
+    }
+    .newsletter-social-responsive .footer-social-icon:hover {
+      transform: scale(1.08);
+      filter: brightness(1.1);
+    }
+    @media (max-width: 600px) {
+      .newsletter-social-responsive {
+        max-width: 98vw;
+        padding: 18px 6vw 18px 6vw;
+        border-radius: 16px;
+      }
+      .newsletter-social-responsive .newsletter-title {
+        font-size: 1.1rem;
+      }
+      .newsletter-social-responsive .footer-social-icon {
+        width: 38px;
+        height: 38px;
+        font-size: 1.2rem;
+      }
+    }
+
+    .fab-group {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 1200;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+    }
+    .fab-toggle {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: #1ca060;
+      color: #fff;
+      border: none;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .fab-toggle-arrow {
+      display: inline-block;
+      font-size: 2rem;
+    }
+    .fab-actions {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+    }
+    .fab-actions.fab-actions-show {
+      display: flex;
+    }
+    .fab-action {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: #e53920;
+      color: #fff;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.7rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .fab-action-icon {
+      font-size: 1.7rem;
+    }
+  </style>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Product</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="assets/fontawesome/fontawesome.min.css">
+    <script>
+      // Supabase credentials provided by the user. Make sure this is the anon/public key.
+      window.SUPABASE_URL = 'https://jlwxkykznyjmstpjcgks.supabase.co';
+      window.SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impsd3hreWt6bnlqbXN0cGpjZ2tzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQzMTAxNDIsImV4cCI6MjA2OTg4NjE0Mn0.C86cvOOT5QI0PSHlPMujivWV8NLWMtgNiX8KrglzhIQ';
+    </script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+</head>
+<body>
+  <header class="top-compact-header">
+    <div class="left">
+      <div id="menuBtn" class="hamburger" aria-label="Open menu">☰</div>
+      <span class="brand-text">Lamar Phone And Gadget</span>
+    </div>
+    <div class="header-actions">
+    </div>
+  </header>
+  <!-- Slide-out Menu Drawer (copied from index.html) -->
+  <div id="menuDrawer" class="menu-drawer" aria-hidden="true">
+    <div class="menu-drawer-content">
+  <button class="close" id="closeMenuDrawer" aria-label="Close menu" onclick="closeProductMenu()">&times;</button>
+      <div class="account-area">
+        <div class="account-circle" aria-hidden="true">&#128100;</div>
+        <div class="account-links"><a href="register.html" id="menuLoginLink">Registration</a></div>
+      </div>
+      <div class="menu-section">
+        <a href="#home" class="menu-link selected"><span class="menu-text">Home</span></a>
+        <a href="#flash" class="menu-link"><span class="indicator">»</span><span class="menu-text">Flash Sale</span></a>
+        <a href="#blogs" class="menu-link"><span class="menu-text">Blogs</span></a>
+        <a href="#brands" class="menu-link"><span class="menu-text">All Brands</span></a>
+        <a href="#categories" class="menu-link"><span class="menu-text">All Categories</span></a>
+      </div>
+    </div>
+  </div>
+  <main id="productMain" class="product-page-main">
+    <div id="loading">Loading product...</div>
+    <!-- Product Image Gallery Modal -->
+    <div id="imageGalleryModal" class="modal hidden">
+      <div class="modal-content">
+        <span class="close-modal" id="closeGalleryModal">&times;</span>
+        <div class="gallery-images">
+          <button class="gallery-prev" id="galleryPrevBtn">&#10094;</button>
+          <img id="galleryMainImg" src="https://placehold.co/600x400" alt="Product Image" />
+          <button class="gallery-next" id="galleryNextBtn">&#10095;</button>
+        </div>
+        <div class="gallery-thumbnails" id="galleryThumbnails">
+          <!-- Thumbnails will be inserted by JS -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Floating Action Button Group -->
+    <div id="fab-group" class="fab-group">
+      <button id="fab-toggle" class="fab-toggle">
+        <span class="fab-toggle-arrow">&#171;</span>
+      </button>
+      <div id="fab-actions" class="fab-actions">
+        <button class="fab-action"><span class="fab-action-icon">&#9776;</span></button>
+        <button class="fab-action"><span class="fab-action-icon">&#9889;</span></button>
+        <button class="fab-action"><span class="fab-action-icon">&#128337;</span></button>
+      </div>
+    </div>
+  </main>
+  <script>
+    const supabase = window.supabase ? window.supabase : (window.supabase = supabase ? supabase : null);
+    async function fetchProduct(id) {
+      if (window.supabaseClient) {
+        const { data, error } = await window.supabaseClient.from('products').select('*').eq('id', id).single();
+        if (error) return null;
+        return data;
+      }
+      return null;
+    }
+    function formatPrice(p){ try { return '₦' + Number(p).toLocaleString(); } catch(e){ return p; } }
+    (async function(){
+      const params = new URLSearchParams(location.search);
+      const idParam = params.get('id');
+      const slugParam = params.get('slug');
+      const nameParam = params.get('name');
+      const main = document.getElementById('productMain');
+      if (!idParam && !slugParam && !nameParam) { main.innerHTML = '<div>No product specified.</div>'; return; }
+      // initialize supabase client if missing
+      if (!window.supabaseClient && window.SUPABASE_URL && window.SUPABASE_KEY) {
+        try { window.supabaseClient = supabase.createClient(window.SUPABASE_URL, window.SUPABASE_KEY); } catch(e) { console.error('supabase client init error', e); }
+      }
+      let product = null;
+      // Try to fetch product by id, then slug, then by name (case-insensitive partial match)
+      if (window.supabaseClient) {
+        try {
+          if (idParam) {
+            const res = await window.supabaseClient.from('products').select('*').eq('id', idParam).single();
+            if (!res.error) product = res.data || res;
+          }
+          if (!product && slugParam) {
+            // Safely probe whether the 'slug' column exists to avoid PostgREST 400 errors
+            async function _checkProductsHasColumn(col) {
+              // Cache probe results to avoid repeated requests
+              window.__PRODUCTS_COLUMNS = window.__PRODUCTS_COLUMNS || {};
+              if (typeof window.__PRODUCTS_COLUMNS[col] !== 'undefined') return window.__PRODUCTS_COLUMNS[col];
+              try {
+                // Safer probe: request a full row (select '*') and check whether the returned
+                // object contains the column. This avoids issuing select(col) which causes
+                // a 400 if the column doesn't exist.
+                const probe = await window.supabaseClient.from('products').select('*').limit(1);
+                if (probe && probe.error) {
+                  // If there's an error selecting from table at all, mark as absent to avoid further queries
+                  window.__PRODUCTS_COLUMNS[col] = false;
+                } else {
+                  const row = Array.isArray(probe.data) && probe.data.length ? probe.data[0] : {};
+                  window.__PRODUCTS_COLUMNS[col] = Object.prototype.hasOwnProperty.call(row, col);
+                }
+              } catch (e) {
+                window.__PRODUCTS_COLUMNS[col] = false;
+              }
+              return window.__PRODUCTS_COLUMNS[col];
+            }
+
+            try {
+              const hasSlug = await _checkProductsHasColumn('slug');
+              if (hasSlug) {
+                try {
+                  const res = await window.supabaseClient.from('products').select('*').eq('slug', slugParam).single();
+                  if (!res.error) product = res.data || res;
+                } catch (e) {
+                  // Query failed despite column existing; ignore and continue to fallback
+                  console.warn('Product lookup by slug failed:', e);
+                  product = null;
+                }
+              } else {
+                console.info('Skipping slug lookup: products.slug column not present');
+                // If the DB doesn't expose a slug column, create a friendly
+                // representation from the provided slugParam so the product page
+                // still 'represents' the requested item instead of a generic sample.
+                try {
+                  // Example slug forms: "ipnowo:281", "ipnowo-281", "iphone-12-pro"
+                  function prettifySlug(s) {
+                    if (!s) return s;
+                    // Replace separators with space, remove numeric id suffixes after ':' or '-'
+                    let out = String(s).trim();
+                    // If form is prefix:digits, show prefix and the id in parentheses
+                    const m = out.match(/^([^:\-]+)[:\-]?(\d+)?$/i);
+                    if (m) {
+                      const namePart = m[1].replace(/[-_]+/g, ' ');
+                      if (m[2]) return namePart.replace(/\b\w/g, c => c.toUpperCase()) + ' (ID ' + m[2] + ')';
+                      return namePart.replace(/\b\w/g, c => c.toUpperCase());
+                    }
+                    // Generic fallback: convert dashes/underscores/colons to spaces and title-case
+                    out = out.replace(/[:_\-]+/g, ' ');
+                    return out.replace(/\b\w/g, c => c.toUpperCase());
+                  }
+
+                  // Build a minimal product object derived from the slug
+                  const prettyName = prettifySlug(slugParam);
+                  if (prettyName) {
+                    product = { id: slugParam, name: prettyName, price: null, description: 'Representing product: ' + prettyName, image_url: 'https://placehold.co/600x400' };
+                  }
+                } catch (e) {
+                  console.warn('Error creating slug-derived product representation:', e);
+                }
+              }
+            } catch (e) {
+              console.warn('Error checking products columns:', e);
+              product = null;
+            }
+          }
+          if (!product && nameParam) {
+            try {
+              const q = `%${nameParam.replace(/%/g,'') }%`;
+              const res = await window.supabaseClient.from('products').select('*').ilike('name', q).limit(1);
+              if (!res.error && Array.isArray(res.data) && res.data.length) product = res.data[0];
+            } catch(e) { product = null; }
+          }
+        } catch(err) {
+          console.error('Error fetching product from Supabase', err);
+          product = null;
+        }
+      }
+      // fallback placeholder
+      if (!product) {
+        const fallbackId = idParam || slugParam || nameParam || 'unknown';
+        product = { id: fallbackId, name: 'Sample Product', price: 387000, description: 'Product description goes here. Replace with real data.', image_url: 'https://placehold.co/600x400' };
+      }
+      main.innerHTML = `
+        <div class="product-detail-grid">
+          <div class="product-gallery">
+            <img src="${product.image_url || 'https://placehold.co/600x400'}" class="product-gallery-img clickable-img" alt="${product.name}" id="mainProductImg" />
+          </div>
+          <div class="product-info">
+            <h1 class="product-page-title">${product.name}</h1>
+            <div class="product-page-price" id="unitPrice">${formatPrice(product.price)}</div>
+            
+            <!-- Memory options -->
+            <div class="product-option-group">
+              <label class="option-label">Memory</label>
+              <div class="option-buttons" id="memoryOptions">
+                <!-- buttons inserted by JS; fallback shown below -->
+                <button class="option-btn selected" data-price="${product.price}" data-name="Default">Default</button>
+              </div>
+            </div>
+
+            <!-- Quantity controls -->
+            <div class="product-quantity-row">
+              <label class="option-label">Quantity</label>
+              <div class="qty-controls">
+                <button id="qtyMinus" class="qty-btn">−</button>
+                <input id="qtyValue" class="qty-input" type="number" value="1" min="1" />
+                <button id="qtyPlus" class="qty-btn">+</button>
+                <span id="stockNote" class="stock-note"></span>
+              </div>
+            </div>
+
+            <div class="product-total-row">
+              <label class="option-label">Total Price</label>
+              <div id="totalPrice" class="product-total">${formatPrice(product.price)}</div>
+            </div>
+
+              <div class="product-page-actions">
+                <button id="addToCartBtn" class="btn-add"><span class="btn-icon-margin">&#128722;</span> Add to cart</button>
+                <button id="buyNowBtn" class="btn-buy">Buy Now</button>
+              </div>
+              <div class="product-share">
+                <span class="share-label">Share</span>
+                <a href="#" class="share-btn share-email" title="Email">&#9993;</a>
+                <a href="#" class="share-btn share-twitter" title="Twitter">&#128081;</a>
+                <a href="#" class="share-btn share-facebook" title="Facebook">&#128100;</a>
+                <a href="#" class="share-btn share-whatsapp" title="WhatsApp">&#128241;</a>
+              </div>
+            <div class="description-box">${product.description || ''}</div>
+          </div>
+        </div>
+
+        <!-- Secondary section: Top Selling + Reviews -->
+        <div class="product-secondary">
+          <div class="product-secondary-flex">
+            <aside class="top-selling">
+              <h3>Top Selling Products</h3>
+              <ul>
+                <li class="top-item">
+                  <img src="assets/images/smartphone.png" alt="Top 1" />
+                  <div class="top-meta"><div class="top-name">TECNO SPARK 40 SERIES (128GB)</div><div class="top-price">#148,000</div></div>
+                </li>
+                <li class="top-item">
+                  <img src="assets/images/promo-banner.png" alt="Top 2" />
+                  <div class="top-meta"><div class="top-name">TECNO POP 10 SERIES</div><div class="top-price">#102,000</div></div>
+                </li>
+                <li class="top-item">
+                  <img src="assets/images/appliances.png" alt="Top 3" />
+                  <div class="top-meta"><div class="top-name">ITEL A06 (32GB ROM)</div><div class="top-price">#48,000</div></div>
+                </li>
+              </ul>
+            </aside>
+            <section class="newsletter-social-section inline-flex">
+              <style>
+                /* Footer styles kept in-section for backwards compatibility */
+                .lamar-footer { background: #181818; color: #fff; padding: 36px 0 18px 0; margin-top: 48px; font-family: inherit; }
+                .footer-container { max-width: 900000px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; gap: 18px; }
+                .footer-brand { font-size: 1.5rem; font-weight: 7000; margin-bottom: 6px; }
+                .footer-links { display: flex; gap: 24px; margin-bottom: 6px; }
+                .footer-links a { color: #fff; text-decoration: none; font-size: 1rem; transition: color 0.2s; }
+                .footer-links a:hover { color: #e53935; }
+                .footer-social { display:flex; gap:16px; margin-bottom:6px; }
+                .footer-social a { color:#fff; font-size:1.4rem; width:38px; height:38px; border-radius:50%; background:#232323; display:flex; align-items:center; justify-content:center; transition:background 0.2s, color 0.2s; text-decoration:none; }
+                .footer-social a:hover { background:#e53935; color:#fff; }
+                .footer-copy { font-size:0.95rem; color:#bbb; margin-top:8px; text-align:center; }
+                @media (max-width:6000px){ .footer-container{ padding:0 8vw } .footer-links{ flex-wrap:wrap; gap:14px } .footer-social{ gap:10px } }
+              </style>
+
+              <!-- Promotional card resembling the screenshot -->
+              <div class="newsletter-social-responsive inline-margin">
+                <div class="newsletter-title">Lamar Phone And Gadget</div>
+                <div class="newsletter-subtitle">Lamar Phone And Gadget: Best Online Store in Nigeria</div>
+                <p class="newsletter-paragraph">Online stores have dominated the Internet space in Nigeria and it keeps growing. There are indications that this growth will continue because <mark class="highlight-mark">online</mark> shopping is nowhere near its potential. While it offers a lot of comfortableness and class in trading.</p>
+
+                <div class="follow-us-title">FOLLOW US</div>
+                <div class="social-links inline-bottom">
+                  <a class="footer-social-icon facebook" href="#" aria-label="Facebook">f</a>
+                  <a class="footer-social-icon twitter" href="#" aria-label="Twitter">t</a>
+                  <a class="footer-social-icon whatsapp" href="#" aria-label="WhatsApp">w</a>
+                  <a class="footer-social-icon youtube" href="#" aria-label="YouTube">y</a>
+                  <a class="footer-social-icon instagram" href="#" aria-label="Instagram">ig</a>
+                </div>
+              </div>
+            </section>
+          </div>
+        </div>
+      `;
+      
+      // Build variants/memory options from product data (prefer real fields when available)
+      let variants = [];
+      // 1) product.variants (array of strings or objects)
+      if (Array.isArray(product.variants) && product.variants.length) {
+        variants = product.variants.map(v => {
+          if (typeof v === 'string') return { name: v, price: Number(product.price) || 0 };
+          return { name: v.name || v.title || v.option || 'Variant', price: Number(v.price ?? product.price) || 0 };
+        });
+      }
+      // 2) product.options (common listing of option values)
+      else if (Array.isArray(product.options) && product.options.length) {
+        variants = product.options.map(o => {
+          if (typeof o === 'string') return { name: o, price: Number(product.price) || 0 };
+          return { name: o.name || o.value || 'Option', price: Number(o.price ?? product.price) || 0 };
+        });
+      }
+      // 3) product.memory_options as comma-separated string or array
+      else if (product.memory_options) {
+        let arr = [];
+        if (typeof product.memory_options === 'string') arr = product.memory_options.split(',').map(s => s.trim()).filter(Boolean);
+        else if (Array.isArray(product.memory_options)) arr = product.memory_options;
+        variants = arr.map((name, idx) => ({ name, price: (product.variant_prices && product.variant_prices[idx]) ? Number(product.variant_prices[idx]) : Number(product.price) || 0 }));
+      }
+      // 4) attributes array with memory/ram attribute
+      else if (Array.isArray(product.attributes) && product.attributes.length) {
+        const memAttr = product.attributes.find(a => /memory|ram/i.test(a.name || ''));
+        if (memAttr && Array.isArray(memAttr.options) && memAttr.options.length) {
+          variants = memAttr.options.map(o => ({ name: (typeof o === 'string' ? o : o.name || o.value), price: Number(product.price) || 0 }));
+        }
+      }
+      // Fallback to a single default variant
+      if (!variants || variants.length === 0) {
+        variants = [{ name: 'Default', price: Number(product.price) || 0 }];
+      }
+
+      // Render memory option buttons
+      const memoryContainer = document.getElementById('memoryOptions');
+      memoryContainer.innerHTML = variants.map((v, idx) => `
+        <button class="option-btn ${idx===0? 'selected':''}" data-price="${v.price}" data-name="${v.name}">${v.name}</button>
+      `).join('');
+
+      let selectedVariant = variants[0];
+      const unitPriceEl = document.getElementById('unitPrice');
+      const totalPriceEl = document.getElementById('totalPrice');
+      const qtyInput = document.getElementById('qtyValue');
+
+      function updatePrices() {
+        const qty = Math.max(1, Number(qtyInput.value) || 1);
+        const unit = Number(selectedVariant.price) || Number(product.price) || 0;
+        unitPriceEl.textContent = formatPrice(unit);
+        totalPriceEl.textContent = formatPrice(unit * qty);
+      }
+
+      // Option button clicks
+      memoryContainer.addEventListener('click', function(e){
+        const btn = e.target.closest('.option-btn');
+        if (!btn) return;
+        memoryContainer.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        selectedVariant = { name: btn.dataset.name, price: Number(btn.dataset.price) };
+        updatePrices();
+      });
+
+      // Quantity controls
+      document.getElementById('qtyPlus').addEventListener('click', function(){ qtyInput.value = Number(qtyInput.value||1) + 1; updatePrices(); });
+      document.getElementById('qtyMinus').addEventListener('click', function(){ qtyInput.value = Math.max(1, Number(qtyInput.value||1) - 1); updatePrices(); });
+      qtyInput.addEventListener('change', updatePrices);
+
+      // Wire Add to cart to include variant and qty
+      document.getElementById('addToCartBtn').addEventListener('click', function(){
+        const qty = Math.max(1, Number(qtyInput.value) || 1);
+        const prod = { id: product.id, name: product.name, price: selectedVariant.price || product.price, image_url: product.image_url, variant: selectedVariant.name, qty };
+        if (window.opener && window.opener.addToCart) { window.opener.addToCart(prod); }
+        if (typeof addToCart === 'function') addToCart(prod);
+        alert('Added to cart: ' + prod.variant + ' x' + qty);
+      });
+
+      // initialize prices
+      updatePrices();
+      document.getElementById('buyNowBtn').addEventListener('click', function(){ alert('Buy Now clicked'); });
+
+      // --- Product Image Gallery Modal Logic ---
+      // Example: product.images = [url1, url2, ...] or fallback to [image_url]
+      let images = Array.isArray(product.images) && product.images.length ? product.images : [product.image_url || 'https://placehold.co/600x400'];
+      let currentImgIdx = 0;
+      const modal = document.getElementById('imageGalleryModal');
+      const mainImg = document.getElementById('galleryMainImg');
+      const prevBtn = document.getElementById('galleryPrevBtn');
+      const nextBtn = document.getElementById('galleryNextBtn');
+      const closeBtn = document.getElementById('closeGalleryModal');
+      const thumbnails = document.getElementById('galleryThumbnails');
+
+      function showGallery(idx=0) {
+  currentImgIdx = idx;
+  if (mainImg) mainImg.src = images[currentImgIdx];
+  if (thumbnails) thumbnails.innerHTML = images.map((img, i) => `<img src="${img}" class="gallery-thumb${i===currentImgIdx?' selected':''}" data-idx="${i}" />`).join('');
+  if (modal) modal.classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+      }
+      function hideGallery() {
+        modal.classList.add('hidden');
+        document.body.style.overflow = '';
+      }
+      function showImg(idx) {
+        if (idx < 0) idx = images.length-1;
+        if (idx >= images.length) idx = 0;
+        showGallery(idx);
+      }
+      // Open gallery on main product image click
+      const mainProductImg = document.getElementById('mainProductImg');
+      if (mainProductImg) mainProductImg.addEventListener('click', () => showGallery(currentImgIdx));
+      if (prevBtn) prevBtn.addEventListener('click', () => showImg(currentImgIdx-1));
+      if (nextBtn) nextBtn.addEventListener('click', () => showImg(currentImgIdx+1));
+      if (closeBtn) closeBtn.addEventListener('click', hideGallery);
+      if (thumbnails) thumbnails.addEventListener('click', function(e){
+        const thumb = e.target.closest('img.gallery-thumb');
+        if (thumb) showGallery(Number(thumb.dataset.idx));
+      });
+      // Close modal on outside click
+      if (modal) modal.addEventListener('click', function(e){
+        if (e.target === modal) hideGallery();
+      });
+
+      // Delegated handler: clicking any Top Selling image updates the main product image with a fade
+      document.addEventListener('click', function delegatedTopClick(e){
+        const img = e.target.closest('.top-selling .top-item img');
+        if (!img) return;
+        const mainImgEl = document.getElementById('mainProductImg');
+        if (!mainImgEl) return;
+        // animate fade out -> change src -> fade in
+        mainImgEl.style.transition = 'opacity 180ms ease';
+        mainImgEl.style.opacity = '0';
+        setTimeout(() => {
+          // update gallery array if present
+          try {
+            if (typeof images !== 'undefined' && Array.isArray(images) && images.length) {
+              images[0] = img.src;
+              currentImgIdx = 0;
+            }
+          } catch (err) { /* ignore */ }
+          mainImgEl.src = img.src;
+          mainImgEl.alt = img.alt || mainImgEl.alt || '';
+          mainImgEl.style.opacity = '1';
+        }, 200);
+      });
+    })();
+  </script>
+  <script>
+    (function(){
+      var fabToggle = document.getElementById('fab-toggle');
+      if (!fabToggle) return;
+      fabToggle.addEventListener('click', function() {
+        var actions = document.getElementById('fab-actions');
+        if (!actions) return;
+        actions.classList.toggle('fab-actions-show');
+      });
+    })();
+  </script>
+  <script>
+    // Menu open/close logic (for product page)
+    document.addEventListener('DOMContentLoaded', function() {
+      var menuBtn = document.getElementById('menuBtn');
+      var menuDrawer = document.getElementById('menuDrawer');
+      var closeMenuDrawer = document.getElementById('closeMenuDrawer');
+      if (menuBtn && menuDrawer) {
+        menuBtn.addEventListener('click', function() {
+          menuDrawer.classList.add('open');
+          document.body.classList.add('menu-drawer-open');
+        });
+      }
+      if (closeMenuDrawer && menuDrawer) {
+        closeMenuDrawer.addEventListener('click', function() {
+          menuDrawer.classList.remove('open');
+          document.body.classList.remove('menu-drawer-open');
+        });
+      }
+      // Also close the menu if a menu link is clicked
+      document.querySelectorAll('#menuDrawer .menu-link').forEach(function(link){
+        link.addEventListener('click', function(){
+          if (menuDrawer) { menuDrawer.classList.remove('open'); document.body.classList.remove('menu-drawer-open'); }
+        });
+      });
+    });
+  </script>
+  <!-- Bottom fixed navigation (mobile style) -->
+  <nav class="bottom-nav" aria-hidden="false">
+    <a href="index.html" class="bottom-nav-item">
+      <span class="nav-ico">🏠</span>
+      <span class="nav-label">Home</span>
+    </a>
+    <a href="categories.html" class="bottom-nav-item">
+      <span class="nav-ico">☰</span>
+      <span class="nav-label">Categories</span>
+    </a>
+    <a href="cart.html" class="bottom-nav-item active">
+      <span class="nav-ico">🛒</span>
+      <span class="nav-label">Cart</span>
+    </a>
+    <a href="notifications.html" class="bottom-nav-item">
+      <span class="nav-ico">🔔</span>
+      <span class="nav-label">Notifications</span>
+    </a>
+    <a href="login.html" class="bottom-nav-item">
+      <span class="nav-ico">👤</span>
+      <span class="nav-label">My Account</span>
+    </a>
+  </nav>
+
+  <!-- Simple cart modal -->
+  <div id="cartModal" class="mobile-cart-modal">
+    <div class="mobile-cart-content">
+      <button id="closeCartModal" class="close close-cart-btn">&times;</button>
+      <h3 class="cart-title-mobile">Your Cart</h3>
+      <div id="cartItemsContainer" class="cart-items-mobile">
+        <div class="cart-steps" aria-hidden="true">
+          <div class="cart-step active">🛒</div>
+          <div class="cart-step">🗺️</div>
+          <div class="cart-step">🚚</div>
+          <div class="cart-step">💳</div>
+          <div class="cart-step">✅</div>
+        </div>
+        <div class="cart-empty-box">
+          <div class="cart-empty-ico">😕</div>
+          <div class="cart-empty">Your Cart is empty</div>
+        </div>
+      </div>
+      <div class="cart-footer-tiles">
+        <div class="tile"><div class="tile-ico">🛒</div><div class="tile-text">Terms & conditions</div></div>
+        <div class="tile"><div class="tile-ico">🔁</div><div class="tile-text">Return Policy</div></div>
+        <div class="tile"><div class="tile-ico">🎧</div><div class="tile-text">Support</div></div>
+        <div class="tile"><div class="tile-ico">❗</div><div class="tile-text">Help</div></div>
+      </div>
+      <div class="cart-modal-footer">
+        <div class="cart-total-label">Total: <span id="cartTotal">₦0</span></div>
+        <button id="checkoutBtn" class="checkout-btn">Checkout</button>
+      </div>
+    </div>
+  </div>
+  <script src="cart.js"></script>
+</body>
+</html>

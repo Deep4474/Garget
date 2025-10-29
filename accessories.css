@@ -1,0 +1,16 @@
+/* Accessories listing styles */
+.products-grid { display:grid; grid-template-columns: repeat(auto-fill,minmax(180px,1fr)); gap:14px; }
+.product-card { background:#fff; border-radius:8px; padding:12px; box-shadow:0 6px 18px rgba(0,0,0,0.04); }
+.product-img { height:140px; object-fit:contain }
+.product-name { font-size:1rem; font-weight:700 }
+.price { color:#e64a19; font-weight:700; margin-top:8px }
+
+@media (max-width:640px) { .products-grid { grid-template-columns: repeat(2,1fr); } }
+
+/* Responsive override: single column under 432px, two columns from 432px up to 899px */
+@media (max-width:200px) {
+	.products-grid { grid-template-columns: 1fr !important; }
+}
+@media (min-width:432px) and (max-width:200px) {
+	.products-grid { grid-template-columns: repeat(2,1fr) !important; }
+}

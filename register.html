@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Account - Registration</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="footer-section.css">
+  <style>
+    .register-container {
+      max-width: 420px;
+      margin: 32px auto;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+      padding: 32px 24px 24px 24px;
+      font-family: inherit;
+    }
+    .register-logo {
+      display: block;
+      margin: 0 auto 8px auto;
+      height: 38px;
+    }
+    .register-title {
+      text-align: center;
+      color: #e64a19;
+      font-size: 1.5em;
+      font-weight: 700;
+      margin-bottom: 8px;
+      letter-spacing: 1px;
+    }
+    .register-subtitle {
+      text-align: center;
+      color: #222;
+      font-size: 1.1em;
+      margin-bottom: 24px;
+      font-weight: 500;
+    }
+    .register-form label {
+      font-weight: 600;
+      margin-bottom: 4px;
+      display: block;
+      color: #222;
+    }
+    .register-form input[type="text"],
+    .register-form input[type="email"],
+    .register-form input[type="password"] {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      margin-bottom: 18px;
+      font-size: 1em;
+      background: #fafafa;
+      color: #222;
+    }
+    .register-form .input-row {
+      position: relative;
+    }
+    .register-form .toggle-password {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 1.1em;
+      color: #888;
+    }
+    .register-form .password-hint {
+      font-size: 0.93em;
+      color: #888;
+      margin-top: -14px;
+      margin-bottom: 12px;
+      text-align: right;
+    }
+    .register-form .terms {
+      margin-bottom: 18px;
+      font-size: 0.98em;
+      color: #222;
+    }
+    .register-form .terms a {
+      color: #e64a19;
+      text-decoration: underline;
+    }
+    .register-form .terms-label {
+      display: inline;
+    }
+    .register-form .register-btn {
+      width: 100%;
+      background: #e64a19;
+      color: #fff;
+      font-size: 1.1em;
+      font-weight: 700;
+      border: none;
+      border-radius: 4px;
+      padding: 13px 0;
+      margin-top: 8px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .register-form .register-btn:hover {
+      background: #c0390b;
+    }
+    .register-form .login-link {
+      display: block;
+      text-align: center;
+      margin-top: 18px;
+      color: #e64a19;
+      font-weight: 600;
+      text-decoration: none;
+      font-size: 1em;
+    }
+    .register-form .login-link:hover {
+      text-decoration: underline;
+    }
+    .register-form .or-separator {
+      text-align: center;
+      margin: 18px 0 0 0;
+      font-size: 1em;
+      color: #222;
+      font-weight: 500;
+    }
+    .register-form .email-btn {
+      background: #4285F4;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="register-container">
+  <img src="assets/images/smartphone.png" alt="Logo" class="register-logo" onerror="this.style.display='none'">
+    <div class="register-title">CREATE AN ACCOUNT.</div>
+    <form class="register-form" autocomplete="off">
+      <label for="fullname">Full Name</label>
+      <input type="text" id="fullname" name="fullname" placeholder="Full Name" required>
+      <label for="email">Email</label>
+      <input type="email" id="email" name="email" placeholder="Email" required>
+      <label for="password">Password</label>
+      <div class="input-row">
+        <input type="password" id="password" name="password" placeholder="Password" required minlength="6">
+        <button type="button" class="toggle-password" onclick="togglePassword('password', this)">&#128065;</button>
+      </div>
+      <div class="password-hint">Password must contain at least 6 digits</div>
+      <label for="confirm-password">Confirm Password</label>
+      <div class="input-row">
+        <input type="password" id="confirm-password" name="confirm-password" placeholder="Confirm Password" required minlength="6">
+        <button type="button" class="toggle-password" onclick="togglePassword('confirm-password', this)">&#128065;</button>
+      </div>
+      <div class="terms">
+        <input type="checkbox" id="terms" required>
+        <label for="terms">By signing up you agree to our <a href="#">terms and conditions</a></label>
+      </div>
+      <button type="submit" class="register-btn">Create Account</button>
+      <div class="or-separator">or</div>
+  <div class="gmail-instruction">Click the button below to sign up with your Gmail account.</div>
+      <button type="button" class="register-btn email-btn gmail-btn-flex" id="continueWithGmailBtn">
+        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" class="gmail-btn-icon"> 
+        Continue with Gmail
+      </button>
+      <a href="#login" class="login-link">Already have an account? Log In</a>
+    </form>
+  </div>
+  <script>
+    function togglePassword(id, btn) {
+      const input = document.getElementById(id);
+      if (input.type === 'password') {
+        input.type = 'text';
+        btn.innerHTML = '&#128064;';
+      } else {
+        input.type = 'password';
+        btn.innerHTML = '&#128065;';
+      }
+    }
+
+    // Supabase Gmail OAuth for 'Continue with Gmail' using Google provider
+    (function(){
+      var gmailBtn = document.getElementById('continueWithGmailBtn');
+      if (!gmailBtn) return;
+      gmailBtn.addEventListener('click', function(){
+        // Use the production Netlify URL for redirect
+        const registerUrl = 'https://lamarphoneandgadget.netlify.app/phonefolder/register.html';
+        const url = 'https://jlwxkykznyjmstpjcgks.supabase.co/auth/v1/authorize?provider=google&redirect_to=' + encodeURIComponent(registerUrl);
+        window.location.href = url;
+      });
+    })();
+
+    // Parse access token and user info from URL hash after Google OAuth
+    function parseHashParams() {
+      const hash = window.location.hash.substr(1);
+      const params = {};
+      hash.split('&').forEach(function(part) {
+        const item = part.split('=');
+        if (item[0]) params[item[0]] = decodeURIComponent(item[1]);
+      });
+      return params;
+    }
+
+    window.addEventListener('DOMContentLoaded', function() {
+      const params = parseHashParams();
+      if (params['access_token']) {
+        // Optionally, you can store the token in localStorage/sessionStorage
+        // localStorage.setItem('access_token', params['access_token']);
+
+        // Try to parse user info from id_token or user_metadata if available
+        // For demo, just show a welcome message
+        let userInfo = '';
+        if (params['user_metadata']) {
+            try {
+            const meta = JSON.parse(params['user_metadata']);
+            userInfo = `<div class="register-welcome">Welcome, <b>${meta.full_name || meta.name || ''}</b><br>Email: <b>${meta.email || ''}</b></div>`;
+          } catch(e) {}
+        }
+        if (!userInfo && params['access_token']) {
+          userInfo = `<div class="register-welcome">Login successful! (Google OAuth)</div>`;
+        }
+        // Insert user info above the form
+        const form = document.querySelector('.register-form');
+        if (form && userInfo) {
+          const div = document.createElement('div');
+          div.innerHTML = userInfo;
+          form.parentNode.insertBefore(div, form);
+        }
+        // Optionally, clear the hash from the URL
+        history.replaceState(null, '', window.location.pathname);
+      }
+    });
+  </script>
+</body>
+</html>

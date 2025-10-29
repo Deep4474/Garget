@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Special New Product — Share & Get 20% Off</title>
+  <link rel="stylesheet" href="new-product.css">
+</head>
+<body>
+  <header class="top-compact-header">
+    <div class="left">
+      <div id="menuBtn" class="hamburger" aria-label="Open menu">☰</div>
+      <span class="brand-text">Lamar Phone And Gadget</span>
+    </div>
+    <div class="header-actions"></div>
+  </header>
+
+  <main class="np-main">
+    <section class="np-card">
+      <h1 id="npTitle">New Product</h1>
+      <img id="npImage" src="https://placehold.co/400x300" alt="New product" />
+      <p id="npDescription">Share this product link with a friend and get 20% discount on your next purchase.</p>
+
+      <div class="np-actions">
+        <label for="npShareInput" class="sr-only">Share link for 20% discount</label>
+        <input id="npShareInput" type="text" readonly title="Share link for 20% discount" placeholder="https://lamarphoneandgadget.netlify.app/" />
+        <button id="npCopyBtn" class="btn">Copy Link</button>
+        <button id="npNativeShare" class="btn">Share</button>
+      </div>
+
+      <p class="np-note">Share and show proof at checkout to redeem your discount. Link includes a promo tag for tracking.</p>
+    </section>
+  </main>
+
+  <script src="new-product.js"></script>
+</body>
+</html>

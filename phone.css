@@ -1,0 +1,20 @@
+/* Styles specific to the phone listing page */
+.phones-main { padding: 0 12px 120px 12px; max-width: 980px; margin: 0 auto }
+.phones-main h1 { font-size: 1.4rem; margin-bottom: 12px }
+/* Default: single column for very small screens (phones smaller than ~4.5in) */
+#phonesGrid { display: grid; grid-template-columns: 1fr; gap: 12px }
+
+/* Two columns starting at approximately 4.5 inches (4.5in * 96dpi = 432px) */
+@media (min-width: 432px) {
+	#phonesGrid { grid-template-columns: repeat(2, 1fr); gap: 16px }
+}
+
+/* Larger breakpoint tweaks (optional) */
+@media (min-width: 900px) {
+	#phonesGrid { gap: 20px }
+}
+
+.product-card { background:#fff; border-radius:8px; padding:12px; box-shadow:0 6px 18px rgba(0,0,0,0.04); }
+.product-img { height:140px; object-fit:contain }
+.product-name { font-size:1rem; font-weight:700 }
+.price { color:#e64a19; font-weight:700; margin-top:8px }

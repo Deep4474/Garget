@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Checkout - Lamar Phone And Gadget</title>
+  <link rel="stylesheet" href="checkout.css">
+</head>
+<body>
+  <header class="top-compact-header">
+    <div class="left">
+      <div id="menuBtn" class="hamburger" aria-label="Open menu">☰</div>
+      <span class="brand-text">Lamar Phone And Gadget</span>
+    </div>
+    <div class="header-actions"></div>
+  </header>
+
+  <main class="checkout-main">
+    <div class="grid">
+      <section class="checkout-card">
+        <h1>Checkout</h1>
+        <div class="checkout-sub">Confirm your details and place order securely</div>
+
+        <form id="checkoutForm" class="checkout-form">
+          <div class="form-grid">
+            <label>Name<input id="checkoutUserName" name="name" type="text" autocomplete="name" required></label>
+            <label>Email<input id="checkoutEmail" name="email" type="email" autocomplete="email" required></label>
+            <div class="form-row">
+              <label>Phone<input id="checkoutPhone" name="phone" type="tel" required></label>
+              <label>State<select id="checkoutState" required>
+                <option value="">State</option>
+                <option>Abuja</option>
+                <option>Lagos</option>
+                <option>Oyo</option>
+                <option>Kano</option>
+                <option>Rivers</option>
+                <option>Kaduna</option>
+                <option>Enugu</option>
+                <option>Edo</option>
+                <option>Others</option>
+              </select></label>
+            </div>
+            <label>Address<textarea id="checkoutAddress" name="address" rows="3" required></textarea></label>
+            <div class="form-row">
+              <label>Delivery Option<select id="checkoutPickOption" required>
+                <option value="">Select</option>
+                <option value="Hub to Hub">Hub to Hub</option>
+                <option value="Hub to Door">Hub to Door</option>
+              </select></label>
+            </div>
+          </div>
+          <!-- Inline total shown inside the form -->
+          <div class="summary-row summary-inline"><div>Total</div><div id="summaryTotal">₦0</div></div>
+
+          <div class="form-actions">
+            <div class="note">We will contact you with delivery details after order confirmation.</div>
+            <div>
+              <button id="placeOrderBtn" class="btn btn-primary" type="submit">Place Order</button>
+            </div>
+          </div>
+
+          <div id="orderStatus" class="order-status" aria-live="polite"></div>
+        </form>
+      </section>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <script src="supabase-config.js"></script>
+  <script src="script.js"></script>
+  <script src="checkout.js"></script>
+  <!-- bottom navigation bar for mobile (matches site style) -->
+  <nav class="bottom-nav" aria-hidden="false">
+    <a href="index.html">
+      <span class="nav-ico">🏠</span>
+      <span class="nav-label">Home</span>
+    </a>
+    <a href="categories.html">
+      <span class="nav-ico">☰</span>
+      <span class="nav-label">Categories</span>
+    </a>
+    <a href="cart.html" id="bottomCartLink">
+      <span class="nav-ico">🛒</span>
+      <span class="nav-label">Cart</span>
+      <span id="bottomCartCount" class="bottom-cart-count" aria-hidden="true"></span>
+    </a>
+    <a href="notifications.html">
+      <span class="nav-ico">🔔</span>
+      <span class="nav-label">Notifications</span>
+    </a>
+    <a href="login.html">
+      <span class="nav-ico">👤</span>
+      <span class="nav-label">My Account</span>
+    </a>
+  </nav>
+</body>
+</html>

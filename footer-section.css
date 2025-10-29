@@ -1,0 +1,225 @@
+/* Footer content padding for spacing */
+.footer-content {
+  padding: 8px 16px 0 16px;
+}
+/* Visually hidden utility for accessibility (replaces display:none inline style) */
+.visually-hidden {
+  position: absolute !important;
+  height: 1px; width: 1px;
+  overflow: hidden;
+  clip: rect(1px, 1px, 1px, 1px);
+  white-space: nowrap;
+}
+/* Footer Section Styles extracted from inline styles in index.html */
+.footer-section {
+  background: #23232b;
+  color: #bdbdbd;
+  padding: 0 0 48px 0;
+  margin-top: 0;
+}
+.footer-container {
+  max-width: 900px;
+  margin: 0 auto;
+}
+.footer-policies {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #fff;
+  padding: 0;
+  border-bottom: 1px solid #e0e0e0;
+}
+.footer-policies a {
+  flex: 1;
+  text-align: center;
+  padding: 12px 0;
+  color: #23232b;
+  font-weight: 600;
+  text-decoration: none;
+}
+.footer-policies a:first-child {
+  border-right: 1px solid #e0e0e0;
+}
+.footer-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.footer-logo {
+  height: 40px;
+  width: auto;
+  vertical-align: middle;
+}
+.footer-title {
+  font-size: 2em;
+  font-weight: 700;
+  color: #ff4c36;
+  letter-spacing: 1px;
+}
+.footer-desc-title {
+  margin-top: 12px;
+  font-size: 1.1em;
+  font-weight: 600;
+  color: #bdbdbd;
+}
+.footer-desc {
+  margin-top: 8px;
+  max-width: 600px;
+  line-height: 1.6;
+}
+.footer-desc .highlight {
+  background: #c8e6c9;
+  color: #23232b;
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+.footer-newsletter-title {
+  margin-top: 20px;
+  font-weight: 600;
+}
+.footer-newsletter-form {
+  margin-top: 10px;
+  display: flex;
+  max-width: 420px;
+  gap: 0;
+}
+.footer-newsletter-form input[type="email"] {
+  flex: 1;
+  padding: 10px 12px;
+  border: 1px solid #444;
+  background: #23232b;
+  color: #fff;
+  border-radius: 3px 0 0 3px;
+  font-size: 1em;
+  outline: none;
+}
+.footer-newsletter-form button {
+  background: #ff4c36;
+  color: #fff;
+  padding: 0 28px;
+  font-size: 1em;
+  font-weight: 600;
+  border: none;
+  border-radius: 0 3px 3px 0;
+  cursor: pointer;
+}
+
+.footer-social-title {
+  margin-top: 32px;
+  font-weight: 700;
+  font-size: 1.15em;
+  color: #fff;
+  letter-spacing: 0.5px;
+}
+.footer-social-links {
+  margin-top: 16px;
+  display: flex;
+  gap: 22px;
+  align-items: center;
+  justify-content: flex-start;
+}
+.footer-social-links a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  line-height: 44px;
+  text-align: center;
+  color: #fff;
+  font-size: 1.6em;
+  background: #444;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+  transition: background 0.2s, transform 0.2s;
+  opacity: 1;
+}
+.footer-social-links a:hover {
+  transform: translateY(-3px) scale(1.08);
+  filter: brightness(1.1);
+}
+.footer-social-links .facebook { background: #3b5998; }
+.footer-social-links .twitter { background: #1da1f2; }
+.footer-social-links .whatsapp { background: #25d366; }
+.footer-social-links .x { background: #000; }
+.footer-social-links .instagram { background: #e1306c; }
+.footer-social-links .youtube { background: #ff0000; }
+
+/* Chat Widget Styles */
+#chatWidgetBtn {
+  position: fixed;
+  bottom: 90px;
+  right: 18px;
+  z-index: 9999;
+  background: #4285F4;
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 54px;
+  height: 54px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.18);
+  font-size: 2em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+#chatWidget {
+  display: none;
+  position: fixed;
+  bottom: 150px;
+  right: 18px;
+  z-index: 10000;
+  width: 320px;
+  max-width: 95vw;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.18);
+  overflow: hidden;
+}
+#chatWidget .chat-header {
+  background: #4285F4;
+  color: #fff;
+  padding: 12px 16px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+#closeChatWidget {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 1.3em;
+  cursor: pointer;
+}
+#chatMessages {
+  padding: 16px;
+  min-height: 120px;
+  max-height: 260px;
+  overflow-y: auto;
+  font-size: 1em;
+}
+#chatMessages .chat-greeting {
+  color: #888;
+}
+#chatForm {
+  display: flex;
+  border-top: 1px solid #eee;
+}
+#chatInput {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  font-size: 1em;
+  outline: none;
+}
+#chatForm button[type="submit"] {
+  background: #4285F4;
+  color: #fff;
+  border: none;
+  padding: 0 18px;
+  font-size: 1em;
+  font-weight: 600;
+  cursor: pointer;
+}

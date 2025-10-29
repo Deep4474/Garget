@@ -1,0 +1,193 @@
+/* categories.css - styles for the categories sidebar (card list) */
+:root{
+  --hdr-bg: #1976d2;
+  --hdr-contrast: #fff;
+  --hdr-shadow: 0 3px 12px rgba(0,0,0,0.08);
+  --hdr-pad: 10px 12px;
+}
+:root{
+  --cat-bg:#fff;
+  --cat-border:#ececec;
+  --cat-radius:10px;
+  --cat-shadow: 0 6px 18px rgba(0,0,0,0.04);
+  --cat-gap:14px;
+  --cat-pad:12px;
+  --muted:#6b6b6b;
+}
+
+/* Header styles for categories page */
+.lamar-header{
+  position: -webkit-sticky; /* for Safari */
+  position: sticky;
+  top: 0;
+  z-index: 1200;
+  background: var(--hdr-bg);
+  color: var(--hdr-contrast);
+  box-shadow: var(--hdr-shadow);
+}
+.lamar-header .topbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:6px 12px;
+  font-size:13px;
+  opacity:0.95;
+}
+.lamar-header-content{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding: var(--hdr-pad);
+}
+.lamar-menu-btn{
+  background: transparent;
+  border: none;
+  color: var(--hdr-contrast);
+  font-size:22px;
+  width:40px;
+  height:40px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:8px;
+  cursor:pointer;
+  flex: 0 0 auto;
+}
+.lamar-menu-btn:active,.lamar-menu-btn:focus{ outline: none; box-shadow: 0 0 0 3px rgba(255,255,255,0.06); }
+.lamar-header-logo{
+  color: var(--hdr-contrast);
+  font-weight:800;
+  font-size:1rem;
+  text-decoration:none;
+  display:inline-block;
+  white-space:nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ensure page content doesn't hide under sticky header on small screens */
+.categories-main{ padding-top: 8px; }
+
+@media(min-width:900px){
+  /* on larger screens, tone down header background to match desktop layout */
+  .lamar-header{ background: #ffffff; color: #111; box-shadow: 0 1px 6px rgba(0,0,0,0.04); }
+  .lamar-header .topbar{ color: #666; }
+  .lamar-header-content{ padding:14px 18px; }
+  .lamar-menu-btn{ color: #111; }
+  .lamar-header-logo{ color: #111; }
+}
+
+/* Reuse compact header styles (same as index.html) so menu + logo sit together */
+.top-compact-header {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:10px 12px;
+  background:#1976d2;
+  border-bottom:1px solid rgba(0,0,0,0.08);
+  position:sticky;
+  top:0;
+  z-index:1000;
+  color: #fff;
+}
+.top-compact-header .left { display:flex; align-items:center; gap:8px }
+.hamburger { width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer; color:#fff }
+.brand-text { font-weight:800; color:#fff; font-size:1rem; display:inline-block; font-family: Arial, Helvetica, sans-serif; }
+.header-actions { display:flex;align-items:center;gap:10px }
+
+@media(min-width:900px){
+  .top-compact-header { background: #ffffff; color: #111; border-bottom: 1px solid rgba(0,0,0,0.04); }
+  .top-compact-header .left { gap:10px }
+  .brand-text { color: #111 }
+  .hamburger { color: #111 }
+}
+
+.categories-list {
+  display:flex;
+  flex-direction:column;
+  gap: var(--cat-gap);
+  padding: 6px;
+}
+
+.category-card{
+  display:flex;
+  align-items:flex-start;
+  gap:12px;
+  background:var(--cat-bg);
+  border:1px solid var(--cat-border);
+  border-radius: var(--cat-radius);
+  padding: var(--cat-pad);
+  box-shadow: var(--cat-shadow);
+  cursor:pointer;
+  transition: transform .12s ease, box-shadow .12s ease;
+}
+.category-card:hover{ transform: translateY(-3px); box-shadow: 0 10px 26px rgba(0,0,0,0.06); }
+
+.category-thumb{
+  width:56px; height:56px; border-radius:8px; flex:0 0 56px; overflow:hidden; background:#fafafa; display:flex; align-items:center; justify-content:center; border:1px solid #f2f2f2;
+}
+.category-thumb img{ width:100%; height:100%; display:block; object-fit:cover; }
+
+/* explicit class for JS-updated img element */
+.category-thumb-img{ width:100%; height:100%; object-fit:cover; display:block; }
+
+.category-meta{
+  flex:1 1 auto; min-width:0;
+}
+.category-title{
+  font-weight:700; color:#111; font-size:15px; margin-bottom:4px;
+}
+.category-sublist{
+  font-size:13px; color:var(--muted); line-height:1.35; max-height:5.3em; overflow:hidden;
+}
+
+/* Small screens: make sidebar full width and card layout more spacious */
+@media (max-width:900px){
+  .categories-list{ padding:4px; }
+  .category-card{ padding:10px; }
+  .category-thumb{ width:48px; height:48px; flex:0 0 48px; }
+  .category-title{ font-size:14px; }
+}
+
+/* When used inside a narrow sidebar, ensure consistent spacing */
+.categories-aside{ padding:8px; }
+
+/* utility for active/selected state */
+.category-card.active{ outline: 2px solid rgba(25,118,210,0.12); }
+
+/* Accessibility: focus styles */
+.category-card:focus{ outline: 3px solid rgba(25,118,210,0.18); outline-offset:2px; }
+
+/* compact variant used in some pages */
+.category-card.compact{ padding:8px; gap:10px; }
+.category-card.compact .category-thumb{ width:44px; height:44px; }
+
+/* subtle divider between cards if desired */
+.categories-list.divided .category-card{ border-left-width:4px; border-left-color:transparent; }
+.categories-list.divided .category-card:hover{ border-left-color:rgba(25,118,210,0.06); }
+
+/* Page-level container: center the header and content and provide a comfortable max width */
+.page-header,
+.categories-layout {
+  max-width: 1100px;
+  margin: 12px auto;
+  box-sizing: border-box;
+}
+
+/* On wider screens use a two-column layout: fixed-width aside and flexible products area */
+@media (min-width: 900px) {
+  .categories-layout { display: flex; flex-direction: row; gap: 24px; align-items: flex-start; padding: 0; }
+  .categories-aside { flex: 0 0 260px; max-width: 260px; padding: 8px; }
+  .products-section { flex: 1 1 auto; margin-top: 0; }
+  .page-header { margin-bottom: 8px; }
+}
+
+/* Improve page title row responsiveness so controls wrap on narrow screens */
+.page-header .page-title-row { flex-wrap: wrap; }
+.page-header .page-title-row .page-title { margin-right: 12px; }
+.page-header .page-controls { margin-top: 8px; }
+
+/* Slight visual polish to page-header so it reads as a card on wide screens */
+@media (min-width: 900px) {
+  .page-header { background: #fff; border-radius: 8px; padding: 18px; box-shadow: 0 6px 18px rgba(0,0,0,0.03); }
+}

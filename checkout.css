@@ -1,0 +1,115 @@
+/* Polished checkout styles - mobile-first */
+*{box-sizing:border-box}
+html,body{height:100%}
+body{font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; margin:0; background:linear-gradient(180deg,#f6f8fb 0%, #ffffff 100%); color:#112}
+
+/* Header */
+.lamar-header{background:#0b57ff;color:#fff;padding:14px 16px;box-shadow:0 2px 8px rgba(11,87,255,0.08)}
+.lamar-header .lamar-header-logo{font-weight:800;font-size:18px;letter-spacing:0.2px}
+
+/* Topbar (language / region) */
+.topbar{display:flex;justify-content:space-between;align-items:center;padding:6px 0 8px;border-bottom:1px solid rgba(255,255,255,0.06)}
+.topbar-left,.topbar-right{color:rgba(255,255,255,0.95);font-size:13px}
+.topbar-left{justify-self:start}
+.topbar-right{justify-self:end}
+
+/* Header content row: menu button, logo, actions */
+/* Header layout: left menu, centered logo, right actions */
+.lamar-header-content{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:12px;padding-top:8px}
+.lamar-header-logo{color:#fff;font-size:18px;grid-column:2;justify-self:center}
+
+/* Menu button */
+#menuBtn{background:#fff;color:#0b57ff;border:none;border-radius:8px;padding:6px 8px;font-size:18px;display:inline-flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(11,87,255,0.12);cursor:pointer}
+#menuBtn:focus{outline:2px solid rgba(255,255,255,0.12)}
+
+.lamar-header-actions{grid-column:3;justify-self:end;display:flex;align-items:center;gap:8px}
+
+/* Small screens: keep header compact */
+@media(max-width:480px){
+	.lamar-header{padding:10px 12px}
+	.topbar{padding:4px 0}
+	#menuBtn{padding:6px}
+	.lamar-header-logo{font-size:16px}
+}
+
+.checkout-main{max-width:980px;margin:18px auto;padding:16px}
+
+/* Ensure the checkout content is not hidden behind the fixed bottom nav on mobile */
+.checkout-main { padding-bottom: 160px; }
+
+.grid{display:grid;grid-template-columns:1fr;gap:16px}
+
+.checkout-card{background:#fff;border-radius:14px;padding:18px;box-shadow:0 10px 30px rgba(17,23,34,0.06);border:1px solid rgba(16,24,40,0.04)}
+.checkout-card{margin-bottom:18px}
+.checkout-card h1{margin:0 0 8px;font-size:20px}
+.checkout-sub{color:#556; margin-bottom:12px;font-size:14px}
+
+.cart-summary{border-radius:10px;padding:12px;background:linear-gradient(180deg,#fafbfd,#ffffff);border:1px solid #eef2f7}
+.items-list{max-height:260px;overflow:auto;padding-right:6px}
+.items-row{display:flex;justify-content:space-between;align-items:center;padding:10px 6px;border-bottom:1px dashed #f0f2f6}
+.items-row:last-child{border-bottom:none}
+.item-name{font-weight:700;color:#0e1724}
+.item-meta{color:#6b7280;font-size:13px}
+
+.summary-row{display:flex;justify-content:space-between;padding-top:10px;font-weight:800;color:#0e1724;font-size:16px}
+
+.summary-inline { margin-top: 10px; }
+
+.checkout-form{display:block;margin-top:6px}
+.form-grid{display:grid;grid-template-columns:1fr;gap:10px}
+.form-row{display:flex;gap:10px}
+label{display:block;font-size:13px;color:#344054}
+input[type="text"],input[type="email"],input[type="tel"],textarea,select{width:100%;padding:12px 14px;border-radius:10px;border:1px solid #e6e9ef;background:#fff;font-size:14px;color:#0b1220}
+textarea{min-height:64px;resize:vertical}
+input:focus,textarea:focus,select:focus{outline:none;box-shadow:0 6px 20px rgba(11,87,255,0.08);border-color:#0b57ff}
+
+.delivery-row{display:flex;gap:10px}
+.delivery-row select{flex:1}
+
+.form-actions{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:14px}
+@media(max-width:600px){
+	.form-actions{flex-direction:column;align-items:flex-start;gap:10px}
+	.form-actions .note{order:1}
+	.form-actions .btn{order:2;align-self:stretch}
+}
+.btn{display:inline-flex;align-items:center;gap:10px;padding:12px 16px;border-radius:10px;border:0;cursor:pointer;font-weight:700}
+.btn-primary{background:#0b57ff;color:#fff;box-shadow:0 8px 24px rgba(11,87,255,0.12)}
+.btn-ghost{background:transparent;color:#0b57ff;border:1px solid rgba(11,87,255,0.12)}
+
+.order-status{margin-top:6px;color:#0b1220;font-weight:600}
+
+.note{font-size:13px;color:#667085}
+
+/* Desktop layout: summary on the right */
+@media(min-width:880px){
+	.grid{grid-template-columns: 1fr 360px}
+	.checkout-card{padding:20px}
+	.cart-summary{position:sticky;top:22px}
+	.form-grid{gap:12px}
+  /* on desktop the bottom nav is hidden so reduce extra padding */
+  .checkout-main { padding-bottom: 28px; }
+}
+
+/* subtle scrollbar for items list */
+.items-list::-webkit-scrollbar{width:8px}
+.items-list::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#d1d5db,#c7cbd1);border-radius:8px}
+
+/* Helper small screens */
+@media(max-width:420px){
+	.lamar-header{padding:12px}
+	.btn{padding:10px 12px}
+}
+
+/* Bottom navigation (mobile) */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;height:64px;background:#0b57ff;display:flex;align-items:center;box-shadow:0 -2px 6px rgba(0,0,0,0.08);z-index:1500}
+.bottom-nav a{flex:1;text-decoration:none;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:11px;padding:6px 0}
+.bottom-nav a .nav-ico{font-size:18px;line-height:1;margin-bottom:4px;color:rgba(255,255,255,0.95)}
+.bottom-nav a .nav-label{font-size:11px;color:rgba(255,255,255,0.95)}
+.bottom-nav a.active{background:transparent;color:#ff6a00}
+.bottom-nav a.active .nav-ico{color:#ff6a00}
+.bottom-nav a.active .nav-label{color:#ff6a00}
+.bottom-cart-count{position:absolute;top:8px;right:20%;background:#ff3b30;color:#fff;border-radius:999px;padding:2px 6px;font-size:11px;font-weight:800;box-shadow:0 2px 6px rgba(0,0,0,0.12)}
+
+@media(min-width:900px){
+  .bottom-nav{display:none}
+}
