@@ -1,0 +1,264 @@
+(async function() {
+  // Prevent duplicate initialization
+  if (window.accessoriesInitialized) return;
+  window.accessoriesInitialized = true;
+
+  // Accessory subcategories for filtering
+  const accessoryTypes = {
+    'Phone Accessories': [
+      'Phone Cases & Covers',
+      'Screen Protectors',
+      'Phone Chargers',
+      'Power Banks',
+      'Phone Holders',
+      'Selfie Sticks',
+      'Phone Grips'
+    ],
+    'Audio Accessories': [
+      'Wireless Earbuds',
+      'Headphones',
+      'Bluetooth Speakers',
+      'Wired Earphones',
+      'Microphones'
+    ],
+    'Computer Accessories': [
+      'Keyboards',
+      'Mouse',
+      'Mousepads',
+      'USB Drives',
+      'External Hard Drives',
+      'Laptop Bags',
+      'Webcams',
+      'Laptop Cooling Pads'
+    ],
+    'Networking': [
+      'Wi-Fi Routers',
+      'Network Switches',
+      'Ethernet Cables',
+      'Wi-Fi Adapters',
+      'Network Cards',
+      'Modems',
+      'Wi-Fi Extenders'
+    ],
+    'Gaming Accessories': [
+      'Game Controllers',
+      'Gaming Headsets',
+      'Gaming Mouse',
+      'Gaming Keyboards'
+    ]
+  };
+
+  // Keywords to identify accessories in product data
+  const accessoryKeywords = {
+    'Phone Accessories': [
+      'phone case', 'phone cover', 'screen protector', 'tempered glass',
+      'phone charger', 'car charger', 'wireless charger', 'power bank',
+      'phone holder', 'phone stand', 'selfie stick', 'phone grip',
+      'phone mount', 'phone accessories'
+    ],
+    'Audio Accessories': [
+      'earbuds', 'airpods', 'headphones', 'headset', 'earphones',
+      'bluetooth speaker', 'wireless speaker', 'microphone', 'mic'
+    ],
+    'Computer Accessories': [
+      'keyboard', 'mouse', 'mousepad', 'usb drive', 'flash drive',
+      'hard drive', 'ssd', 'laptop bag', 'laptop sleeve', 'webcam',
+      'cooling pad', 'laptop stand', 'computer accessories'
+    ],
+    'Networking': [
+      'wifi router', 'network switch', 'ethernet cable', 'lan cable',
+      'wifi adapter', 'network card', 'modem', 'wifi extender',
+      'network accessories', 'networking'
+    ],
+    'Gaming Accessories': [
+      'game controller', 'gaming headset', 'gaming mouse', 'gaming keyboard',
+      'gaming accessories', 'game accessories', 'gaming gear'
+    ]
+  };
+
+  // Function to check if a product is an accessory and determine its type
+  function isAccessory(product) {
+    // First, explicitly exclude main product categories
+    const excludeKeywords = [
+      'laptop computer', 'notebook computer', 'desktop computer', 
+      'smartphone device', 'mobile device', 'tablet device', 'television set',
+      'smart tv device'
+    ];
+    
+    const searchText = [
+      product.name || '',
+      product.category || '',
+      product.description || '',
+      product.subcategory || '',
+      product.type || '',
+      (product.tags && Array.isArray(product.tags) ? product.tags.join(' ') : product.tags || '')
+    ].join(' ').toLowerCase();
+
+    // Check category field first - if it explicitly says "accessories", it's an accessory
+    if ((product.category || '').toLowerCase().includes('accessories')) {
+      return true;
+    }
+
+    // Check exclusions first
+    if (excludeKeywords.some(keyword => searchText.includes(keyword.toLowerCase()))) {
+      return false;
+    }
+
+    // Check against our categorized keywords
+    for (const [category, keywords] of Object.entries(accessoryKeywords)) {
+      if (keywords.some(keyword => searchText.includes(keyword.toLowerCase()))) {
+        // Add the detected category to the product
+        product._accessory_category = category;
+        return true;
+      }
+    }
+
+    // Check price as a last resort - most accessories are under ₦100,000
+    const price = Number(product.price || product.amount || 0);
+    if (price > 0 && price < 100000) {
+      // Check if it has accessory-like words
+      const accessoryIndicators = ['kit', 'adapter', 'cable', 'cover', 'protection', 'add-on', 'attachment'];
+      if (accessoryIndicators.some(word => searchText.includes(word))) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  // Function to format price in Naira
+  function formatPrice(price) {
+    return new Intl.NumberFormat('en-NG', {
+      style: 'currency',
+      currency: 'NGN'
+    }).format(price || 0);
+  }
+
+  // Fetch accessories from Supabase
+  async function fetchAccessories() {
+    const grid = document.getElementById('productsGrid');
+    if (!grid) return;
+    
+    grid.innerHTML = '<div class="loading-spinner">Loading accessories...</div>';
+
+    // Make sure we have a Supabase client
+    if (!window.supabaseClient && window.SUPABASE_URL && window.SUPABASE_ANON_KEY) {
+      try {
+        window.supabaseClient = supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
+      } catch (e) {
+        console.error('Failed to initialize Supabase client:', e);
+        grid.innerHTML = '<div class="error-message">Failed to load products</div>';
+        return [];
+      }
+    }
+
+    try {
+      // Build the query conditions
+      const searchFields = ['name', 'category', 'description', 'subcategory', 'type', 'tags'];
+      const orConditions = [];
+      
+      // Add direct category matches
+      orConditions.push(`category.ilike.%accessories%`);
+      
+      // Add keyword matches for each category
+      for (const [category, keywords] of Object.entries(accessoryKeywords)) {
+        for (const keyword of keywords) {
+          for (const field of searchFields) {
+            orConditions.push(`${field}.ilike.%${keyword.replace(/\s+/g, ' ').trim()}%`);
+          }
+        }
+      }
+
+      // Query Supabase
+      if (window.supabaseClient) {
+        const { data, error } = await window.supabaseClient
+          .from('products')
+          .select('*')
+          .or(orConditions.join(','))
+          .order('created_at', { ascending: false })
+          .limit(1000);
+
+        if (error) {
+          console.error('Error fetching accessories:', error);
+          grid.innerHTML = '<div class="error-message">Failed to load accessories</div>';
+          return [];
+        }
+
+        if (data && Array.isArray(data)) {
+          // Filter for actual accessories
+          const accessories = data.filter(isAccessory);
+          
+          // Group by category
+          const categorized = {};
+          for (const product of accessories) {
+            const category = product._accessory_category || 'Other Accessories';
+            if (!categorized[category]) {
+              categorized[category] = [];
+            }
+            categorized[category].push(product);
+          }
+
+          // Render the results by category
+          if (Object.keys(categorized).length === 0) {
+            grid.innerHTML = '<div class="no-results">No accessories found</div>';
+          } else {
+            grid.innerHTML = Object.entries(categorized).map(([category, products]) => `
+              <div class="category-section">
+                <h2 class="category-title">${category}</h2>
+                <div class="products-grid">
+                  ${products.map(product => `
+                    <div class="product-card" data-id="${product.id}">
+                      <img src="${product.image_url || 'assets/images/default-accessory.png'}" 
+                           alt="${product.name}" 
+                           class="product-image"
+                           onerror="this.src='assets/images/default-accessory.png'">
+                      <div class="product-info">
+                        <h3 class="product-name">${product.name}</h3>
+                        <p class="product-price">${formatPrice(product.price)}</p>
+                        <button class="add-to-cart-btn" data-product-id="${product.id}">Add to Cart</button>
+                      </div>
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+            `).join('');
+
+            // Add event listeners
+            grid.querySelectorAll('.product-card').forEach(card => {
+              const productId = card.dataset.id;
+              
+              // Add to cart button click
+              const addToCartBtn = card.querySelector('.add-to-cart-btn');
+              if (addToCartBtn) {
+                addToCartBtn.addEventListener('click', (e) => {
+                  e.stopPropagation();
+                  // TODO: Implement add to cart functionality
+                  console.log('Add to cart:', productId);
+                });
+              }
+
+              // Card click for product details
+              card.addEventListener('click', () => {
+                window.location.href = `product.html?id=${productId}`;
+              });
+            });
+          }
+
+          return accessories;
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching accessories:', error);
+      grid.innerHTML = '<div class="error-message">Error loading accessories</div>';
+    }
+    
+    return [];
+  }
+
+  // Initialize on page load
+  if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    setTimeout(() => fetchAccessories().catch(console.error), 8);
+  } else {
+    document.addEventListener('DOMContentLoaded', () => fetchAccessories().catch(console.error));
+  }
+})();

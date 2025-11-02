@@ -1,0 +1,236 @@
+.account-page {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+  min-height: calc(100vh - 140px); /* Account for header and bottom nav */
+}
+
+.account-panel {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  padding: 24px;
+  margin-top: 20px;
+}
+
+.account-panel h1 {
+  color: #333;
+  font-size: 1.75rem;
+  margin: 0 0 20px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.loading {
+  text-align: center;
+  color: #666;
+  padding: 20px;
+}
+
+.login-subtitle {
+  color: #666;
+  font-size: 1.1rem;
+  margin-bottom: 20px;
+}
+
+.auth-link {
+  display: inline-block;
+  background: #e64a19;
+  color: white;
+  padding: 12px 24px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+
+.auth-link:hover {
+  background: #f4511e;
+}
+
+.profile {
+  padding: 20px;
+  background: #f8f9fa;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.welcome-msg {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 20px;
+}
+
+.profile-row {
+  margin-bottom: 12px;
+  font-size: 1rem;
+  line-height: 1.5;
+  display: flex;
+  align-items: center;
+}
+
+.profile-row strong {
+  color: #444;
+  display: inline-block;
+  width: 80px;
+  font-weight: 600;
+}
+
+.quick-links {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin: 24px 0;
+  padding: 16px 0;
+  border-top: 1px solid #e0e0e0;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.quick-link {
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  background: #fff;
+  border-radius: 8px;
+  text-decoration: none;
+  color: #333;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.quick-link:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  text-decoration: none;
+}
+
+.quick-link-icon {
+  font-size: 1.25rem;
+  margin-right: 8px;
+}
+
+.quick-link-label {
+  font-weight: 500;
+}
+
+.profile-actions {
+  text-align: center;
+  padding-top: 16px;
+}
+
+.sign-out-btn {
+  background: #dc3545;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.sign-out-btn:hover {
+  background: #c82333;
+  transform: translateY(-1px);
+}
+
+.btn-icon {
+  margin-right: 8px;
+  font-size: 1.1em;
+}
+
+/* Links styling */
+.account-page a {
+  color: #e64a19;
+  text-decoration: none;
+}
+
+.account-page a:hover {
+  text-decoration: underline;
+}
+
+/* Responsive adjustments */
+/* Loading spinner */
+.ap-spinner {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #f3f3f3;
+  border-top: 2px solid #e64a19;
+  border-radius: 50%;
+  margin-right: 8px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #666;
+  padding: 30px 20px;
+}
+
+.register-prompt {
+  margin-top: 16px;
+  text-align: center;
+  color: #666;
+}
+
+/* Breadcrumb styling */
+.breadcrumb {
+  margin-bottom: 20px;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.breadcrumb a {
+  color: #e64a19;
+  text-decoration: none;
+}
+
+.breadcrumb span {
+  margin: 0 8px;
+  color: #ccc;
+}
+
+.breadcrumb strong {
+  color: #333;
+}
+
+@media (max-width: 600px) {
+  .account-page {
+    padding: 12px;
+  }
+  
+  .account-panel {
+    padding: 16px;
+    margin-top: 12px;
+    border-radius: 8px;
+  }
+
+  .profile {
+    padding: 16px;
+  }
+
+  .quick-links {
+    grid-template-columns: 1fr;
+  }
+
+  .welcome-msg {
+    font-size: 1.1rem;
+  }
+
+  .sign-out-btn {
+    width: 100%;
+    margin-top: 8px;
+  }
+}

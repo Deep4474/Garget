@@ -1,0 +1,143 @@
+(async () => {
+  // Prevent multiple initializations
+  if (window.tabletInitialized) return;
+  window.tabletInitialized = true;
+
+  const grid = document.getElementById('productsGrid');
+  if (!grid) return;
+
+  // Show loading state
+  grid.innerHTML = '<div class="loading-spinner">Loading tablets...</div>';
+
+  // Constants for tablet identification
+  const TABLET_KEYWORDS = [
+    'tablet', 'ipad', 'galaxy tab', 'android tablet', 'windows tablet',
+    'samsung tab', 'surface', 'ipad pro', 'ipad air', 'ipad mini'
+  ];
+
+  // Format price helper
+  function formatPrice(value) {
+    if (!value) return '₦0.00';
+    return new Intl.NumberFormat('en-NG', { 
+      style: 'currency', 
+      currency: 'NGN'
+    }).format(value);
+  }
+
+  // Helper function to check if a product is a tablet
+  function isTabletProduct(product) {
+    if (!product) return false;
+    
+    // List of keywords that indicate the product is NOT a tablet
+    const excludeKeywords = [
+      'phone', 'laptop', 'desktop', 'accessories', 
+      'charger', 'case', 'cover', 'screen protector'
+    ];
+    
+    const searchText = [
+      product.name || '',
+      product.category || '',
+      product.description || '',
+      product.subcategory || '',
+      product.product_type || '',
+      (Array.isArray(product.tags) ? product.tags.join(' ') : product.tags || '')
+    ].join(' ').toLowerCase().trim();
+
+    // First check exclusions
+    if (excludeKeywords.some(keyword => searchText.includes(keyword))) {
+      console.log('[tablet] Excluded product:', product.name, '- matched exclusion keyword');
+      return false;
+    }
+    
+    // Then check for tablet keywords
+    const isTablet = TABLET_KEYWORDS.some(keyword => searchText.includes(keyword.toLowerCase()));
+    if (isTablet) {
+      console.log('[tablet] Found tablet product:', product.name, '- matched keyword');
+    }
+    return isTablet;
+  }
+
+  // Render products to grid
+  function renderProducts(products) {
+    if (!Array.isArray(products) || !products.length) {
+      grid.innerHTML = '<div class="ap-empty">No tablets found.</div>';
+      return;
+    }
+
+    grid.innerHTML = products.map(product => `
+      <div class="product-card">
+        <img src="${product.image_url || 'assets/images/tablet-thumb.png'}" 
+             alt="${product.name}" 
+             class="product-image"
+             onerror="this.onerror=null;this.src='assets/images/tablet-thumb.png'">
+        <div class="product-info">
+          <h2 class="product-title">${product.name}</h2>
+          <p class="product-price">${formatPrice(product.price)}</p>
+          <button class="add-to-cart-btn" data-id="${product.id}">Add to Cart</button>
+        </div>
+      </div>
+    `).join('');
+
+    // Add click handlers for add to cart
+    grid.querySelectorAll('.add-to-cart-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const productId = btn.getAttribute('data-id');
+        if (typeof window.addToCart === 'function') {
+          window.addToCart(productId, 'products');
+        }
+      });
+    });
+  }
+
+  // Main function to load tablets
+  async function loadTablets() {
+    try {
+      if (!window.supabaseClient || typeof window.supabaseClient.from !== 'function') {
+        throw new Error('Supabase client not available');
+      }
+
+      // Create query conditions for tablet keywords
+      const orConditions = [];
+      const searchFields = ['category', 'name', 'description'];
+      
+      for (const field of searchFields) {
+        for (const keyword of TABLET_KEYWORDS) {
+          orConditions.push(`${field}.ilike.%${keyword}%`);
+        }
+      }
+
+      // Fetch potential tablet products
+      const { data, error } = await window.supabaseClient
+        .from('products')
+        .select('*')
+        .or(orConditions.join(','))
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      // Filter the results to ensure they are actually tablets
+      const tabletProducts = (data || []).filter(isTabletProduct);
+      
+      console.log('[tablet] Found tablet products:', tabletProducts.length);
+      tabletProducts.forEach(p => console.log('[tablet] Product:', p.name, 'Category:', p.category));
+
+      renderProducts(tabletProducts);
+
+    } catch (error) {
+      console.error('[tablet] Failed to load tablets:', error);
+      grid.innerHTML = '<div class="error-message">Failed to load tablets</div>';
+    }
+  }
+
+  // Initialize Supabase client if needed
+  try {
+    if (!window.supabaseClient && window.SUPABASE_URL && window.SUPABASE_ANON_KEY) {
+      window.supabaseClient = supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
+    }
+    // Start loading tablets
+    await loadTablets();
+  } catch (error) {
+    console.error('[tablet] Initialization error:', error);
+    grid.innerHTML = '<div class="error-message">Failed to load tablets</div>';
+  }
+})();

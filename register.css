@@ -1,0 +1,163 @@
+/* Registration Form Styles */
+.register-container {
+  max-width: 450px;
+  margin: 40px auto;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  padding: 40px;
+}
+
+.register-title {
+  text-align: center;
+  color: #FF4500;
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 30px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 14px;
+}
+
+.password-field {
+  position: relative;
+}
+
+.password-input-wrap {
+  position: relative;
+}
+
+.toggle-password {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #666;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+}
+
+.password-requirements {
+  font-size: 12px;
+  color: #666;
+  margin-top: 6px;
+}
+
+.register-form input[type="password"] {
+  width: 100%;
+  padding: 12px 48px 12px 12px; /* room for toggle */
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 14px;
+  height: 44px;
+  box-sizing: border-box;
+}
+
+/* ensure the toggle sits visually inside the input without overlapping content */
+.password-input-wrap .toggle-password {
+  right: 10px;
+  width: 36px;
+  height: 36px;
+  border-radius: 6px;
+  background: transparent;
+}
+
+.password-requirements {
+  color: #444;
+  margin-left: 2px;
+}
+
+/* Confirm password should match styling */
+.register-form input[id^="confirm"],
+.register-form input[name="confirmPassword"] {
+  width: 100%;
+  padding: 12px 48px 12px 12px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 14px;
+  height: 44px;
+  box-sizing: border-box;
+}
+
+/* small responsive tweak */
+@media (max-width: 420px) {
+  .register-container { padding: 20px; }
+  .password-input-wrap .toggle-password { right: 8px; }
+}
+
+.terms-section {
+  margin: 20px 0;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.terms-section input[type="checkbox"] {
+  margin-top: 3px;
+}
+
+.terms-section label {
+  font-size: 14px;
+  color: #333;
+}
+
+.terms-section a {
+  color: #FF4500;
+  text-decoration: none;
+}
+
+.create-account-btn {
+  width: 100%;
+  padding: 12px;
+  background-color: #FF4500;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  margin-top: 20px;
+}
+
+.create-account-btn:hover {
+  background-color: #E63E00;
+}
+
+.google-signin {
+  width: 100%;
+  padding: 12px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #333;
+  margin-top: 20px;
+}

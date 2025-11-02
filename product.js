@@ -1,14 +1,39 @@
-// product.js
-// Helpers to extract a usable product image URL from diverse product shapes
-// and render it into the DOM. Designed to be small and dependency-free.
-
-(function(window){
+// product.js - Display product details from Supabase
+(function(){
   'use strict';
 
-  // Normalize a single candidate value into a plain URL string or null
+  // Get product ID from URL query parameter
+  function getProductId() {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('id');
+  }
+
+  // Fetch product details from Supabase
+  async function fetchProductDetails(productId) {
+    const response = await fetch(
+      `${API_URL}/rest/v1/products?id=eq.${productId}&select=*`,
+      {
+        headers: {
+          'apikey': API_KEY,
+          'Authorization': `Bearer ${API_KEY}`
+        }
+      }
+    );
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    const products = await response.json();
+    return products[0]; // Return the first (and should be only) product
+  }
+
+  // Local placeholder image path
+  const LOCAL_PLACEHOLDER = 'assets/images/placeholder.svg';
+
   function normalizeImageCandidate(u){
     try{
-      if (!u && u !== 0) return null;
+      if (!u && u !== 0) return LOCAL_PLACEHOLDER;
       // arrays: prefer first element
       if (Array.isArray(u)) u = u[0];
       // objects: pick common fields
@@ -19,7 +44,7 @@
         else if (u.path) u = u.path;
         else {
           const vals = Object.values(u);
-          u = vals.length ? vals[0] : '';
+          u = vals.length ? vals[0] : LOCAL_PLACEHOLDER;
         }
       }
       if (typeof u !== 'string') u = String(u || '');
@@ -96,7 +121,9 @@
   function resolveAbsolute(url){
     try{
       if (!url) return url;
-      if (/^(https?:|data:|\/\/) /i.test(url)) return url; // note: intentionally permissive
+      // If the URL already appears absolute (http(s), data: or protocol-relative), return as-is.
+      // (There was a stray space in the original regex which prevented matches.)
+      if (/^(https?:|data:|\/\/)/i.test(url)) return url;
       // If url starts with '/', new URL handles root-relative
       return new URL(url, document.baseURI).href;
     }catch(e){ return url; }
@@ -110,7 +137,6 @@
     let src = imgUrl ? resolveAbsolute(imgUrl) : null;
 
     // fallback placeholder
-    if (!src) src = 'https://placehold.co/' + (opt.size||80) + 'x' + (opt.size||80);
 
     // build image element
     const img = document.createElement('img');
@@ -118,7 +144,8 @@
     img.alt = (product && product[opt.altField]) ? String(product[opt.altField]) : 'Product image';
     img.width = opt.size; img.height = opt.size;
     img.className = 'product-image';
-    img.addEventListener('error', function(){ this.onerror = null; this.src = 'https://placehold.co/' + (opt.size||80) + 'x' + (opt.size||80); });
+  if (!src) src = 'assets/images/placeholder.svg';
+  img.addEventListener('error', function(){ this.onerror = null; this.src = 'assets/images/placeholder.svg'; });
 
     // clear container and append
     container.innerHTML = '';

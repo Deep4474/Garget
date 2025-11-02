@@ -14,3 +14,29 @@
 @media (min-width:432px) and (max-width:200px) {
 	.products-grid { grid-template-columns: repeat(2,1fr) !important; }
 }
+
+/* Page-specific overrides to avoid large global rules from other stylesheets
+	 forcing product cards off-screen or with incorrect sizing. These are safe
+	 and scoped to #accessoriesGrid only. */
+#accessoriesGrid.product-grid-reset, #accessoriesGrid.products-grid {
+	display: grid !important;
+	grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)) !important;
+	gap: 14px !important;
+}
+#accessoriesGrid .product-card {
+	flex: none !important;
+	max-width: none !important;
+	display: block !important;
+	background: #fff !important;
+	color: #000 !important;
+	padding: 12px !important;
+	border-radius: 8px !important;
+	box-shadow: 0 6px 18px rgba(0,0,0,0.04) !important;
+	min-height: 0 !important;
+}
+#accessoriesGrid .product-img {
+	max-height: 160px !important;
+	height: auto !important;
+	display: block !important;
+	object-fit: contain !important;
+}

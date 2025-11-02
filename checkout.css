@@ -7,6 +7,16 @@ body{font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica
 .lamar-header{background:#0b57ff;color:#fff;padding:14px 16px;box-shadow:0 2px 8px rgba(11,87,255,0.08)}
 .lamar-header .lamar-header-logo{font-weight:800;font-size:18px;letter-spacing:0.2px}
 
+/* Compact top header used across pages (checkout, notifications, etc.) */
+.top-compact-header{background:#0b57ff;color:#fff;padding:10px 14px;box-shadow:0 2px 8px rgba(11,87,255,0.08);display:flex;align-items:center;justify-content:space-between;gap:12px}
+.top-compact-header .left{display:flex;align-items:center;gap:10px}
+.top-compact-header .brand-text{font-weight:700;color:#fff;font-size:16px}
+.top-compact-header .hamburger{background:transparent;border:0;color:#fff;font-size:20px;padding:6px 8px;border-radius:8px;cursor:pointer}
+.top-compact-header .header-actions{display:flex;align-items:center;gap:8px}
+
+/* small logged-in badge / action button on header */
+.top-compact-header .user-action{background:#fff;color:#0b57ff;padding:6px 8px;border-radius:6px;font-weight:600;border:0}
+
 /* Topbar (language / region) */
 .topbar{display:flex;justify-content:space-between;align-items:center;padding:6px 0 8px;border-bottom:1px solid rgba(255,255,255,0.06)}
 .topbar-left,.topbar-right{color:rgba(255,255,255,0.95);font-size:13px}

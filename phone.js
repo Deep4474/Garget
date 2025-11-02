@@ -1,8 +1,15 @@
 (async function(){
-  // show only phones by querying products and product2 for "phone" in category or name
+  // show only phones by querying products table for "phone" in category or name
+  // Prefer querying the dedicated Supabase project for products (new project)
+  // to ensure phones are pulled from the right database. Fallback to the
+  // global `window.supabaseClient` if REST/SDK calls to the dedicated project
+  // fail.
+  const PHONE_SUPABASE_URL = 'https://ahzfkfxqtdtkrwlxvimp.supabase.co';
+  const PHONE_SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFoemZrZnhxdGR0a3J3bHh2aW1wIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE4MTcyMDksImV4cCI6MjA3NzM5MzIwOX0.us--sBWAKTPJrd4gPKMPLBgtkJVhAcrUEQoD9YTnJww';
+  const PHONE_REST_BASE = String(PHONE_SUPABASE_URL || '').replace(/\/$/, '') + '/rest/v1';
   async function fetchPhoneProducts() {
     const client = window.supabaseClient || (typeof supabase !== 'undefined' ? supabase : null);
-  const tables = ['product5','products','product2'];
+  const tables = ['products'];
   const _tableExistsCache = {};
   async function tableExists(client, table) {
     if (!table) return false;
@@ -14,8 +21,9 @@
     // fall back to GET. Any client 4xx (except auth errors) is treated
     // conservatively as "table likely missing" to avoid noisy queries.
     try {
-      const base = String(window.SUPABASE_URL || '').replace(/\/$/, '');
-      const key = window.SUPABASE_ANON_KEY || window.SUPABASE_KEY || '';
+      // Prefer the dedicated project REST endpoint for phone queries.
+      const base = String(PHONE_SUPABASE_URL || window.SUPABASE_URL || '').replace(/\/$/, '');
+      const key = PHONE_SUPABASE_ANON_KEY || window.SUPABASE_ANON_KEY || window.SUPABASE_KEY || '';
       if (base && key) {
         const url = `${base}/rest/v1/${encodeURIComponent(table)}?select=id&limit=1`;
         try {
@@ -199,12 +207,13 @@
             } catch(e) { console.warn(`Array-field client-side filter failed on table="${t}":`, e && e.message ? e.message : e); }
           }
         } else {
-          // fallback to REST
-          const base = String(window.SUPABASE_URL || '').replace(/\/$/, '');
-          if (base) {
-            const res = await fetch(`${base}/rest/v1/${t}?select=*&or=(category.ilike.*phone*,name.ilike.*phone*)`, {
-              headers: { 'apikey': window.SUPABASE_ANON_KEY, 'Authorization': 'Bearer ' + window.SUPABASE_ANON_KEY }
-            });
+          // fallback to REST — prefer the phones project's REST endpoint
+            const base = PHONE_REST_BASE || String(window.SUPABASE_URL || '').replace(/\/$/, '');
+            const key = PHONE_SUPABASE_ANON_KEY || window.SUPABASE_ANON_KEY || window.SUPABASE_KEY || '';
+            if (base && key) {
+              const res = await fetch(`${base}/${t}?select=*&or=(category.ilike.*phone*,name.ilike.*phone*)`, {
+                headers: { 'apikey': key, 'Authorization': 'Bearer ' + key }
+              });
             if (res.ok) {
               const d = await res.json();
               if (Array.isArray(d)) {
@@ -240,10 +249,9 @@
       el.setAttribute('data-product-id', pid);
       el.setAttribute('data-slug', pid);
 
-      // compute image and href; for product5 we want to open new-product.html with image_url & name
-      const imgSrc = p.image_url || 'assets/images/smartphone.png';
-      const isProduct5 = (p.__src === 'product5' || (p._raw && p._raw.__table === 'product5') || p.__table === 'product5');
-      const productHref = isProduct5 ? ('new-product.html' + (imgSrc ? ('?image_url=' + encodeURIComponent(imgSrc) + '&name=' + encodeURIComponent(p.name || '')) : '')) : (p.id ? ('product.html?id=' + encodeURIComponent(p.id)) : '#');
+  // compute image and href; always use product.html for products table
+  const imgSrc = p.image_url || 'assets/images/smartphone.png';
+  const productHref = p.id ? ('product.html?id=' + encodeURIComponent(p.id)) : '#';
       el.setAttribute('data-href', productHref);
       el.setAttribute('data-image', imgSrc);
 
@@ -256,12 +264,8 @@
           <img class="product-img" src="${imgSrc}" alt="${(p.name||'').replace(/"/g,'&quot;')}" />
           <div class="product-name">${p.name}</div>
           <div class="price">${typeof p.price === 'number' ? '₦' + p.price.toLocaleString() : p.price}</div>
-          ${ isProduct5 ? `
-            <div class="product-card-actions"></div>
-          ` : `
             <div class="product-addbar" data-action="addbar"><span class="add-text">Add to cart</span></div>
             <div class="product-card-actions"></div>
-          ` }
         </a>
       `;
 
@@ -286,7 +290,7 @@
     });
     // expose current phones for other scripts (add-to-cart lookup)
     window.products = products;
-    // No delegated share-product handler — product5 cards are clickable and navigate to new-product.html directly
+  // No delegated share-product handler — all products cards use product.html
   }
 
   // init

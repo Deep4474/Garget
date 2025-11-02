@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lamar - Desktop</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="desktop-style.css">
+  <script>
+    // If this page is opened on a small viewport, send users back to the mobile index
+    (function(){
+      try {
+        var w = (window.innerWidth || document.documentElement.clientWidth);
+        if (w && w < 768) {
+          // Use replace so history isn't stacked
+          window.location.replace('index.html');
+        }
+      } catch(e) { console.warn('viewport check failed', e); }
+    })();
+  </script>
+</head>
+<body>
+  <header class="top-compact-header">
+    <div class="left">
+      <a href="index.html" class="logo-link"><span class="brand-text">Lamar Phone And Gadget</span></a>
+      <nav class="desktop-nav" aria-label="Main navigation">
+        <a href="index.html">Home</a>
+        <a href="phone.html">Phones</a>
+        <a href="laptop.html">Laptops</a>
+        <a href="accessories.html">Accessories</a>
+        <a href="blog.html">Blog</a>
+      </nav>
+    </div>
+
+    <div class="header-search" role="search">
+      <input type="search" placeholder="I am shopping for..." aria-label="Search products">
+    </div>
+
+    <div class="header-actions">
+      <a href="cart.html" class="cart-icon" title="Cart">🛒<span id="cartBadge" class="badge">0</span></a>
+      <a href="notifications.html" class="notifications-icon" title="Notifications">🔔<span id="notifyBadge" class="badge">0</span></a>
+    </div>
+  </header>
+
+  <div class="floating-actions" aria-hidden="false">
+    <div class="action-btn" title="Menu">≡</div>
+    <div class="action-btn" title="Offers">⚡</div>
+    <div class="action-btn" title="Support">⏱️</div>
+  </div>
+
+  <main class="site-main">
+    <aside class="categories-panel" aria-label="Categories">
+      <h4>Categories</h4>
+      <ul>
+        <li><a href="phone.html">Phones</a></li>
+        <li><a href="laptop.html">Laptops</a></li>
+        <li><a href="accessories.html">Accessories</a></li>
+        <li><a href="tv.html">TVs</a></li>
+        <li><a href="view-all.html">All Categories</a></li>
+      </ul>
+    </aside>
+
+    <section class="hero-carousel" aria-label="Hero">
+      <img src="assets/images/placeholder.svg" alt="Hero banner" />
+      <div class="hero-cta">ORDER NOW</div>
+    </section>
+
+    <section class="content-area">
+      <div class="featured-section">
+        <h2>Featured Products</h2>
+      </div>
+
+      <div id="productsGrid" class="products-grid" aria-live="polite">
+        <!-- script.js will render product cards here -->
+      </div>
+    </section>
+  </main>
+
+  <div class="cookie-banner" role="dialog" aria-label="Cookie consent">
+    <div>We use cookie for better user experience, check our policy <a href="#">here</a></div>
+    <div class="cookie-banner-button"><a href="#" class="btn">Ok. I Understood</a></div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-container">
+        <div class="footer-content">
+          <div class="footer-branding">
+            <h3>Lamar Phone And Gadget</h3>
+            <p>Best online store for phones and gadgets.</p>
+          </div>
+          <div class="footer-links">
+            <nav>
+              <a href="#">Terms</a>
+              <a href="#">Privacy</a>
+            </nav>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="supabase-config.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

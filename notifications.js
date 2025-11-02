@@ -1,7 +1,5 @@
 (function(){
-  const ordersList = document.getElementById('ordersList');
   const messagesList = document.getElementById('messagesList');
-  const refreshOrdersBtn = document.getElementById('refreshOrders');
   const markAllReadBtn = document.getElementById('markAllRead');
 
   function ensureClient(){
@@ -13,26 +11,6 @@
   }
 
   function formatTime(t){ try { return new Date(t).toLocaleString(); } catch(e){ return t; } }
-
-  function renderOrders(items){
-    if (!ordersList) return;
-    if (!items || items.length === 0) { ordersList.innerHTML = '<div class="empty">No recent orders</div>'; return; }
-    ordersList.innerHTML = '';
-    items.forEach(o => {
-      const el = document.createElement('div'); el.className = 'order-item';
-      const meta = document.createElement('div'); meta.className = 'order-meta';
-      const id = document.createElement('div'); id.className = 'order-id'; id.textContent = o.id || o.order_id || ('Order ' + (o.id || '')); 
-      const when = document.createElement('div'); when.className = 'order-time'; when.textContent = formatTime(o.created_at || o.inserted_at || o.date || o.createdAt || '');
-      const total = document.createElement('div'); total.className = 'order-total'; total.textContent = o.order_total ? ('₦' + Number(o.order_total).toLocaleString()) : (o.amount ? ('₦' + Number(o.amount).toLocaleString()) : '');
-      meta.appendChild(id); meta.appendChild(when);
-      el.appendChild(meta);
-      const right = document.createElement('div'); right.className = 'order-right'; right.appendChild(total);
-      el.appendChild(right);
-      // click to open order details
-      el.addEventListener('click', function(){ window.location.href = 'order-view.html?id=' + encodeURIComponent(o.id || o.order_id || ''); });
-      ordersList.appendChild(el);
-    });
-  }
 
   function renderMessages(items){
     if (!messagesList) return;
@@ -69,15 +47,7 @@
     }catch(e){}
   }
 
-  async function fetchOrders(){
-    const client = ensureClient();
-    if (!client) { ordersList && (ordersList.innerHTML = '<div class="empty">Supabase not configured</div>'); return; }
-    try {
-      const res = await client.from('orders').select('*').order('created_at',{ascending:false}).limit(50);
-      if (res && !res.error) { renderOrders(Array.isArray(res.data)?res.data:[]); }
-      else { ordersList && (ordersList.innerHTML = '<div class="empty">Error loading orders</div>'); }
-    } catch(e){ ordersList && (ordersList.innerHTML = '<div class="empty">Error loading orders</div>'); }
-  }
+
 
   async function findMessagesTable(client){
     // Cache discovery result so we don't keep probing (which creates repeated 404 network responses)
@@ -148,7 +118,6 @@
     try {
       // supabase-js v2 Realtime via client.channel
       const channel = supabase.channel('realtime-notifications');
-      channel.on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, payload => { fetchOrders(); });
       channel.on('postgres_changes', { event: '*', schema: 'public' }, payload => { fetchMessages(); });
       channel.subscribe();
       return true;
@@ -156,17 +125,16 @@
   }
 
   let pollInterval = null;
-  function startPolling(){ if (pollInterval) return; pollInterval = setInterval(()=>{ fetchOrders(); fetchMessages(); }, 10000); }
+  function startPolling(){ if (pollInterval) return; pollInterval = setInterval(()=>{ fetchMessages(); }, 10000); }
   function stopPolling(){ if (pollInterval) { clearInterval(pollInterval); pollInterval = null; } }
 
   async function refreshMessages(){ await fetchMessages(); }
 
   // wire buttons
-  if (refreshOrdersBtn) refreshOrdersBtn.addEventListener('click', fetchOrders);
   if (markAllReadBtn) markAllReadBtn.addEventListener('click', async function(){ await markAllRead(); });
 
   // initial load
-  fetchOrders(); fetchMessages();
+  fetchMessages();
   // try realtime
   const realtimeOk = setupRealtime(); if (!realtimeOk) startPolling();
 

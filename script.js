@@ -59,6 +59,32 @@
     console.info('Supabase appears not configured. To enable dynamic content from Supabase set window.SUPABASE_URL and window.SUPABASE_ANON_KEY before loading scripts, or include the Supabase SDK and createClient.');
   }
 
+  // Global image error handler
+  const PLACEHOLDER_IMAGES = {
+    phone: '/assets/images/smartphone.png',
+    laptop: '/assets/images/laptop-thumb.png',
+    tablet: '/assets/images/tablet-thumb.png',
+    tv: '/assets/images/tv.png',
+    accessory: '/assets/images/placeholder.svg'
+  };
+  
+  // Function to ensure paths start with forward slash and handle missing images
+  function getImagePath(path, category = 'accessory') {
+    if (!path || path.includes('example.com')) {
+      return PLACEHOLDER_IMAGES[category.toLowerCase()] || PLACEHOLDER_IMAGES.accessory;
+    }
+    return path.startsWith('/') ? path : '/' + path;
+  }
+
+  document.addEventListener('error', function(e) {
+    if (e.target.tagName === 'IMG') {
+      console.warn('Image failed to load:', e.target.src);
+      const category = e.target.getAttribute('data-category') || 'accessory';
+      e.target.src = PLACEHOLDER_IMAGES[category.toLowerCase()] || PLACEHOLDER_IMAGES.accessory;
+      e.target.onerror = null; // Prevent infinite loop if placeholder fails
+    }
+  }, true);
+
 // Hide product section when checkout form is open
   var productsSection = document.getElementById('productsSection');
   if (productsSection) productsSection.style.display = 'none';
@@ -387,7 +413,7 @@ document.addEventListener('DOMContentLoaded', function() {
       const card = document.createElement('a');
       card.href = link;
       card.className = 'site-search-card';
-  card.innerHTML = `<img src="${escapeHtml(img)}" alt="" onerror="this.onerror=null;this.src='assets/images/smartphone.png'" />` +
+  card.innerHTML = `<img src="${escapeHtml(img)}" alt="" onerror="this.onerror=null;this.src='${getImagePath('assets/images/smartphone.png')}'" />` +
            `<div class="meta"><div class="title">${escapeHtml(title)}</div><div class="price">${escapeHtml(price)}</div></div>`;
       resultsEl.appendChild(card);
     }
@@ -703,7 +729,9 @@ document.addEventListener('DOMContentLoaded', function() {
   function formatPrice(v){ if (v === undefined || v === null || v === '') return ''; if (typeof v === 'number') return '₦' + Number(v).toLocaleString(); return String(v); }
 
   function productCardHtml(p){
-    const img = p.image_url || p.image || (p.image_urls && Array.isArray(p.image_urls) && p.image_urls[0]) || (p.images && Array.isArray(p.images) && p.images[0]) || p.photo || 'assets/images/smartphone.png';
+    const rawImg = p.image_url || p.image || (p.image_urls && Array.isArray(p.image_urls) && p.image_urls[0]) || (p.images && Array.isArray(p.images) && p.images[0]) || p.photo;
+    const category = (p.category || '').toLowerCase();
+    const img = getImagePath(rawImg, category);
     const name = p.name || p.title || p.product_name || 'Unnamed product';
     const price = formatPrice(p.price || p.amount || p.product_price || p.unit_price || '');
     const idAttr = p.id ? `data-product-id="${String(p.id).replace(/"/g,'') }"` : '';
@@ -711,7 +739,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const href = p.slug ? `product.html?slug=${encodeURIComponent(p.slug)}` : (p.id ? `product.html?id=${encodeURIComponent(p.id)}` : '#');
     return `
       <article class="product-card" role="article" aria-label="${escapeHtml(name)}" ${idAttr} data-href="${href}" data-image="${escapeHtml(img)}">
-        <div class="product-thumb"><img src="${escapeHtml(img)}" alt="${escapeHtml(name)}"></div>
+        <div class="product-thumb"><img src="${escapeHtml(img)}" alt="${escapeHtml(name)}" data-category="${category}"></div>
         <div class="product-title">${escapeHtml(name)}</div>
         <div class="product-price">${escapeHtml(price)}</div>
         <div class="card-overlay"><div class="overlay-top"><button class="ico-btn wish">♡</button></div><div class="overlay-bottom"><button class="add-cart">Add to cart</button></div></div>
@@ -744,7 +772,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const pid = p.id || (p.name && p.name.replace(/\s+/g,'-').toLowerCase()) || '';
         el.setAttribute('data-product-id', pid);
         el.setAttribute('data-slug', pid);
-        const imgSrc = p.image_url || 'assets/images/smartphone.png';
+        const imgSrc = p.image_url || getImagePath('assets/images/smartphone.png');
         const href = p.slug ? `product.html?slug=${encodeURIComponent(p.slug)}` : (p.id ? `product.html?id=${encodeURIComponent(p.id)}` : '#');
         el.setAttribute('data-href', href);
         el.setAttribute('data-image', imgSrc);
@@ -877,24 +905,12 @@ function openBuyModal(product) {
 document.addEventListener('DOMContentLoaded', function() {
   // Show all categories at once, no see all/see less toggle
   const container = document.getElementById('menuCategoriesContainer');
+  // Only render the main product categories in the drawer
   const categories = [
     { id: 'phones', name: 'Phones', icon: 'fa-mobile-alt' },
-    { id: 'tablets', name: 'Tablets', icon: 'fa-tablet-alt' },
     { id: 'laptops', name: 'Laptops', icon: 'fa-laptop' },
-  { id: 'accessories', name: 'Accessories', icon: 'fa-headphones' },
-  { id: 'appliances', name: 'Appliances', icon: '' },
-  { id: 'electronics', name: 'Electronics', icon: '' },
-  { id: 'supermarket', name: 'Supermarket', icon: '' },
-  { id: 'health', name: 'Health & Beauty', icon: '' },
-  { id: 'home', name: 'Home & Office', icon: '' },
-  { id: 'power', name: 'Power', icon: '' },
-  { id: 'computing', name: 'Computing', icon: '' },
-  { id: 'womens-fashion', name: "Women's Fashion", icon: '' },
-  { id: 'mens-fashion', name: "Men's Fashion", icon: '' },
-  { id: 'baby', name: 'Baby Products', icon: '' },
-  { id: 'gaming', name: 'Gaming', icon: '' },
-    { id: 'chips', name: 'Chips', icon: '' },
-    { id: 'ankara-style', name: 'Ankara Style', icon: '' }
+    { id: 'accessories', name: 'Accessories', icon: 'fa-headphones' },
+    { id: 'tvs', name: 'TVs', icon: 'fa-tv' }
   ];
   if (container) {
     container.innerHTML = categories.map(cat => {
@@ -963,8 +979,8 @@ document.addEventListener('DOMContentLoaded', function() {
       <div class="menu-drawer-content">
         <button class="close" id="closeMenuDrawer" aria-label="Close menu">&times;</button>
         <div class="account-area">
-          <div class="account-circle" aria-hidden="true"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4z" stroke="#777" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 20c0-3.31 3.59-6 8-6s8 2.69 8 6" stroke="#777" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-          <div class="account-links"><a href="login.html">Login</a> <span class="sep">|</span> <a href="register.html">Registration</a></div>
+          <div class="account-circle" style="cursor: pointer" onclick="showAccountModal()" aria-hidden="true"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4z" stroke="#777" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 20c0-3.31 3.59-6 8-6s8 2.69 8 6" stroke="#777" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="account-links"><a href="#" onclick="showAccountModal(); return false;">My Account</a></div>
         </div>
         <hr class="menu-sep" />
         <nav class="menu-list">
@@ -972,7 +988,16 @@ document.addEventListener('DOMContentLoaded', function() {
           <a href="#flash" class="menu-item"><span class="menu-flag">›</span>Flash Sale</a>
           <a href="#blogs" class="menu-item">Blogs</a>
           <a href="#brands" class="menu-item">All Brands</a>
-          <a href="#categories" class="menu-item">All Categories</a>
+          <!-- All Categories toggle -->
+          <div class="menu-categories">
+            <a href="#categories" class="menu-item" id="allCategoriesToggle">All Categories <span class="toggle-arrow" aria-hidden="true">»</span></a>
+            <div id="menuCategoriesContainer" class="menu-categories-list">
+              <a href="#phones" class="menu-link" data-category="Phones">Phones</a>
+              <a href="#laptops" class="menu-link" data-category="Laptops">Laptops</a>
+              <a href="#accessories" class="menu-link" data-category="Accessories">Accessories</a>
+              <a href="#tvs" class="menu-link" data-category="TVs">TVs</a>
+            </div>
+          </div>
         </nav>
       </div>
     `;
@@ -1004,6 +1029,56 @@ document.addEventListener('DOMContentLoaded', function() {
     // wire close handler immediately
     const closeBtn = d.querySelector('#closeMenuDrawer');
     if (closeBtn) closeBtn.addEventListener('click', function(){ d.classList.remove('open'); document.body.classList.remove('menu-drawer-open'); });
+
+    // Wire the All Categories toggle and subcategory click handlers
+    const allToggle = d.querySelector('#allCategoriesToggle');
+    const categoriesContainer = d.querySelector('#menuCategoriesContainer');
+    if (allToggle && categoriesContainer) {
+      allToggle.addEventListener('click', function(e){
+        e.preventDefault();
+        console.debug('[menu] allCategoriesToggle clicked (dynamic drawer)');
+        // toggle visible class instead of inline styles
+        const isOpen = categoriesContainer.classList.toggle('open');
+        const arrow = allToggle.querySelector('.toggle-arrow');
+        if (arrow) arrow.classList.toggle('toggle-rotated', isOpen);
+      });
+
+      // Add click listeners to each subcategory link to fetch products and close menu
+      categoriesContainer.querySelectorAll('.menu-link').forEach(link => {
+        link.addEventListener('click', async function(e){
+          e.preventDefault();
+          const category = this.getAttribute('data-category');
+          if (!category) return;
+          // Attempt to fetch products using existing Supabase RPC if available
+          try {
+            if (typeof supabase !== 'undefined' && supabase.rpc) {
+              const { data, error } = await supabase.rpc('fetch_products_by_category', { cat: category });
+              if (error) {
+                console.warn('Error fetching products for', category, error);
+              } else if (data && typeof renderProducts === 'function') {
+                renderProducts(data);
+              }
+            }
+          } catch (err) { console.warn('Category fetch failed', err); }
+
+          // Close the menu drawer
+          d.classList.remove('open');
+          document.body.classList.remove('menu-drawer-open');
+
+          // Scroll to products section if present
+          const productsSection = document.getElementById('productsGrid');
+          if (productsSection) {
+            const header = document.querySelector('.lamar-header');
+            const headerHeight = header ? header.offsetHeight : 0;
+            const sectionTop = productsSection.getBoundingClientRect().top + window.pageYOffset - headerHeight - 10;
+            window.scrollTo({ top: sectionTop, behavior: 'smooth' });
+            productsSection.classList.add('highlight-products-section');
+            setTimeout(() => productsSection.classList.remove('highlight-products-section'), 800);
+          }
+        });
+      });
+    }
+
     return d;
   }
 
@@ -1039,6 +1114,93 @@ document.addEventListener('DOMContentLoaded', function() {
       lastScrollTop = st;
     });
   }
+
+// Wire static All Categories toggles (for pages with a static menu)
+document.addEventListener('DOMContentLoaded', function() {
+  // Generic function to wire a toggle and its container
+  function wireToggle(toggleSelector, containerSelector) {
+    const toggle = document.querySelector(toggleSelector);
+    const container = document.querySelector(containerSelector);
+    if (!toggle || !container) return;
+    toggle.addEventListener('click', function(e){
+      e.preventDefault();
+      console.debug('[menu] allCategoriesToggle clicked (static)', toggleSelector, containerSelector);
+      const isOpen = container.classList.toggle('open');
+      const arrow = toggle.querySelector('.toggle-arrow');
+      if (arrow) arrow.classList.toggle('toggle-rotated', isOpen);
+      // Also toggle the page-level categories section if present
+      const pageSection = document.getElementById('pageCategoriesSection');
+      if (pageSection) {
+        pageSection.classList.toggle('open', isOpen);
+        pageSection.setAttribute('aria-hidden', !isOpen);
+      }
+    });
+
+    // Wire category links inside container
+    container.querySelectorAll('.menu-link').forEach(link => {
+      link.addEventListener('click', async function(e){
+        e.preventDefault();
+        const category = this.getAttribute('data-category');
+        if (!category) return;
+        try {
+          if (typeof supabase !== 'undefined' && supabase.rpc) {
+            const { data, error } = await supabase.rpc('fetch_products_by_category', { cat: category });
+            if (error) {
+              console.warn('Error fetching products for', category, error);
+            } else if (data && typeof renderProducts === 'function') {
+              renderProducts(data);
+            }
+          }
+        } catch (err) { console.warn('Category fetch failed', err); }
+
+        // Close menu if present
+        const menuDrawer = document.getElementById('menuDrawer');
+        if (menuDrawer) { menuDrawer.classList.remove('open'); document.body.classList.remove('menu-drawer-open'); }
+
+        const productsSection = document.getElementById('productsGrid');
+        if (productsSection) {
+          const header = document.querySelector('.lamar-header');
+          const headerHeight = header ? header.offsetHeight : 0;
+          const sectionTop = productsSection.getBoundingClientRect().top + window.pageYOffset - headerHeight - 10;
+          window.scrollTo({ top: sectionTop, behavior: 'smooth' });
+          productsSection.classList.add('highlight-products-section');
+          setTimeout(() => productsSection.classList.remove('highlight-products-section'), 800);
+        }
+      });
+    });
+  }
+
+  // wire the index and product static toggles if present
+  wireToggle('#allCategoriesToggle', '#menuCategoriesContainer');
+  wireToggle('#allCategoriesToggleProduct', '#menuCategoriesContainerProduct');
+});
+// Wire page-level category links to behave like menu links (fetch/render/scroll)
+document.addEventListener('DOMContentLoaded', function(){
+  document.querySelectorAll('.page-category-link').forEach(link => {
+    link.addEventListener('click', async function(e){
+      e.preventDefault();
+      const category = this.getAttribute('data-category');
+      if (!category) return;
+      try {
+        if (typeof supabase !== 'undefined' && supabase.rpc) {
+          const { data, error } = await supabase.rpc('fetch_products_by_category', { cat: category });
+          if (error) console.warn('Error fetching products for', category, error);
+          else if (data && typeof renderProducts === 'function') renderProducts(data);
+        }
+      } catch(err){ console.warn('Category fetch failed', err); }
+      // Scroll to products grid
+      const productsSection = document.getElementById('productsGrid');
+      if (productsSection) {
+        const header = document.querySelector('.lamar-header');
+        const headerHeight = header ? header.offsetHeight : 0;
+        const sectionTop = productsSection.getBoundingClientRect().top + window.pageYOffset - headerHeight - 10;
+        window.scrollTo({ top: sectionTop, behavior: 'smooth' });
+        productsSection.classList.add('highlight-products-section');
+        setTimeout(()=>productsSection.classList.remove('highlight-products-section'),800);
+      }
+    });
+  });
+});
   if (closeMenuDrawer && menuDrawer) {
     closeMenuDrawer.addEventListener('click', function() {
       menuDrawer.classList.remove('open');
@@ -1348,15 +1510,22 @@ document.addEventListener('DOMContentLoaded', function() {
     // detect whether we're on the categories page and should suppress share buttons
     const isCategoriesPage = !!document.getElementById('categoriesList');
 
+      const LOCAL_PLACEHOLDER = 'assets/images/placeholder.svg';
       grid.innerHTML = products.map(product => {
         const categoryName = categoryMap && product.category_id ? categoryMap[product.category_id] : (product.category || 'N/A');
+        const imageUrl = product.image_url || LOCAL_PLACEHOLDER;
         return `
-          <div class="product-card" data-product-id="${product.id}" data-href="${(isCategoriesPage && product.image_url) ? ('new-product.html?image_url=' + encodeURIComponent(String(product.image_url)) + '&name=' + encodeURIComponent(String(product.name || ''))) : ((String(product.name||'').toLowerCase().indexOf('phone4')!==-1)?'new-product.html':'')}">
+          <div class="product-card" data-product-id="${product.id}" data-href="${(isCategoriesPage && imageUrl) ? ('new-product.html?image_url=' + encodeURIComponent(String(imageUrl)) + '&name=' + encodeURIComponent(String(product.name || ''))) : ((String(product.name||'').toLowerCase().indexOf('phone4')!==-1)?'new-product.html':'')}">
+            <div class="product-thumb">
+              <img src="${imageUrl}" alt="${product.name || 'Product'}" 
+                   loading="lazy" 
+                   onerror="this.onerror=null;this.src='assets/images/placeholder.svg';">
+            </div>
             <div class="product-overlay">
               <button class="icon-btn heart" data-action="wishlist" title="Add to wishlist">❤</button>
               <button class="icon-btn compare" data-action="compare" title="Compare">⇄</button>
             </div>
-            <img src="${product.image_url || 'https://placehold.co/180x180'}" alt="${product.name}" class="product-img">
+            <img src="${product.image_url || 'assets/images/placeholder.svg'}" alt="${product.name}" class="product-img">
             <div class="product-name">${product.name}</div>
             <div class="category">Category: ${categoryName}</div>
             <div class="description">${product.description || 'No description available.'}</div>
@@ -1688,6 +1857,83 @@ if (!window.supabaseClient) {
     // Call this on page load
   window.addEventListener('DOMContentLoaded', updateAccountSection);
 
+// Global handler: when user clicks any "My Account" nav label, show account details.
+document.addEventListener('click', function (e) {
+  const el = e.target.closest && e.target.closest('.nav-label, .account-links a, .account-area, .account-circle');
+  if (!el) return;
+  const text = (el.textContent || '').trim().toLowerCase();
+  if (text.indexOf('my account') === -1 && text.indexOf('account') === -1) return;
+  e.preventDefault();
+  // If page already has a full account modal showAccountModal, call it
+  if (typeof window.showAccountModal === 'function') {
+    try { window.showAccountModal(); return; } catch (err) { /* fallthrough */ }
+  }
+
+  // Otherwise build a small modal dynamically that shows user info (or redirects to login/register)
+  const userName = localStorage.getItem('userName') || localStorage.getItem('name');
+  const userEmail = localStorage.getItem('userEmail') || localStorage.getItem('email');
+
+  if (!userEmail) {
+    // Not logged in — go to login/register page
+    window.location.href = 'register.html';
+    return;
+  }
+
+  // Remove existing lightweight modal if present
+  const existing = document.getElementById('lightAccountModal');
+  if (existing) existing.remove();
+
+  const modal = document.createElement('div');
+  modal.id = 'lightAccountModal';
+  modal.style.position = 'fixed';
+  modal.style.left = '0';
+  modal.style.top = '0';
+  modal.style.right = '0';
+  modal.style.bottom = '0';
+  modal.style.background = 'rgba(0,0,0,0.4)';
+  modal.style.display = 'flex';
+  modal.style.alignItems = 'center';
+  modal.style.justifyContent = 'center';
+  modal.style.zIndex = '9999';
+
+  const card = document.createElement('div');
+  card.style.background = '#fff';
+  card.style.padding = '18px';
+  card.style.borderRadius = '8px';
+  card.style.width = '320px';
+  card.style.boxShadow = '0 8px 28px rgba(0,0,0,0.2)';
+
+  card.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <strong>My Account</strong>
+      <button id="lightAccountClose" style="background:none;border:none;font-size:18px;cursor:pointer">&times;</button>
+    </div>
+    <div style="margin-bottom:8px"><strong>Name:</strong> <div style="color:#333">${userName || 'User'}</div></div>
+    <div style="margin-bottom:14px"><strong>Email:</strong> <div style="color:#333">${userEmail}</div></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button id="lightAccountSignOut" style="padding:8px 12px;border-radius:6px;border:1px solid #ddd;background:#fff;cursor:pointer">Sign out</button>
+      <button id="lightAccountManage" style="padding:8px 12px;border-radius:6px;border:none;background:#ff5722;color:#fff;cursor:pointer">Manage</button>
+    </div>
+  `;
+
+  modal.appendChild(card);
+  document.body.appendChild(modal);
+
+  document.getElementById('lightAccountClose').addEventListener('click', () => modal.remove());
+  document.getElementById('lightAccountSignOut').addEventListener('click', () => {
+    localStorage.removeItem('userEmail');
+    localStorage.removeItem('userName');
+    localStorage.removeItem('userJoinDate');
+    modal.remove();
+    // Update any UI
+    if (typeof updateAccountSection === 'function') updateAccountSection();
+  });
+  document.getElementById('lightAccountManage').addEventListener('click', () => {
+    modal.remove();
+    window.location.href = 'account.html' ; // change if you have account page
+  });
+});
+
 document.addEventListener('DOMContentLoaded', async function() {
   // Example: handle nav active state
   document.querySelectorAll('.mobile-nav .nav-item').forEach(function(item) {
@@ -1698,14 +1944,14 @@ document.addEventListener('DOMContentLoaded', async function() {
     });
   });
 
-  // Fetch categories and products
+  // Return hardcoded categories since we're not using a categories table
   async function fetchCategories() {
-  const { data, error } = await window.supabaseClient.from('categories').select('*');
-    if (error) {
-      console.error('Error fetching categories:', error);
-      return [];
-    }
-    return data;
+    return [
+      { id: 'phones', name: 'Phones', image: 'assets/images/phone-category.png' },
+      { id: 'laptops', name: 'Laptops', image: 'assets/images/laptop-category.png' },
+      { id: 'tvs', name: 'TVs', image: 'assets/images/tv.png' },
+      { id: 'accessories', name: 'Accessories', image: 'assets/images/accessories-category.png' }
+    ];
   }
 
   function renderCategories(categories) {
@@ -1844,7 +2090,7 @@ document.addEventListener('DOMContentLoaded', function() {
 // Product Image Gallery Modal Logic
 function setupProductImageGallery(product) {
   // Example: product.images = [url1, url2, url3]
-  var images = product.images && product.images.length ? product.images : [product.image_url || 'https://placehold.co/600x400'];
+  var images = product.images && product.images.length ? product.images : [product.image_url || 'assets/images/placeholder.svg'];
   var modal = document.getElementById('imageGalleryModal');
   var mainImg = document.getElementById('galleryMainImg');
   var thumbnails = document.getElementById('galleryThumbnails');

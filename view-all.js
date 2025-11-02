@@ -1,39 +1,30 @@
 /* view-all.js
-   Fetch products from product, product2, product3 and render a combined grid.
+   Fetch products from Supabase and render them in a grid.
 */
+
+
 (function(){
   'use strict';
 
-  function ensureClient(){
-    if (window.__LAMAR_SUPABASE) return window.__LAMAR_SUPABASE;
-    // Prefer an existing global `supabase` instance if present
-    if (window.supabase && typeof window.supabase.from === 'function') {
-      window.__LAMAR_SUPABASE = window.supabase;
-      return window.__LAMAR_SUPABASE;
+  async function fetchProducts(category = 'all') {
+    let query = `${API_URL}/rest/v1/products?select=*`;
+    if (category !== 'all') {
+      // Use ilike for case-insensitive matching
+      query += `&category=ilike.${encodeURIComponent('%' + category + '%')}`;
     }
-    const url = window.SUPABASE_URL;
-    const key = window.SUPABASE_ANON_KEY;
-    if (!url || !key) {
-      // cannot create a client here; caller should handle null
-      return null;
+    
+    const response = await fetch(query, {
+      headers: {
+        'apikey': API_KEY,
+        'Authorization': `Bearer ${API_KEY}`
+      }
+    });
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
-    const client = supabase.createClient(url, key);
-    window.__LAMAR_SUPABASE = client;
-    return client;
-  }
-
-  function el(sel){ return document.querySelector(sel); }
-
-  function guessImage(rec){
-    // common candidates
-    const candidates = ['image_url','image','images','image_urls','photo','photos','thumbnail','thumb','img','imageUrl','imageUrl1'];
-    for (const k of candidates){
-      if (!rec) continue;
-      if (rec[k]) return rec[k];
-      // try nested structures like { url: '...' }
-      if (rec[k] && typeof rec[k] === 'object' && rec[k].url) return rec[k].url;
-    }
-    return null;
+    
+    return await response.json();
   }
 
   function escapeHtml(s){
@@ -50,209 +41,236 @@
     return '₦' + n.toLocaleString();
   }
 
+  // Add to cart utility (stores minimal cart in localStorage and updates badge)
+  function addToCart(prod){
+    if (!prod || !prod.id) return;
+    const key = 'lmg_cart_v1';
+    const stored = JSON.parse(localStorage.getItem(key) || '[]');
+    const idx = stored.findIndex(x => String(x.id) === String(prod.id));
+    if (idx > -1) {
+      stored[idx].qty = (Number(stored[idx].qty) || 1) + 1;
+    } else {
+      const item = {
+        id: prod.id,
+        name: prod.name || prod.title || '',
+        price: prod.price || 0,
+        image_url: prod.image_url || (prod.image_urls && prod.image_urls[0]) || null,
+        qty: 1
+      };
+      stored.push(item);
+    }
+    localStorage.setItem(key, JSON.stringify(stored));
+    try { window.dispatchEvent(new CustomEvent('cart:updated', { detail: { cart: stored } })); } catch (e) {}
+    // update visible badge if present
+    const badge = document.querySelector('.cart-badge') || document.getElementById('cartBadge');
+    if (badge) {
+      const total = stored.reduce((s, i) => s + (Number(i.qty) || 0), 0);
+      badge.textContent = total;
+    }
+    return stored;
+  }
+  // expose globally for other scripts to use if needed, but don't override an existing implementation
+  if (!window.addToCart) window.addToCart = addToCart;
+
+  function sortProducts(products, sortBy) {
+    const sorted = [...products];
+    switch (sortBy) {
+      case 'price-asc':
+        sorted.sort((a, b) => (Number(a.price) || 0) - (Number(b.price) || 0));
+        break;
+      case 'price-desc':
+        sorted.sort((a, b) => (Number(b.price) || 0) - (Number(a.price) || 0));
+        break;
+      case 'newest':
+      default:
+        sorted.sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
+        break;
+    }
+    return sorted;
+  }
+
   function renderProducts(container, items){
     container.innerHTML = '';
     if (!items || items.length === 0){
-      container.innerHTML = '<div class="ap-empty">No products found.</div>';
+      container.innerHTML = `
+        <div class="ap-empty">
+          <div class="empty-icon">📦</div>
+          <h3>No Products Found</h3>
+          <p>There are no products available in this category yet.</p>
+        </div>`;
       return;
     }
 
-    // two-column mobile-friendly grid
+    // Create grid container
     const grid = document.createElement('div');
-    grid.className = 'all-products-grid view-all-grid';
+    grid.className = 'products-grid ' + currentCategory;
 
     for (const p of items){
-      const imgUrl = guessImage(p) || 'assets/images/smartphone.png';
-      const titleText = p.name || p.title || p.product_name || 'Untitled';
-      const priceText = formatPrice(p.price || p.amount || p.sell_price || p.cost) || '';
-
-      // If this row comes from product5, make the entire card link to new-product.html with image_url and name
-      const productHref = p.__src === 'product5' ? ('new-product.html' + (imgUrl ? ('?image_url=' + encodeURIComponent(imgUrl) + '&name=' + encodeURIComponent(titleText)) : '')) : (p.slug ? ('product.html?slug=' + encodeURIComponent(p.slug)) : (p.id ? ('product.html?id=' + encodeURIComponent(p.id)) : '#'));
-      // For product5 use a clickable anchor that wraps the content and omit the per-card share button.
-      const overlayBottom = p.__src === 'product5' ? '' : `<button class="add-cart">Add to cart</button>`;
+      const imgUrl = p.image_url || (p.image_urls && p.image_urls[0]) || 'assets/images/placeholder.jpg';
+      const titleText = p.name || 'Untitled Product';
+      const priceText = formatPrice(p.price);
+      const categoryText = p.category || '';
 
       const cardHtml = `
-        <a class="card ap-card" href="${productHref}" data-id="${escapeHtml(p.id || '')}" data-name="${escapeHtml(titleText)}" data-price="${escapeHtml(String(p.price||''))}" data-image="${escapeHtml(imgUrl)}">
-          <div class="card-inner">
-            <div class="thumb" style="background-image:url('${escapeHtml(imgUrl)}')"></div>
-            <div class="card-body">
-              <div class="card-title">${escapeHtml(titleText)}</div>
-              <div class="card-price">${escapeHtml(priceText)}</div>
-            </div>
-
-            <!-- hover overlay -->
-            <div class="card-overlay">
-              <div class="overlay-top">
-                <button class="ico-btn wish" title="Add to wishlist">♡</button>
-                <button class="ico-btn compare" title="Compare">⇄</button>
-              </div>
-              <div class="overlay-bottom">
-                ${overlayBottom}
-              </div>
-            </div>
+        <div class="product-card">
+          <a class="product-link" href="product.html?id=${p.id}" style="display:block;">
+            <img 
+              src="${escapeHtml(imgUrl)}" 
+              alt="${escapeHtml(titleText)}"
+              class="product-image"
+              loading="lazy"
+            >
+          </a>
+          <div class="product-overlay">
+            <!-- overlay icons (heart/compare) could go here; add-to-cart moved to bottom bar -->
           </div>
-        </a>
+          <div class="product-info">
+            <h3 class="product-name">${escapeHtml(titleText)}</h3>
+            <div class="product-price">${escapeHtml(priceText)}</div>
+            ${categoryText ? `<div class="product-category">${escapeHtml(categoryText)}</div>` : ''}
+            ${p.description ? `<p class="product-description">${escapeHtml(p.description)}</p>` : ''}
+          </div>
+          <div class="product-addbar" data-action="addbar">
+            <button type="button" class="add-to-cart-btn" data-product-id="${p.id}" aria-label="Add to cart">
+              <span class="add-icon" style="display:inline-block;vertical-align:middle;width:18px;height:18px;margin-right:8px;">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" width="18" height="18">
+                  <circle cx="9" cy="21" r="1" fill="#fff"/>
+                  <circle cx="20" cy="21" r="1" fill="#fff"/>
+                  <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h7.72a2 2 0 0 0 2-1.61L23 6H6" stroke="#fff" stroke-width="2" fill="none"/>
+                </svg>
+              </span>
+              <span class="add-text">Add to cart</span>
+            </button>
+          </div>
+        </div>
       `;
       grid.insertAdjacentHTML('beforeend', cardHtml);
     }
 
+    // Attach Add to Cart handlers (stop propagation so clicking the button doesn't navigate)
+    grid.querySelectorAll('.add-to-cart-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const id = btn.dataset.productId;
+        const prod = items.find(x => String(x.id) === String(id));
+        try {
+          // prefer local addToCart implementation
+          if (typeof addToCart === 'function') {
+            addToCart(prod);
+          } else if (window.addToCart && typeof window.addToCart === 'function') {
+            window.addToCart(prod);
+          }
+        } catch (err) {
+          console.error('addToCart error', err);
+        }
+      });
+    });
+
+    // Make the whole product card navigate to product page when clicked (except add-to-cart)
+    grid.querySelectorAll('.product-card').forEach(card => {
+      card.addEventListener('click', (e) => {
+        // If click originated from an interactive element that stopped propagation, this won't run.
+        const link = card.querySelector('.product-link');
+        if (link && link.href) {
+          window.location.href = link.href;
+        }
+      });
+    });
+
     container.appendChild(grid);
   }
 
-  const __missingTableCache = new Set();
-  async function fetchTable(client, tableName){
-    // Attempt to select from tableName. If the table doesn't exist (PGRST205)
-    // try a suggested name from the error hint, then fall back to common names.
-    try {
-      const res = await client.from(tableName).select('*').limit(200);
-      if (!res.error) return Array.isArray(res.data) ? res.data : [];
+  let currentCategory = 'all';
 
-      // If PostgREST returns PGRST205 (table not found) try to parse suggestion
-      try {
-        const err = res.error || {};
-        if (err.code === 'PGRST205' && err.hint && typeof err.hint === 'string'){
-          const m = err.hint.match(/'([^']+)'/);
-          if (m && m[1]){
-            const parts = m[1].split('.');
-            const suggested = parts[parts.length-1];
-            try {
-              const tryRes = await client.from(suggested).select('*').limit(200);
-              if (!tryRes.error) return Array.isArray(tryRes.data) ? tryRes.data : [];
-            } catch(_) { /* ignore */ }
-          }
-        }
-      } catch(_) { /* ignore suggestion parse issues */ }
-
-      // Common fallback table names to try (avoid endless loops)
-      const fallbacks = ['products','product','product2','product3'];
-      for (const t of fallbacks){
-        if (__missingTableCache.has(t)) continue;
-        if (t === tableName) continue;
-        try {
-          const r = await client.from(t).select('*').limit(200);
-          if (!r.error) return Array.isArray(r.data) ? r.data : [];
-          // record missing table to skip future attempts
-          if (r.error && r.error.code === 'PGRST205') __missingTableCache.add(t);
-        } catch(_) { /* ignore and continue */ }
-      }
-
-      // If none worked, return empty instead of throwing — caller handles empty sets.
-      return [];
-    } catch (err){
-      // don't noisy-log every missing table; return empty so callers continue
-      return [];
+  function updatePageTitle(category) {
+    const titles = {
+      'all': 'All Products',
+      'phones': 'Phones',
+      'laptops': 'Laptops',
+      'accessories': 'Accessories',
+      'tvs': 'TVs'
+    };
+    document.title = `${titles[category] || 'Products'} - Lamar Phone & Gadget`;
+    const h1 = document.querySelector('.section-header h1');
+    if (h1) {
+      h1.textContent = titles[category] || 'Products';
     }
   }
 
-  async function loadAll(){
+  async function loadAll(category = 'all'){
     const root = document.getElementById('allProductsRoot');
-    const loading = root.querySelector('.ap-loading') || document.querySelector('.ap-loading');
-    const client = ensureClient();
-
-    // if client is not available, show error
-    if (!client){
-      if (loading) loading.innerHTML = 'Supabase configuration missing.';
+    const container = document.getElementById('allProductsContainer');
+    if (!root || !container) {
+      console.error('Required DOM elements not found');
       return;
     }
 
-    try {
-      loading && (loading.textContent = 'Fetching products...');
-  const tables = ['product5','products','product2','product3'];
-      const promises = tables.map(t => fetchTable(client, t));
-      const results = await Promise.all(promises);
-      // flatten and tag with source table
-      let all = [];
-      for (let i = 0; i < results.length; i++){
-        const rows = results[i] || [];
-        const src = tables[i];
-        for (const row of rows) {
-          all.push(Object.assign({ __src: src }, row || {}));
-        }
-      }
-      // Remove any products coming from product3 as requested
-      all = all.filter(item => item && item.__src !== 'product3');
-      // assign a parsed date for sorting
-      all.forEach(item => {
-        const d = item.created_at || item.createdAt || item.date || item.inserted_at;
-        item.__createdAt = d ? new Date(d) : new Date(0);
-      });
-      all.sort((a,b) => b.__createdAt - a.__createdAt);
+    container.innerHTML = '<div class="ap-loading">Loading products...</div>';
+    currentCategory = category;
+    updatePageTitle(category);
 
-    // store items globally for client-side sorting
-    window.__ALL_PRODUCTS = all;
-    applySortAndRender();
-    } catch (err){
-      console.error(err);
-      root.innerHTML = '<div class="ap-error">Failed to load products. Check console for details.</div>';
+    try {
+      // Update active tab
+      document.querySelectorAll('.category-tab').forEach(tab => {
+        if (tab.dataset.category === category) {
+          tab.classList.add('active');
+        } else {
+          tab.classList.remove('active');
+        }
+      });
+
+      // Fetch products for the selected category
+      const products = await fetchProducts(category);
+
+      if (!products || products.length === 0) {
+        container.innerHTML = '<div class="ap-empty">No products found</div>';
+        return;
+      }
+
+      // Sort products based on current selection
+      const sortSelect = document.getElementById('sortSelect');
+      if (sortSelect) {
+        const sorted = sortProducts(products, sortSelect.value);
+        renderProducts(container, sorted);
+
+        // Setup sort change handler
+        sortSelect.addEventListener('change', () => {
+          const resorted = sortProducts(products, sortSelect.value);
+          renderProducts(container, resorted);
+        });
+      } else {
+        // No sort select, just render in default order
+        renderProducts(container, products);
+      }
+
+    } catch (err) {
+      console.error('Error loading products:', err);
+      container.innerHTML = '<div class="ap-error">Failed to load products: ' + escapeHtml(err.message) + '</div>';
     }
   }
 
-  function applySortAndRender(){
-    const sortSelect = document.getElementById('sortSelect');
-    const val = sortSelect ? sortSelect.value : 'newest';
-    const items = Array.isArray(window.__ALL_PRODUCTS) ? window.__ALL_PRODUCTS.slice() : [];
-    if (val === 'price-asc') items.sort((a,b)=> (Number(a.price||a.amount||0) - Number(b.price||b.amount||0)));
-    else if (val === 'price-desc') items.sort((a,b)=> (Number(b.price||b.amount||0) - Number(a.price||a.amount||0)));
-    else items.sort((a,b)=> new Date(b.created_at||0) - new Date(a.created_at||0));
-    renderProducts(document.getElementById('allProductsContainer'), items);
+  // Handle floating chevron scroll-to-top
+  function initFloatingChevron() {
+    const chevron = document.getElementById('floatingChevron');
+    if (chevron) {
+      chevron.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+    }
   }
 
-  // wait for supabase script to load (global `supabase` available)
-  function whenSupabaseReady(){
-    if (window.supabase && typeof window.supabase.createClient === 'function') return Promise.resolve();
-    return new Promise((resolve) => {
-      const max = 5000; // 5s
-      const start = Date.now();
-      (function check(){
-        if (window.supabase && typeof window.supabase.createClient === 'function') return resolve();
-        if (Date.now() - start > max) return resolve();
-        setTimeout(check, 50);
-      })();
+  // Initialize when the page loads
+  document.addEventListener('DOMContentLoaded', () => {
+    // Setup category tab listeners
+    document.querySelectorAll('.category-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        const category = tab.dataset.category;
+        loadAll(category);
+      });
     });
-  }
 
-  document.addEventListener('DOMContentLoaded', async function(){
-    await whenSupabaseReady();
-    try { loadAll(); } catch (e) { console.error(e); }
-
-    // wire sort control
-    const sortSelect = document.getElementById('sortSelect');
-    if (sortSelect){ sortSelect.addEventListener('change', applySortAndRender); }
-
-    // floating chevron scroll-to-top
-    const che = document.getElementById('floatingChevron');
-    if (che){ che.addEventListener('click', ()=> window.scrollTo({ top: 0, behavior: 'smooth' })); }
-
-    // delegated handler for Share button (open new-product with image_url)
-    document.body.addEventListener('click', function(e){
-      var t = e.target;
-      if (!t) return;
-      var sbtn = t.closest && t.closest('.share-product');
-      if (!sbtn) return;
-      var img = (sbtn.getAttribute && sbtn.getAttribute('data-image')) || (sbtn.dataset && sbtn.dataset.image) || '';
-      if (!img) {
-        var card = sbtn.closest && sbtn.closest('.card');
-        if (card) {
-          var imgTag = card.querySelector && (card.querySelector('img') || card.querySelector('.thumb'));
-          if (imgTag && imgTag.src) img = imgTag.src;
-          if (!img) {
-            var thumb = card.querySelector && (card.querySelector('.thumb'));
-            if (thumb) {
-              var style = window.getComputedStyle(thumb);
-              var bg = style && style.backgroundImage;
-              if (bg && bg !== 'none') {
-                var m = bg.match(/url\(["']?(.+?)["']?\)/);
-                if (m) img = m[1];
-              }
-            }
-          }
-        }
-      }
-      try { if (img && !/^https?:\/\//i.test(img)) img = new URL(img, window.location.href).href; } catch(e){}
-      try { if (img) sessionStorage.setItem('selectedProductImageUrl', img); } catch(e){}
-      var href = 'new-product.html' + (img ? ('?image_url=' + encodeURIComponent(img)) : '');
-      window.open(href, '_blank');
-    });
+    // Initial load
+    loadAll();
+    initFloatingChevron();
   });
 
 })();

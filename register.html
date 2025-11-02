@@ -6,6 +6,7 @@
   <title>Create Account - Registration</title>
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="footer-section.css">
+  <link rel="stylesheet" href="register-new.css">
   <style>
     .register-container {
       max-width: 420px;
@@ -141,7 +142,7 @@
       <div class="input-row">
         <input type="password" id="password" name="password" placeholder="Password" required minlength="6">
         <button type="button" class="toggle-password" onclick="togglePassword('password', this)">&#128065;</button>
-      </div>
+      </div><br>
       <div class="password-hint">Password must contain at least 6 digits</div>
       <label for="confirm-password">Confirm Password</label>
       <div class="input-row">
@@ -226,6 +227,184 @@
         history.replaceState(null, '', window.location.pathname);
       }
     });
+  </script>
+  <script>
+    // Two-step registration: send verification code to email, then verify code + create account
+    (function(){
+      const form = document.querySelector('.register-form');
+      const API_BASE = window.API_BASE || 'http://localhost:3000';
+      if (!form) return;
+
+      // Helper to render a status message at the bottom of the form
+      function setStatus(msg, isError) {
+        let status = form.querySelector('.register-status');
+        if (!status) { status = document.createElement('div'); status.className = 'register-status'; status.style.marginTop = '12px'; form.appendChild(status); }
+        status.textContent = msg || '';
+        status.style.color = isError ? 'crimson' : '#222';
+      }
+
+      // Step 1: request a verification code
+      async function sendCode(email) {
+        console.log('sendCode: sending request to', API_BASE + '/users/send-code', 'body:', { email });
+        const resp = await fetch(API_BASE + '/users/send-code', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email }) });
+        const text = await resp.text();
+        let data = {};
+        try { data = text ? JSON.parse(text) : {}; } catch(e) { data = { _raw: text }; }
+        return { ok: resp.ok, status: resp.status, data };
+      }
+
+      // Step 2: verify code and create user
+      async function verifyCode(payload) {
+        const resp = await fetch(API_BASE + '/users/verify-code', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+        const text = await resp.text();
+        let data = {};
+        try { data = text ? JSON.parse(text) : {}; } catch(e) { data = { _raw: text }; }
+        return { ok: resp.ok, status: resp.status, data };
+      }
+
+      form.addEventListener('submit', async function(e){
+        e.preventDefault();
+        const name = document.getElementById('fullname').value.trim();
+        const email = document.getElementById('email').value.trim();
+        if (!name || !email) { setStatus('Please enter name and email', true); return; }
+        setStatus('Sending verification code...');
+        try {
+          const res = await sendCode(email);
+          if (!res.ok) {
+            setStatus('Failed to send code: ' + (res.data && (res.data.error || res.data.message) ? (res.data.error || res.data.message) : res.status), true);
+            console.warn('send-code failed', res);
+            return;
+          }
+
+          // If server returned a code (dev mode or mail failure), show it to developer in UI for easier testing.
+          if (res.data && res.data.code) {
+            // store the last received dev code so we can auto-fill the verification input
+            window._lastDevCode = String(res.data.code);
+            setStatus('Code (dev): ' + window._lastDevCode + '. Enter it below to complete registration.');
+          } else {
+            setStatus('Verification code sent to ' + email + '. Enter the code below.');
+          }
+
+          // Replace form with verification step (keep name/email visible but disable editing)
+          renderVerificationStep(name, email);
+        } catch (err) {
+          console.error('sendCode exception', err);
+          setStatus('Error sending code: ' + (err && err.message ? err.message : String(err)), true);
+        }
+      });
+
+      function renderVerificationStep(name, email) {
+        // Clear existing password inputs (if any) and replace submit button with verify flow
+        form.querySelector('#fullname').value = name;
+        form.querySelector('#fullname').disabled = true;
+        form.querySelector('#email').value = email;
+        form.querySelector('#email').disabled = true;
+
+        // Remove existing password/confirm inputs if present
+        const pw = form.querySelector('#password');
+        const conf = form.querySelector('#confirm-password');
+        if (pw) pw.parentNode.style.display = '';
+        if (conf) conf.parentNode.style.display = '';
+
+        // Add code input
+        let codeRow = form.querySelector('.code-row');
+        if (!codeRow) {
+          codeRow = document.createElement('div'); codeRow.className = 'code-row';
+          const lbl = document.createElement('label'); lbl.textContent = 'Verification code'; lbl.htmlFor = 'verify-code';
+          const input = document.createElement('input'); input.type = 'text'; input.id = 'verify-code'; input.name = 'verify-code'; input.placeholder = 'Enter code'; input.required = true; input.style.marginBottom = '12px';
+          codeRow.appendChild(lbl); codeRow.appendChild(input);
+          // If a code was returned by the server (dev mode), show it and provide a copy button
+          if (window._lastDevCode) {
+            const devNote = document.createElement('div');
+            devNote.className = 'dev-code-note';
+            devNote.style.margin = '8px 0 12px 0';
+            devNote.style.fontSize = '0.95em';
+            devNote.style.color = '#444';
+            devNote.innerHTML = `Detected dev code: <b>${window._lastDevCode}</b> <button type="button" id="copyDevCodeBtn" style="margin-left:8px;padding:6px 8px; border-radius:4px; border:1px solid #ddd; background:#f5f5f5; cursor:pointer;">Copy</button>`;
+            codeRow.appendChild(devNote);
+            setTimeout(() => {
+              const copyBtn = document.getElementById('copyDevCodeBtn');
+              if (copyBtn) copyBtn.addEventListener('click', () => {
+                try { navigator.clipboard.writeText(window._lastDevCode); setStatus('Dev code copied to clipboard'); } catch(e) { setStatus('Dev code: ' + window._lastDevCode); }
+              });
+            }, 20);
+          }
+          // Insert before password hint (or before confirm)
+          const hint = form.querySelector('.password-hint');
+          if (hint) form.insertBefore(codeRow, hint.nextSibling);
+          else form.appendChild(codeRow);
+        }
+
+        // Change button to 'Verify & Create'
+        const btn = form.querySelector('.register-btn');
+        btn.textContent = 'Verify & Create';
+        btn.onclick = async function(ev){
+          ev.preventDefault();
+          const code = document.getElementById('verify-code').value.trim();
+          // if developer mode and no code entered, try to auto-fill from server-returned code
+          if (!code && window._lastDevCode) {
+            document.getElementById('verify-code').value = window._lastDevCode;
+          }
+          const password = document.getElementById('password').value;
+          const confirm = document.getElementById('confirm-password').value;
+          if (!code || !password) { setStatus('Enter code and choose a password', true); return; }
+          if (password.length < 6) { setStatus('Password must be at least 6 characters', true); return; }
+          if (password !== confirm) { setStatus('Passwords do not match', true); return; }
+          setStatus('Verifying code and creating account...');
+          try {
+            const payload = { email, code, password, user_metadata: { full_name: name } };
+            const res = await verifyCode(payload);
+            if (!res.ok) {
+              setStatus('Verification failed: ' + (res.data && (res.data.error || res.data.message) ? (res.data.error || res.data.message) : res.status), true);
+              console.warn('verify-code failed', res);
+              return;
+            }
+
+            // If server created user (201) and returned user, try to sign in with Supabase client
+            if (res.status === 201 && res.data && res.data.user) {
+              // Server created the user and stored it in user.json.
+              // Save minimal info locally and redirect to index.html.
+              try { 
+                localStorage.setItem('userName', name); 
+                localStorage.setItem('userEmail', email);
+                // If we're on index.html, update the menu immediately
+                if (typeof updateMenuAuth === 'function') {
+                  updateMenuAuth();
+                }
+              } catch(e){}
+              // Attempt Supabase sign-in if available (non-blocking). Regardless, redirect to index.
+              if (window.supabaseClient && window.supabaseClient.auth && typeof window.supabaseClient.auth.signInWithPassword === 'function') {
+                window.supabaseClient.auth.signInWithPassword({ email, password }).catch(() => {});
+              }
+              setStatus('Account created. Redirecting to home...');
+              setTimeout(() => { window.location.href = 'index.html'; }, 700);
+              return;
+            }
+
+            // If server responded ok but did not create user (fallback), attempt client-side signUp
+            if (res.data && res.data.ok) {
+              if (window.supabaseClient && window.supabaseClient.auth && typeof window.supabaseClient.auth.signUp === 'function') {
+                const { data: signupData, error: signupError } = await window.supabaseClient.auth.signUp({ email, password }, { data: { full_name: name } });
+                if (signupError) {
+                  setStatus('Account created but sign-up failed: ' + (signupError.message || JSON.stringify(signupError)), true);
+                  return;
+                }
+                setStatus('Account created — please check your email to confirm (if required). Redirecting...');
+                try { localStorage.setItem('userName', name); localStorage.setItem('userEmail', email); } catch(e){}
+                setTimeout(() => { window.location.href = 'index.html'; }, 1200);
+                return;
+              }
+            }
+
+            setStatus('Verification succeeded. Please sign in.');
+            setTimeout(() => { window.location.href = 'login.html'; }, 900);
+          } catch (err) {
+            console.error('verify exception', err);
+            setStatus('Verification error: ' + (err && err.message ? err.message : String(err)), true);
+          }
+        };
+      }
+    })();
   </script>
 </body>
 </html>

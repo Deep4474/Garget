@@ -6,6 +6,7 @@
   <title>Login - Lamar Phone & Gadget</title>
   <link rel="stylesheet" href="style.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <script src="supabase-config.js"></script>
 </head>
 <body>
   <div class="login-container">
@@ -38,6 +39,122 @@
         btn.innerHTML = '&#128065;';
       }
     }
+  </script>
+  <style>
+    .status-message {
+      margin-top: 12px;
+      padding: 10px;
+      border-radius: 4px;
+      text-align: center;
+      font-size: 14px;
+    }
+    .status-error {
+      background-color: #fee;
+      color: #c00;
+      border: 1px solid #fcc;
+    }
+    .status-success {
+      background-color: #efe;
+      color: #080;
+      border: 1px solid #cfc;
+    }
+    .status-info {
+      background-color: #f0f0f0;
+      color: #666;
+      border: 1px solid #ddd;
+    }
+  </style>
+
+  <script>
+    // Local authentication handler with welcome back email
+    (function(){
+      const form = document.querySelector('.login-form');
+      if (!form) return;
+
+      // Create persistent status element
+      const status = document.createElement('div');
+      status.className = 'status-message';
+      status.style.display = 'none';
+      form.appendChild(status);
+
+      function showStatus(message, type = 'info') {
+        status.textContent = message;
+        status.className = 'status-message status-' + type;
+        status.style.display = 'block';
+      }
+
+      form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        // Clear previous status
+        status.style.display = 'none';
+        
+        const email = document.getElementById('login-email').value.trim();
+        const password = document.getElementById('login-password').value;
+
+        // Validate inputs
+        if (!email || !password) {
+          showStatus('Please enter both email and password', 'error');
+          return;
+        }
+
+        // Validate email format
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+          showStatus('Please enter a valid email address', 'error');
+          return;
+        }
+
+        showStatus('Signing in...', 'info');
+
+        try {
+          // Call our local server endpoint for authentication
+          const response = await fetch('http://localhost:3000/api/login', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              email,
+              password
+            })
+          });
+
+          const result = await response.json();
+
+          if (!response.ok) {
+            showStatus(result.error || 'Login failed', 'error');
+            return;
+          }
+
+          // Store user data
+          try {
+            localStorage.setItem('userEmail', result.user.email);
+            if (result.user.name) {
+              localStorage.setItem('userName', result.user.name);
+            }
+          } catch(e) {
+            console.warn('Failed to save user data to localStorage:', e);
+          }
+
+          // Success!
+          showStatus('Welcome back! Redirecting...', 'success');
+          setTimeout(() => {
+            window.location.href = 'index.html';
+          }, 1500);
+
+        } catch (err) {
+          console.error('Login exception:', err);
+          showStatus('An unexpected error occurred. Please try again.', 'error');
+        }
+      });
+
+      // Clear status on input
+      ['login-email', 'login-password'].forEach(id => {
+        document.getElementById(id)?.addEventListener('input', () => {
+          status.style.display = 'none';
+        });
+      });
+    })();
   </script>
 </body>
 </html>

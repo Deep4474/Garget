@@ -1,6 +1,6 @@
 (function(){
   'use strict';
-  const placeholder = 'https://placehold.co/600x600?text=Image+not+available';
+  const placeholder = 'assets/images/placeholder.svg';
   const imgEl = document.getElementById('npImage');
   const titleEl = document.getElementById('npTitle');
   const descEl = document.getElementById('npDescription');

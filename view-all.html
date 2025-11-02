@@ -1,34 +1,398 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>All Products — Lamar</title>
-  <link rel="stylesheet" href="./style.css">
-  <!--
-    This page expects `window.SUPABASE_URL` and `window.SUPABASE_ANON_KEY` to be available.
-    If you already set them globally in another script (for example in index.html), this page will reuse them.
-    Alternatively, open this file and set the variables below in the inline script (not recommended to commit secrets).
-  -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>All Products - Lamar Phone & Gadget</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="cart-badge.css">
   <script>
-    // Ensure Supabase credentials are available when this page is opened directly.
-    // These values mirror those used on the site (they are public anon keys).
-    if (!window.SUPABASE_URL) {
-      window.SUPABASE_URL = 'https://jlwxkykznyjmstpjcgks.supabase.co';
-    }
-    if (!window.SUPABASE_ANON_KEY) {
-      window.SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impsd3hreWt6bnlqbXN0cGpjZ2tzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQzMTAxNDIsImV4cCI6MjA2OTg4NjE0Mn0.C86cvOOT5QI0PSHlPMujivWV8NLWMtgNiX8KrglzhIQ';
-    }
+    // Supabase configuration (ahzfkfxqtdtkrwlxvimp)
+    const API_URL = "https://ahzfkfxqtdtkrwlxvimp.supabase.co";
+    const API_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFoemZrZnhxdGR0a3J3bHh2aW1wIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE4MTcyMDksImV4cCI6MjA3NzM5MzIwOX0.us--sBWAKTPJrd4gPKMPLBgtkJVhAcrUEQoD9YTnJww";
   </script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js" defer></script>
+  <style>
+    .section-header {
+      padding: 20px;
+      background: white;
+      margin-bottom: 20px;
+    }
+
+    .breadcrumb {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 16px;
+      color: #666;
+    }
+
+    .breadcrumb a {
+      color: #0066ff;
+      text-decoration: none;
+    }
+
+    .category-tabs {
+      display: flex;
+      gap: 8px;
+      margin: 15px 0;
+      flex-wrap: wrap;
+      padding: 5px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .category-tab {
+      padding: 6px 12px;
+      border-radius: 20px;
+      background: white;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      border: 1px solid #e0e0e0;
+      color: #333;
+      min-width: 100px;
+      justify-content: center;
+    }
+
+    .category-tab:hover {
+      background: #f8f8f8;
+      transform: translateY(-1px);
+    }
+
+    .category-tab.active {
+      background: #333;
+      color: white;
+      border-color: #333;
+    }
+
+    .all-categories-tab {
+      background: #333;
+      color: white;
+      font-weight: 500;
+      padding: 6px 16px;
+    }
+
+    .all-categories-tab:hover {
+      background: #444;
+      color: white;
+    }
+
+    .category-icon {
+      font-size: 1em;
+      opacity: 0.9;
+    }
+
+    .header-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    .header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .sort-select {
+      padding: 8px 16px;
+      border-radius: 20px;
+      border: 1px solid #e0e0e0;
+      outline: none;
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+
+    .page-title {
+      font-size: 1.5rem;
+      font-weight: 500;
+      color: #333;
+      margin: 0;
+    }
+
+    /* Grid and card styling */
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 20px;
+      padding: 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .product-card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      overflow: hidden;
+      position: relative;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .product-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .product-image {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+    }
+
+    .product-info {
+      padding: 16px;
+    }
+
+    .product-name {
+      margin: 0 0 8px 0;
+      font-size: 1.1em;
+      color: #333;
+      font-weight: 500;
+    }
+
+    .product-price {
+      color: #0066ff;
+      font-weight: 600;
+      font-size: 1.2em;
+      margin: 8px 0;
+    }
+
+    .product-category {
+      font-size: 0.9em;
+      color: #666;
+      margin-top: 8px;
+    }
+
+    .product-description {
+      color: #666;
+      font-size: 0.9em;
+      margin: 8px 0 0 0;
+      line-height: 1.4;
+    }
+
+    /* Overlay that appears on hover to show actions like Add to Cart */
+    .product-overlay {
+      position: absolute;
+      left: 12px; /* place near left edge */
+      bottom: 12px; /* sit above the card bottom */
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      pointer-events: none; /* allow click through when hidden */
+      opacity: 0;
+      transform: translateY(12px);
+      transition: opacity 160ms ease, transform 160ms ease;
+      z-index: 6;
+    }
+
+    .product-card:hover .product-overlay {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+
+    /* Black rounded pill style to match screenshot */
+    .product-overlay .add-to-cart-btn {
+      padding: 8px 14px;
+      border-radius: 999px;
+      border: none;
+      background: #000000;
+      color: #ffffff;
+      cursor: pointer;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.18);
+      font-weight: 600;
+      font-size: 0.95rem;
+      line-height: 1;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .product-overlay .add-to-cart-btn:hover {
+      background: #0a0a0a;
+    }
+
+    /* Make sure card allows overlay placement without clipping */
+    .product-card {
+      overflow: visible; /* allow the overlay to sit comfortably */
+    }
+
+    /* Empty state styling */
+    .ap-empty {
+      text-align: center;
+      padding: 40px 20px;
+      color: #666;
+    }
+
+    .empty-icon {
+      font-size: 3em;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+
+    .ap-empty h3 {
+      margin: 0 0 8px 0;
+      color: #333;
+    }
+
+    .ap-empty p {
+      margin: 0;
+      color: #666;
+    }
+
+    /* Loading state */
+    .ap-loading {
+      text-align: center;
+      padding: 40px 20px;
+      color: #666;
+    }
+
+    .ap-spinner {
+      display: inline-block;
+      width: 30px;
+      height: 30px;
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid #0066ff;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-right: 10px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .category-tabs {
+        gap: 8px;
+      }
+
+      .category-tab {
+        padding: 8px 16px;
+        font-size: 0.9rem;
+        min-width: auto;
+      }
+
+      .products-grid {
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: 15px;
+        padding: 15px;
+      }
+
+      .product-image {
+        height: 160px;
+      }
+
+      .header-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+      }
+
+      .sort-select {
+        width: 100%;
+      }
+    }
+
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 20px;
+      padding: 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .product-card {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      overflow: hidden;
+      transition: transform 0.2s;
+      cursor: pointer;
+    }
+
+    .product-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .product-image {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+    }
+
+    .product-info {
+      padding: 15px;
+    }
+
+    .product-name {
+      margin: 0;
+      font-size: 1.1em;
+      color: #333;
+    }
+
+    .product-price {
+      color: #1ca060;
+      font-weight: bold;
+      margin: 10px 0;
+    }
+
+    .product-description {
+      color: #666;
+      font-size: 0.9em;
+      margin: 0;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 50px;
+      font-size: 1.2em;
+      color: #666;
+    }
+
+    .error {
+      text-align: center;
+      padding: 50px;
+      color: #e53935;
+    }
+
+    .page-title {
+      text-align: center;
+      margin: 20px 0;
+      color: #333;
+    }
+
+    .filters {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .filter-select {
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      min-width: 150px;
+    }
+  </style>
   <script src="./view-all.js" defer></script>
   <script src="./cart.js" defer></script>
 </head>
-  <body>
+<body>
   <a class="skip-link" href="#mainContent">Skip to main content</a>
   <header class="top-compact-header viewall-header">
     <div class="left">
-      <button id="menuBtn" class="hamburger" aria-label="Open menu">≡</button>
       <span class="brand-text">Lamar Phone And Gadget</span>
     </div>
     <div class="header-actions">
@@ -44,17 +408,33 @@
     </nav>
 
     <header class="section-header" tabindex="-1">
-      <div>
-        <h1>All Products</h1>
-        <p class="muted">"All Categories"</p>
-      </div>
-      <div class="controls">
-        <button class="filter-btn" aria-label="Filter"><span class="filter-ico">⚝</span></button>
-        <select id="sortSelect" aria-label="Sort">
-          <option value="newest">Newest</option>
-          <option value="price-asc">Price: Low to High</option>
-          <option value="price-desc">Price: High to Low</option>
-        </select>
+      <div class="header-content">
+        <div class="header-row">
+          <h1 class="page-title">All Products</h1>
+          <select id="sortSelect" class="sort-select" aria-label="Sort">
+            <option value="newest">Newest</option>
+            <option value="price-asc">Price: Low to High</option>
+            <option value="price-desc">Price: High to Low</option>
+          </select>
+        </div>
+
+        <div class="category-tabs">
+          <button class="category-tab all-categories-tab active" data-category="all">
+            <span class="category-icon">🏠</span>All Categories
+          </button>
+          <button class="category-tab" data-category="phones">
+            <span class="category-icon">📱</span>Phones
+          </button>
+          <button class="category-tab" data-category="laptops">
+            <span class="category-icon">💻</span>Laptops
+          </button>
+          <button class="category-tab" data-category="accessories">
+            <span class="category-icon">🎧</span>Accessories
+          </button>
+          <button class="category-tab" data-category="tvs">
+            <span class="category-icon">📺</span>TVs
+          </button>
+        </div>
       </div>
     </header>
 
@@ -73,10 +453,6 @@
         <span class="nav-ico">🏠</span>
         <span class="nav-label">Home</span>
       </a>
-      <a href="categories.html" class="bottom-nav-item">
-        <span class="nav-ico">▦</span>
-        <span class="nav-label">Categories</span>
-      </a>
       <a href="cart.html" class="bottom-nav-item">
         <span class="nav-ico">🛒</span>
         <span class="nav-label">Cart (0)</span>
@@ -85,7 +461,7 @@
         <span class="nav-ico">🔔</span>
         <span class="nav-label">Notifications</span>
       </a>
-      <a href="login.html" class="bottom-nav-item">
+      <a href="account.html" class="bottom-nav-item">
         <span class="nav-ico">👤</span>
         <span class="nav-label">My Account</span>
       </a>

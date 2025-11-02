@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>My Account</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="account.css">
+  <link rel="stylesheet" href="desktop-style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <script src="supabase-config.js"></script>
+</head>
+<body>
+  <header class="top-compact-header">
+    <div class="left">
+      <a href="index.html" class="logo-link">
+        <span class="brand-text">Lamar Phone And Gadget</span>
+      </a>
+      <nav class="desktop-nav">
+        <a href="index.html">Home</a>
+        <a href="phone.html">Phones</a>
+        <a href="laptop.html">Laptops</a>
+        <a href="accessories.html">Accessories</a>
+        <a href="blog.html">Blog</a>
+      </nav>
+    </div>
+    <div class="header-actions">
+      <a href="cart.html" class="cart-icon">
+        🛒
+        <span class="badge" id="cartBadge">0</span>
+      </a>
+      <a href="notifications.html" class="notifications-icon">
+        🔔
+        <span class="badge" id="notifyBadge">0</span>
+      </a>
+    </div>
+  </header>
+
+  <main class="account-page">
+    <nav class="breadcrumb">
+      <a href="index.html">Home</a> <span>/</span> <strong>My Account</strong>
+    </nav>
+    
+    <section class="account-panel">
+      <h1>My Account</h1>
+
+      <div id="accountContent">
+        <div class="loading">
+          <span class="ap-spinner" aria-hidden="true"></span>
+          Checking your session…
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <nav class="bottom-nav">
+    <a href="index.html" class="bottom-nav-item">
+      <span class="nav-ico">🏠</span>
+      <span class="nav-label">Home</span>
+    </a>
+    <a href="cart.html" class="bottom-nav-item">
+      <span class="nav-ico">🛒</span>
+      <span class="nav-label">Cart</span>
+    </a>
+    <a href="notifications.html" class="bottom-nav-item">
+      <span class="nav-ico">🔔</span>
+      <span class="nav-label">Notifications</span>
+    </a>
+    <a href="account.html" class="bottom-nav-item">
+      <span class="nav-ico">👤</span>
+      <span class="nav-label">My Account</span>
+    </a>
+  </nav>
+
+<script>
+// Render account details or login form depending on auth state.
+(async function(){
+  const container = document.getElementById('accountContent');
+  function renderLoginPrompt() {
+    container.innerHTML = `
+      <div class="login-subtitle">Please sign in to access your account</div>
+      <a class="auth-link" href="login.html">Sign in</a>
+      <div class="register-prompt">
+        Don't have an account? <a href="register.html">Create one</a>
+      </div>
+    `;
+  }
+
+  function renderProfile(user) {
+    container.innerHTML = `
+      <div class="profile">
+        <div class="welcome-msg">Welcome back!</div>
+        <div class="profile-row"><strong>Name:</strong> <span id="pf-name">${(user.user_metadata && (user.user_metadata.full_name || user.user_metadata.name)) || 'Not provided'}</span></div>
+        <div class="profile-row"><strong>Email:</strong> <span id="pf-email">${user.email || 'Not provided'}</span></div>
+        
+        <div class="quick-links">
+          <a href="orders.html" class="quick-link">
+            <span class="quick-link-icon">📦</span>
+            <span class="quick-link-label">My Orders</span>
+          </a>
+          <a href="notifications.html" class="quick-link">
+            <span class="quick-link-icon">🔔</span>
+            <span class="quick-link-label">My Messages</span>
+          </a>
+        </div>
+
+        <div class="profile-actions">
+          <button id="signOutBtn" class="sign-out-btn">
+            <span class="btn-icon">↪️</span>
+            Sign out
+          </button>
+        </div>
+      </div>
+    `;
+    const btn = document.getElementById('signOutBtn');
+    if (btn) btn.addEventListener('click', async function(){
+      if (window.appAuth && typeof window.appAuth.signOut === 'function') {
+        await window.appAuth.signOut();
+      } else if (window.supabaseClient && window.supabaseClient.auth && typeof window.supabaseClient.auth.signOut === 'function') {
+        await window.supabaseClient.auth.signOut();
+        localStorage.removeItem('userEmail'); localStorage.removeItem('userName');
+        window.location.href = 'index.html';
+      } else {
+        localStorage.removeItem('userEmail'); localStorage.removeItem('userName');
+        window.location.href = 'index.html';
+      }
+    });
+  }
+
+  // Try Supabase first, then fall back to localStorage-based user
+  try {
+    let user = null;
+    if (window.supabaseClient && window.supabaseClient.auth && typeof window.supabaseClient.auth.getUser === 'function') {
+      const resp = await window.supabaseClient.auth.getUser();
+      if (resp && resp.data && resp.data.user) user = resp.data.user;
+    }
+    if (!user) {
+      // local fallback (older pages store name/email in localStorage)
+      const email = localStorage.getItem('userEmail');
+      const name = localStorage.getItem('userName');
+      if (email) user = { email: email, user_metadata: { full_name: name } };
+    }
+
+    if (user) {
+      renderProfile(user);
+    } else {
+      renderLoginPrompt();
+    }
+  } catch (e) {
+    console.warn('account page error', e);
+    renderLoginPrompt();
+  }
+})();
+</script>
+</body>
+</html>

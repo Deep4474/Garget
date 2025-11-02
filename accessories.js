@@ -1,395 +1,333 @@
-(function(){
-  // Only target the accessories grid. Remove phonesGrid fallback to avoid showing phones here.
-  const grid = document.getElementById('accessoriesGrid');
+(async function() {
+  // Prevent duplicate initialization
+  if (window.accessoriesInitialized) return;
+  window.accessoriesInitialized = true;
 
-  // Defensive: wrap the global `renderProducts` so if other scripts call it on this
-  // page (for example, a global renderer that doesn't know about accessories) we
-  // intercept the array, filter to accessories/wearables and render locally.
-  try {
-    if (window && typeof window.renderProducts === 'function') {
-      window._originalRenderProducts_for_accessories = window.renderProducts;
-    }
-  } catch (e) {}
-
-  // Replace with a wrapper that forwards accessory/wearable product lists to our
-  // local `render` function when on the accessories page. Otherwise call the
-  // original renderer if available.
-  window.renderProducts = function(products, categoryMap) {
-    const isAccessoriesPage = !!document.getElementById('accessoriesGrid');
-    if (!isAccessoriesPage) {
-      if (window._originalRenderProducts_for_accessories && typeof window._originalRenderProducts_for_accessories === 'function') {
-        return window._originalRenderProducts_for_accessories(products, categoryMap);
-      }
-      return;
-    }
-
-    // Normalize incoming array-like payloads
-    const arr = Array.isArray(products) ? products : (window.products && Array.isArray(window.products) ? window.products : []);
-    if (!arr.length) {
-      // nothing to render
-      grid && (grid.innerHTML = '<div class="ap-loading">No accessories found.</div>');
-      return;
-    }
-
-    // Filter to accessories and wearables, and always exclude phones/laptops
-    const filtered = arr.filter(p => {
-      if (!p || typeof p !== 'object') return false;
-      if (isPhoneOrLaptop(p)) return false;
-      const name = (p.name || p.title || p.product_name || '').toString().toLowerCase();
-      const isWearable = WEARABLE_KEYWORDS.some(k => name.includes(k));
-      const isAccessoryName = ACCESSORY_KEYWORDS.some(k => name.includes(k));
-      if (isWearable || isAccessoryName) return true;
-      // also allow if category fields indicate accessory
-      for (const f of CATEGORY_FIELDS) {
-        if (!Object.prototype.hasOwnProperty.call(p, f)) continue;
-        const v = p[f]; if (!v) continue;
-        const str = Array.isArray(v) ? v.join(' ').toLowerCase() : String(v).toLowerCase();
-        if (ACCESSORY_KEYWORDS.some(kw => str.includes(kw)) || WEARABLE_KEYWORDS.some(kw => str.includes(kw))) return true;
-      }
-      return false;
-    });
-
-    if (!filtered.length) {
-      grid && (grid.innerHTML = '<div class="ap-loading">No accessories found.</div>');
-      window.products = [];
-      return;
-    }
-
-    window.products = filtered;
-    render(filtered);
+  // Accessory subcategories for filtering
+  const accessoryTypes = {
+    'Phone Accessories': [
+      'Phone Cases & Covers',
+      'Screen Protectors',
+      'Phone Chargers',
+      'Power Banks',
+      'Phone Holders',
+      'Selfie Sticks',
+      'Phone Grips'
+    ],
+    'Audio Accessories': [
+      'Wireless Earbuds',
+      'Headphones',
+      'Bluetooth Speakers',
+      'Wired Earphones',
+      'Microphones'
+    ],
+    'Computer Accessories': [
+      'Keyboards',
+      'Mouse',
+      'Mousepads',
+      'USB Drives',
+      'External Hard Drives',
+      'Laptop Bags',
+      'Webcams',
+      'Laptop Cooling Pads'
+    ],
+    'Networking': [
+      'Wi-Fi Routers',
+      'Network Switches',
+      'Ethernet Cables',
+      'Wi-Fi Adapters',
+      'Network Cards',
+      'Modems',
+      'Wi-Fi Extenders'
+    ],
+    'Gaming Accessories': [
+      'Game Controllers',
+      'Gaming Headsets',
+      'Gaming Mouse',
+      'Gaming Keyboards'
+    ]
   };
 
-  // Ensure the accessories grid is empty before our rendering runs
-  if (grid) grid.innerHTML = '';
+  // Keywords to identify accessories in product data
+  const accessoryKeywords = {
+    'Phone Accessories': [
+      'phone case', 'phone cover', 'screen protector', 'tempered glass',
+      'phone charger', 'car charger', 'wireless charger', 'power bank',
+      'phone holder', 'phone stand', 'selfie stick', 'phone grip',
+      'phone mount', 'phone accessories'
+    ],
+    'Audio Accessories': [
+      'earbuds', 'airpods', 'headphones', 'headset', 'earphones',
+      'bluetooth speaker', 'wireless speaker', 'microphone', 'mic'
+    ],
+    'Computer Accessories': [
+      'keyboard', 'mouse', 'mousepad', 'usb drive', 'flash drive',
+      'hard drive', 'ssd', 'laptop bag', 'laptop sleeve', 'webcam',
+      'cooling pad', 'laptop stand', 'computer accessories'
+    ],
+    'Networking': [
+      'wifi router', 'network switch', 'ethernet cable', 'lan cable',
+      'wifi adapter', 'network card', 'modem', 'wifi extender',
+      'network accessories', 'networking'
+    ],
+    'Gaming Accessories': [
+      'game controller', 'gaming headset', 'gaming mouse', 'gaming keyboard',
+      'gaming accessories', 'game accessories', 'gaming gear'
+    ]
+  };
 
-  function formatPrice(v){
-    const n = Number(v);
-    if (!isFinite(n)) return '';
-    return new Intl.NumberFormat('en-NG',{ style: 'currency', currency: 'NGN' }).format(n);
-  }
-
-  const CATEGORY_FIELDS = ['category','categories','category_name','cat','type','tags'];
-  const ACCESSORY_KEYWORDS = ['accessory','accessories','case','charger','power bank','headphone','earbud','screen guard','wear','wearable','watch','cable'];
-  const WEARABLE_KEYWORDS = ['watch','earbud','earbuds','earphone','earphones','buds','smartwatch','fitness band','fitness tracker','tracker','wearable','ring','hearable','tws','true wireless'];
-
-  // Exclude items that are clearly phones or laptops
-  const PHONE_LAPTOP_KEYWORDS = [
-    'phone', 'smartphone', 'mobile', 'laptop', 'notebook', 'iphone', 'macbook', 'samsung galaxy',
-    'macbook pro', 'macbook air', 'imac', 'mac mini', 'mac pro',
-    'galaxy book', 'dell', 'lenovo', 'thinkpad', 'ideapad', 'chromebook'
-  ];
-
-  const BRAND_BLACKLIST = ['apple', 'samsung', 'dell', 'lenovo', 'hp', 'asus', 'acer'].map(b => b.toLowerCase());
-
-  function isPhoneOrLaptop(row) {
-    if (!row || typeof row !== 'object') return false;
-    const name = (row.name || row.title || row.product_name || '').toString().toLowerCase();
+  // Function to check if a product is an accessory and determine its type
+  function isAccessory(product) {
+    // First, explicitly exclude main product categories
+    const excludeKeywords = [
+      'laptop computer', 'notebook computer', 'desktop computer', 
+      'smartphone device', 'mobile device', 'tablet device', 'television set',
+      'smart tv device'
+    ];
     
-    // Check for blacklisted brands in product name
-    if (BRAND_BLACKLIST.some(brand => name.includes(brand))) {
-      // If it's a brand match, only exclude if it's not clearly an accessory
-      if (!ACCESSORY_KEYWORDS.some(acc => name.includes(acc.toLowerCase()))) {
+    const searchText = [
+      product.name || '',
+      product.category || '',
+      product.description || '',
+      product.subcategory || '',
+      product.type || '',
+      (product.tags && Array.isArray(product.tags) ? product.tags.join(' ') : product.tags || '')
+    ].join(' ').toLowerCase();
+
+    // Check category field first - if it explicitly says "accessories", it's an accessory
+    if ((product.category || '').toLowerCase().includes('accessories')) {
+      return true;
+    }
+
+    // Check exclusions first
+    if (excludeKeywords.some(keyword => searchText.includes(keyword.toLowerCase()))) {
+      return false;
+    }
+
+    // Check against our categorized keywords
+    for (const [category, keywords] of Object.entries(accessoryKeywords)) {
+      if (keywords.some(keyword => searchText.includes(keyword.toLowerCase()))) {
+        // Add the detected category to the product
+        product._accessory_category = category;
         return true;
       }
     }
 
-    // Check for explicit phone/laptop keywords
-    for (const kw of PHONE_LAPTOP_KEYWORDS) if (name.includes(kw)) return true;
-    
-    // Check category fields
-    for (const f of CATEGORY_FIELDS) {
-      if (!Object.prototype.hasOwnProperty.call(row, f)) continue;
-      const v = row[f];
-      if (!v) continue;
-      const str = Array.isArray(v) ? v.join(' ').toLowerCase() : String(v).toLowerCase();
-      for (const kw of PHONE_LAPTOP_KEYWORDS) if (str.includes(kw)) return true;
-    }
-
-    // Check product type/category
-    const category = (row.type || row.category || '').toString().toLowerCase();
-    if (category.includes('phone') || category.includes('laptop')) return true;
-
-    // Check price range - most accessories are cheaper than phones/laptops
-    const price = parseFloat(row.price || row.amount || 0);
-    // If price is very high, likely a phone/laptop — but allow if the name/category clearly indicates an accessory (e.g., 'watch', 'earbud')
-    if (price > 1000000) {
-      const isAccessoryName = ACCESSORY_KEYWORDS.some(acc => name.includes(acc.toLowerCase()));
-      if (!isAccessoryName) return true;
+    // Check price as a last resort - most accessories are under ₦100,000
+    const price = Number(product.price || product.amount || 0);
+    if (price > 0 && price < 100000) {
+      // Check if it has accessory-like words
+      const accessoryIndicators = ['kit', 'adapter', 'cable', 'cover', 'protection', 'add-on', 'attachment'];
+      if (accessoryIndicators.some(word => searchText.includes(word))) {
+        return true;
+      }
     }
 
     return false;
   }
 
-  // Strict category-based matcher: only checks name/title and explicit category-like fields.
-  function isAccessoryByCategory(row) {
-    if (!row || typeof row !== 'object') return false;
-    const name = (row.name || row.title || row.product_name || '').toString().toLowerCase();
-    for (const kw of ACCESSORY_KEYWORDS) if (name.includes(kw)) return true;
-    for (const f of CATEGORY_FIELDS) {
-      if (!row.hasOwnProperty(f)) continue;
-      const v = row[f];
-      if (!v) continue;
-      if (typeof v === 'string' && ACCESSORY_KEYWORDS.some(kw => v.toLowerCase().includes(kw))) return true;
-      if (Array.isArray(v) && ACCESSORY_KEYWORDS.some(kw => v.join(' ').toLowerCase().includes(kw))) return true;
-    }
-    return false;
+  // Function to format price in Naira
+  function formatPrice(price) {
+    return new Intl.NumberFormat('en-NG', {
+      style: 'currency',
+      currency: 'NGN'
+    }).format(price || 0);
   }
 
-  function render(products){
+  // Fetch accessories from Supabase
+  async function fetchAccessories() {
+  // Prefer the dedicated project REST endpoint before falling back to the global SDK client.
+  const ACCESSORIES_SUPABASE_URL = 'https://ahzfkfxqtdtkrwlxvimp.supabase.co';
+  const ACCESSORIES_SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFoemZrZnhxdGR0a3J3bHh2aW1wIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE4MTcyMDksImV4cCI6MjA3NzM5MzIwOX0.us--sBWAKTPJrd4gPKMPLBgtkJVhAcrUEQoD9YTnJww';
+  const ACCESSORIES_REST_BASE = String(ACCESSORIES_SUPABASE_URL || '').replace(/\/$/, '') + '/rest/v1';
+  const grid = document.getElementById('accessoriesGrid') || document.getElementById('productsGrid');
+  if (!grid) return;
+  grid.innerHTML = '<div class="loading-spinner">Loading accessories...</div>';
+
+  // Try REST fetch first (safe: fetch a bulk of rows and filter client-side)
+  try {
+    if (ACCESSORIES_REST_BASE && ACCESSORIES_SUPABASE_ANON_KEY) {
+      const url = `${ACCESSORIES_REST_BASE}/products?select=*&order=created_at.desc&limit=1000`;
+      const res = await fetch(url, { headers: { 'apikey': ACCESSORIES_SUPABASE_ANON_KEY, 'Authorization': 'Bearer ' + ACCESSORIES_SUPABASE_ANON_KEY, 'Accept': 'application/json' } });
+      if (res && res.ok) {
+        try {
+          const data = await res.json();
+          if (Array.isArray(data) && data.length) {
+            // Filter for actual accessories using existing logic
+            const accessories = data.filter(isAccessory);
+            const accessoriesFiltered = accessories.filter(p => (p._accessory_category || '').toLowerCase() !== 'computer accessories');
+            // Render the results by category (reuse existing rendering structure)
+            if (Object.keys(accessoriesFiltered || {}).length === 0) {
+              grid.innerHTML = '<div class="no-results">No accessories found</div>';
+            } else {
+              const categorized = {};
+              for (const product of accessoriesFiltered) {
+                const category = product._accessory_category || 'Other Accessories';
+                if (!categorized[category]) categorized[category] = [];
+                categorized[category].push(product);
+              }
+              grid.innerHTML = Object.entries(categorized).map(([category, products]) => `
+                <div class="category-section">
+                  <h2 class="category-title">${category}</h2>
+                  <div class="products-grid">
+                    ${products.map(product => `
+                      <div class="product-card" data-id="${product.id}">
+                        <img src="${product.image_url || 'assets/images/default-accessory.png'}" 
+                             alt="${product.name}" 
+                             class="product-image"
+                             onerror="this.src='assets/images/default-accessory.png'">
+                        <div class="product-info">
+                          <h3 class="product-name">${product.name}</h3>
+                          <p class="product-price">${formatPrice(product.price)}</p>
+                          <button class="add-to-cart-btn" data-product-id="${product.id}">Add to Cart</button>
+                        </div>
+                      </div>
+                    `).join('')}
+                  </div>
+                </div>
+              `).join('');
+
+              // Wire events
+              grid.querySelectorAll('.product-card').forEach(card => {
+                const productId = card.dataset.id;
+                const addToCartBtn = card.querySelector('.add-to-cart-btn');
+                if (addToCartBtn) addToCartBtn.addEventListener('click', (e) => { e.stopPropagation(); console.log('Add to cart:', productId); });
+                card.addEventListener('click', () => { window.location.href = `product.html?id=${productId}`; });
+              });
+            }
+
+            return accessoriesFiltered;
+          }
+        } catch (e) {
+          // JSON parse error or unexpected shape — fall through to SDK fallback
+        }
+      }
+    }
+  } catch (e) {
+    // REST fetch failed — will fall back to SDK below
+    console.warn('[accessories] REST fetch failed, falling back to SDK:', e && e.message ? e.message : e);
+  }
+  // Support both page variants: prefer 'accessoriesGrid' (accessories.html) but fall back to 'productsGrid'
+  const grid = document.getElementById('accessoriesGrid') || document.getElementById('productsGrid');
     if (!grid) return;
-    if (!Array.isArray(products) || products.length === 0) {
-      grid.innerHTML = '<div class="ap-loading">No accessories found.</div>';
-      return;
-    }
-    // Filter out phones and laptops
-    products = products.filter(p => !isPhoneOrLaptop(p));
-    const seen = new Set();
-    const rows = [];
-    for (const p of products) {
-      const id = String(p.id || p.slug || (p.name && p.name.trim().toLowerCase()) || '').trim();
-      if (!id) continue;
-      if (seen.has(id)) continue;
-      seen.add(id);
-      rows.push(p);
-    }
+    
+    grid.innerHTML = '<div class="loading-spinner">Loading accessories...</div>';
 
-    grid.innerHTML = rows.map(p => {
-      const img = p.image_url || p.image || 'assets/images/appliances.png';
-      const title = (p.name || p.title || p.product_name || 'Untitled').replace(/</g,'&lt;');
-      const price = formatPrice(p.price || p.amount || 0);
-      const slug = p.slug || p.id || '';
-      const pid = p.id || p.product_id || slug || '';
-      const isProduct5 = (p.__source === 'product5' || p.__table === 'product5' || p.source === 'product5');
-      const productHref = isProduct5 ? ('new-product.html' + (img ? ('?image_url=' + encodeURIComponent(img) + '&name=' + encodeURIComponent(p.name || '')) : '')) : ('product.html' + (slug ? ('?id=' + encodeURIComponent(slug)) : ''));
-      return `
-        <article class="product-card" data-product-id="${pid}" data-slug="${slug}" data-href="${productHref}">
-          <div class="product-overlay">
-            <button class="icon-btn heart" data-action="wishlist" title="Add to wishlist">❤</button>
-            <button class="icon-btn compare" data-action="compare" title="Compare">⇄</button>
-          </div>
-          <img class="product-img" src="${img}" alt="${title}" onerror="this.onerror=null;this.src='assets/images/appliances.png'" />
-          <h3 class="product-name">${title}</h3>
-          <div class="price">${price}</div>
-          ${ isProduct5 ? `
-            <div class="product-card-actions"></div>
-          ` : `
-            <div class="product-addbar" data-action="addbar"><span class="add-text">Add to cart</span></div>
-          ` }
-        </article>
-      `;
-    }).join('\n');
-
-    grid.querySelectorAll('.product-card').forEach(card => {
-      card.addEventListener('click', function(e){
-        if (e.target.closest('.icon-btn') || e.target.closest('.product-addbar')) return;
-        const href = card.getAttribute('data-href');
-        if (href) window.location.href = href;
-      });
-    });
-
-    // No delegated share-product handler: product5 cards navigate via data-href
-  }
-
-  async function loadAccessories(){
-    if (window.supabaseClient && typeof window.supabaseClient.from === 'function') {
+    // Make sure we have a Supabase client
+      if (!window.supabaseClient && window.SUPABASE_URL && window.SUPABASE_ANON_KEY) {
       try {
-  // prioritize product2 so its accessories and wearables show up first
-  const tables = ['product2','product5','products'];
-  // extra wearable-specific keywords to ensure wearables are included
-  const WEARABLE_KEYWORDS = ['watch','earbud','earbuds','earphone','earphones','buds','smartwatch','fitness band','fitness tracker','tracker','wearable','ring','hearable'];
-        // helper: check whether a table exists (cache results)
-        // This uses a REST probe first (checks HTTP status) which is a reliable way
-        // to detect a missing table (404) without letting the Supabase SDK generate
-        // noisy REST calls that show up as 404 in the console. Falls back to SDK probe.
-        const _tableExistsCache = {};
-        async function tableExists(client, table) {
-          if (!table) return false;
-          if (Object.prototype.hasOwnProperty.call(_tableExistsCache, table)) return _tableExistsCache[table];
-
-          // Try REST probe first if SUPABASE_URL and key are available
-          try {
-            const base = String(window.SUPABASE_URL || '').replace(/\/$/, '');
-            const key = window.SUPABASE_ANON_KEY || window.SUPABASE_KEY || '';
-            if (base && key) {
-                const url = `${base}/rest/v1/${encodeURIComponent(table)}?select=id&limit=1`;
-                try {
-                  // Prefer HEAD probe first (lighter). If HEAD not allowed or fails,
-                  // fall back to GET. Treat client 4xx conservatively as missing.
-                  let headRes = null;
-                  try {
-                    headRes = await fetch(url, { method: 'HEAD', headers: { 'apikey': key, 'Authorization': 'Bearer ' + key } });
-                  } catch (headErr) {
-                    headRes = null; // network/CORS or HEAD not supported
-                  }
-
-                  if (headRes) {
-                    if (headRes.status === 404) { _tableExistsCache[table] = false; return false; }
-                    if (headRes.ok || headRes.status === 204) {
-                      if (client && typeof client.from === 'function') {
-                        try {
-                          const sdkProbe = await client.from(table).select('id').limit(1);
-                          if (sdkProbe && sdkProbe.error) { _tableExistsCache[table] = false; return false; }
-                          _tableExistsCache[table] = true; return true;
-                        } catch (e) {
-                          _tableExistsCache[table] = false; return false;
-                        }
-                      }
-                      _tableExistsCache[table] = true; return true;
-                    }
-                    if (headRes.status !== 405 && headRes.status !== 501 && (headRes.status >= 400 && headRes.status < 500) && headRes.status !== 401 && headRes.status !== 403) { _tableExistsCache[table] = false; return false; }
-                  }
-
-                  // HEAD inconclusive — try GET
-                  const res = await fetch(url, { method: 'GET', headers: { 'apikey': key, 'Authorization': 'Bearer ' + key, 'Accept': 'application/json' } });
-                  if (res.status === 404) { _tableExistsCache[table] = false; return false; }
-                  if (res.status >= 400 && res.status < 500 && res.status !== 200) { _tableExistsCache[table] = false; return false; }
-                  if (res.ok) {
-                    if (client && typeof client.from === 'function') {
-                      try {
-                        const sdkProbe = await client.from(table).select('id').limit(1);
-                        if (sdkProbe && sdkProbe.error) { _tableExistsCache[table] = false; return false; }
-                        _tableExistsCache[table] = true; return true;
-                      } catch (e) {
-                        _tableExistsCache[table] = false; return false;
-                      }
-                    }
-                    _tableExistsCache[table] = true; return true;
-                  }
-                  // otherwise fallthrough to SDK probe
-                } catch (fetchErr) {
-                  // network error or CORS — fall through to SDK probe
-                }
-            }
-          } catch (e) {
-            // ignore and fall back to SDK probe
-          }
-
-          // Fallback: use SDK probe if available
-          if (client && typeof client.from === 'function') {
-            try {
-              const probe = await client.from(table).select('id').limit(1);
-              if (probe && probe.error) {
-                const msg = String(probe.error.message || '').toLowerCase();
-                if (probe.error.code === 'PGRST205' || /does not exist/.test(msg) || /relation ""/.test(msg)) {
-                  _tableExistsCache[table] = false; return false;
-                }
-              }
-              _tableExistsCache[table] = true; return true;
-            } catch (e) {
-              _tableExistsCache[table] = false; return false;
-            }
-          }
-
-          _tableExistsCache[table] = false; return false;
-        }
-        let rows = [];
-
-        // Only query tables that appear to exist to reduce 404 noise
-        const effectiveTables = [];
-        for (const t of tables) {
-          try { if (await tableExists(window.supabaseClient, t)) effectiveTables.push(t); } catch(e) {}
-        }
-        for (const t of effectiveTables) {
-          // probe present category-like fields
-          let presentFields = new Set();
-          try {
-            const sample = await window.supabaseClient.from(t).select('*').limit(1);
-            if (!sample.error && Array.isArray(sample.data) && sample.data.length) Object.keys(sample.data[0]).forEach(k=>presentFields.add(k));
-          } catch(e){}
-
-          // If table has explicit category/tag fields, use server-side ilike on those only.
-          // Detect array-typed fields and avoid running .ilike against them (Postgres text[] doesn't support ilike).
-          const knownArrayFields = new Set(['tags','images','image_urls','categories','variants','attributes']);
-          let arrayFields = new Set();
-          try {
-            const sample = await window.supabaseClient.from(t).select('*').limit(1);
-            if (!sample.error && Array.isArray(sample.data) && sample.data.length) {
-              const first = sample.data[0] || {};
-              Object.keys(first).forEach(k => { try { if (Array.isArray(first[k])) arrayFields.add(k); } catch(e){} });
-            }
-          } catch(e) {}
-
-          // prefer server-side flattened column if present (tags_text)
-          const serverPrefer = (presentFields.size === 0 || presentFields.has('tags_text')) ? ['tags_text'] : [];
-          const candidatePresent = CATEGORY_FIELDS.filter(f => presentFields.has(f) && !arrayFields.has(f) && !knownArrayFields.has(f));
-          const fieldsToTry = serverPrefer.concat(candidatePresent);
-          if (fieldsToTry.length) {
-            for (const f of fieldsToTry) {
-              for (const kw of ACCESSORY_KEYWORDS) {
-                try {
-                  const res = await window.supabaseClient.from(t).select('*').ilike(f, `%${kw}%`).limit(1000);
-                  if (res && res.error) {
-                    console.warn(`[accessories] supabase query error table=${t} field=${f}:`, res.error);
-                  }
-                  if (res && !res.error && Array.isArray(res.data) && res.data.length) rows = rows.concat(res.data.map(r=>Object.assign({}, r, { __source: t, __table: t })));
-                } catch(e) {
-                  // ignore per-field errors
-                }
-              }
-            }
-          }
-        }
-
-        // If we didn't find any rows via per-field server-side ilike, try a safer
-        // name/title fallback search (useful for tables like `product2` that may
-        // not expose flattened category fields). This searches common text fields
-        // for accessory and wearable keywords.
-        if (!rows.length) {
-          const fallbackFields = ['name','title','product_name','description'];
-          const fallbackKeywords = ACCESSORY_KEYWORDS.concat(WEARABLE_KEYWORDS);
-          for (const t of effectiveTables) {
-            for (const f of fallbackFields) {
-              for (const kw of fallbackKeywords) {
-                try {
-                  const res = await window.supabaseClient.from(t).select('*').ilike(f, `%${kw}%`).limit(1000);
-                  if (res && !res.error && Array.isArray(res.data) && res.data.length) rows = rows.concat(res.data.map(r=>Object.assign({}, r, { __source: t, __table: t })));
-                } catch (e) {
-                  // ignore errors for missing fields or other issues
-                }
-              }
-            }
-          }
-        }
-
-        // dedupe & normalize, excluding phones/laptops
-        const seen = new Set(); const unique = [];
-        for (const r of rows) {
-          // skip phone or laptop rows
-          if (isPhoneOrLaptop(r)) continue;
-          const key = String(r.id || r.product_id || (r.name||'').trim().toLowerCase()||'') + '|' + (r.__source||'');
-          if (!key) continue; if (seen.has(key)) continue; seen.add(key); unique.push(r);
-        }
-        if (!unique.length) {
-          // no explicit category matches found — show none (strict category-only behavior)
-          grid.innerHTML = '<div class="ap-loading">No accessories found (no category matches).</div>';
-          return;
-        }
-  const normalized = unique.map(r=>({ id: r.id||r.product_id||r.uuid, name: r.name||r.title||r.product_name||r.product||'', price: r.price||r.amount||r.unit_price, image_url: r.image_url||r.image||(Array.isArray(r.images)&&r.images[0])||r.photo, slug: r.slug||r.handle||r.id, source: r.__source || r.__table || r.source }));
-        // Final defensive filter: remove any remaining phones/laptops before exposing to UI
-        const finalList = normalized.filter(n => !isPhoneOrLaptop(n));
-        // If everything was filtered out, show a friendly message instead of rendering phone/laptop items
-        if (!finalList.length) {
-          grid.innerHTML = '<div class="ap-loading">No accessories found.</div>';
-          window.products = [];
-          return;
-        }
-        window.products = finalList; render(finalList); return;
-      } catch(e){ console.warn('accessories.js supabase failed', e); }
+        window.supabaseClient = supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
+      } catch (e) {
+        console.error('Failed to initialize Supabase client:', e);
+        grid.innerHTML = '<div class="error-message">Failed to load products</div>';
+        return [];
+      }
     }
-    // if supabase not configured show mock as fallback
-    const mock = [ { id:'a1', name:'Mock Charger', price:4500, image_url:'assets/images/appliances.png' } ]; render(mock);
+
+    try {
+      // Build the query conditions
+      // NOTE: older/newer Supabase/PostgREST schemas may not include columns like
+      // 'subcategory' or 'tags'. Constructing server-side OR filters that refer
+      // to missing columns causes a 400 error (PostgREST 42703). To avoid that,
+      // fetch a sample of rows server-side and perform keyword filtering client-side
+      // (we already have robust client-side detection in `isAccessory`).
+      if (window.supabaseClient) {
+        console.debug('[accessories] fetching products (unfiltered) from supabase');
+        const { data, error } = await window.supabaseClient
+          .from('products')
+          .select('*')
+          .order('created_at', { ascending: false })
+          .limit(1000);
+
+        if (error) {
+          console.error('Error fetching accessories:', error);
+          grid.innerHTML = '<div class="error-message">Failed to load accessories</div>';
+          return [];
+        }
+
+        if (data && Array.isArray(data)) {
+          // Debug: log fetch results count and sample
+          console.debug('[accessories] supabase returned products:', data.length, 'sample:', data.slice(0,3));
+
+          // Filter for actual accessories
+          const accessories = data.filter(isAccessory);
+          console.debug('[accessories] products after accessory filter:', accessories.length);
+
+          // Exclude Computer Accessories explicitly as requested
+          const accessoriesFiltered = accessories.filter(p => (p._accessory_category || '').toLowerCase() !== 'computer accessories');
+          console.debug('[accessories] products after excluding Computer Accessories:', accessoriesFiltered.length);
+          
+          // Group by category (use filtered list that excludes Computer Accessories)
+          const categorized = {};
+          for (const product of accessoriesFiltered) {
+            const category = product._accessory_category || 'Other Accessories';
+            if (!categorized[category]) {
+              categorized[category] = [];
+            }
+            categorized[category].push(product);
+          }
+
+          // Render the results by category
+          if (Object.keys(categorized).length === 0) {
+            grid.innerHTML = '<div class="no-results">No accessories found</div>';
+          } else {
+            grid.innerHTML = Object.entries(categorized).map(([category, products]) => `
+              <div class="category-section">
+                <h2 class="category-title">${category}</h2>
+                <div class="products-grid">
+                  ${products.map(product => `
+                    <div class="product-card" data-id="${product.id}">
+                      <img src="${product.image_url || 'assets/images/default-accessory.png'}" 
+                           alt="${product.name}" 
+                           class="product-image"
+                           onerror="this.src='assets/images/default-accessory.png'">
+                      <div class="product-info">
+                        <h3 class="product-name">${product.name}</h3>
+                        <p class="product-price">${formatPrice(product.price)}</p>
+                        <button class="add-to-cart-btn" data-product-id="${product.id}">Add to Cart</button>
+                      </div>
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+            `).join('');
+
+            // Add event listeners
+            grid.querySelectorAll('.product-card').forEach(card => {
+              const productId = card.dataset.id;
+              
+              // Add to cart button click
+              const addToCartBtn = card.querySelector('.add-to-cart-btn');
+              if (addToCartBtn) {
+                addToCartBtn.addEventListener('click', (e) => {
+                  e.stopPropagation();
+                  // TODO: Implement add to cart functionality
+                  console.log('Add to cart:', productId);
+                });
+              }
+
+              // Card click for product details
+              card.addEventListener('click', () => {
+                window.location.href = `product.html?id=${productId}`;
+              });
+            });
+          }
+
+          return accessoriesFiltered;
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching accessories:', error);
+      grid.innerHTML = '<div class="error-message">Error loading accessories</div>';
+    }
+    
+    return [];
   }
 
-  let hasLoaded = false;
-  function initializeOnce() {
-    if (hasLoaded) return;
-    hasLoaded = true;
-    loadAccessories().catch(() => {});
-  }
-  
+  // Initialize on page load
   if (document.readyState === 'complete' || document.readyState === 'interactive') {
-    initializeOnce();
+    setTimeout(() => fetchAccessories().catch(console.error), 8);
   } else {
-    document.addEventListener('DOMContentLoaded', initializeOnce, { once: true });
+    document.addEventListener('DOMContentLoaded', () => fetchAccessories().catch(console.error));
   }
 })();

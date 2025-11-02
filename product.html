@@ -2,6 +2,17 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Product Details - Lamar Phone & Gadget</title>
+  <link rel="stylesheet" href="style.css">
+  <script>
+    // Supabase configuration
+    const API_URL = "https://ahzfkfxqtdtkrwlxvimp.supabase.co";
+    const API_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFoemZrZnhxdGR0a3J3bHh2aW1wIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE4MTcyMDksImV4cCI6MjA3NzM5MzIwOX0.us--sBWAKTPJrd4gPKMPLBgtkJVhAcrUEQoD9YTnJww";
+    // also expose legacy globals used across scripts
+    window.SUPABASE_URL = window.SUPABASE_URL || API_URL;
+    window.SUPABASE_KEY = window.SUPABASE_KEY || API_KEY;
+  </script>
   <style>
     .newsletter-social-responsive {
       background: #181818;
@@ -146,43 +157,15 @@
       font-size: 1.7rem;
     }
   </style>
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Product</title>
-  <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="assets/fontawesome/fontawesome.min.css">
-    <script>
-      // Supabase credentials provided by the user. Make sure this is the anon/public key.
-      window.SUPABASE_URL = 'https://jlwxkykznyjmstpjcgks.supabase.co';
-      window.SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impsd3hreWt6bnlqbXN0cGpjZ2tzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQzMTAxNDIsImV4cCI6MjA2OTg4NjE0Mn0.C86cvOOT5QI0PSHlPMujivWV8NLWMtgNiX8KrglzhIQ';
-    </script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 </head>
 <body>
   <header class="top-compact-header">
     <div class="left">
-      <div id="menuBtn" class="hamburger" aria-label="Open menu">☰</div>
       <span class="brand-text">Lamar Phone And Gadget</span>
     </div>
     <div class="header-actions">
     </div>
   </header>
-  <!-- Slide-out Menu Drawer (copied from index.html) -->
-  <div id="menuDrawer" class="menu-drawer" aria-hidden="true">
-    <div class="menu-drawer-content">
-  <button class="close" id="closeMenuDrawer" aria-label="Close menu" onclick="closeProductMenu()">&times;</button>
-      <div class="account-area">
-        <div class="account-circle" aria-hidden="true">&#128100;</div>
-        <div class="account-links"><a href="register.html" id="menuLoginLink">Registration</a></div>
-      </div>
-      <div class="menu-section">
-        <a href="#home" class="menu-link selected"><span class="menu-text">Home</span></a>
-        <a href="#flash" class="menu-link"><span class="indicator">»</span><span class="menu-text">Flash Sale</span></a>
-        <a href="#blogs" class="menu-link"><span class="menu-text">Blogs</span></a>
-        <a href="#brands" class="menu-link"><span class="menu-text">All Brands</span></a>
-        <a href="#categories" class="menu-link"><span class="menu-text">All Categories</span></a>
-      </div>
-    </div>
-  </div>
   <main id="productMain" class="product-page-main">
     <div id="loading">Loading product...</div>
     <!-- Product Image Gallery Modal -->
@@ -191,7 +174,7 @@
         <span class="close-modal" id="closeGalleryModal">&times;</span>
         <div class="gallery-images">
           <button class="gallery-prev" id="galleryPrevBtn">&#10094;</button>
-          <img id="galleryMainImg" src="https://placehold.co/600x400" alt="Product Image" />
+          <img id="galleryMainImg" src="assets/images/placeholder.svg" alt="Product Image" />
           <button class="gallery-next" id="galleryNextBtn">&#10095;</button>
         </div>
         <div class="gallery-thumbnails" id="galleryThumbnails">
@@ -212,13 +195,17 @@
       </div>
     </div>
   </main>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
   <script>
-    const supabase = window.supabase ? window.supabase : (window.supabase = supabase ? supabase : null);
+    // Supabase SDK loaded above; we will initialize a client when needed.
     async function fetchProduct(id) {
       if (window.supabaseClient) {
-        const { data, error } = await window.supabaseClient.from('products').select('*').eq('id', id).single();
-        if (error) return null;
-        return data;
+        // Use limit(1) and pick the first row instead of .single()
+        // .single() can cause Supabase/PostgREST to send a special Accept header
+        // which some configurations reject with 406 Not Acceptable.
+        const res = await window.supabaseClient.from('products').select('*').eq('id', id).limit(1);
+        if (res && !res.error && Array.isArray(res.data) && res.data.length) return res.data[0];
+        return null;
       }
       return null;
     }
@@ -231,7 +218,7 @@
       const main = document.getElementById('productMain');
       if (!idParam && !slugParam && !nameParam) { main.innerHTML = '<div>No product specified.</div>'; return; }
       // initialize supabase client if missing
-      if (!window.supabaseClient && window.SUPABASE_URL && window.SUPABASE_KEY) {
+      if (!window.supabaseClient && window.SUPABASE_URL && window.SUPABASE_KEY && typeof supabase !== 'undefined') {
         try { window.supabaseClient = supabase.createClient(window.SUPABASE_URL, window.SUPABASE_KEY); } catch(e) { console.error('supabase client init error', e); }
       }
       let product = null;
@@ -239,8 +226,11 @@
       if (window.supabaseClient) {
         try {
           if (idParam) {
-            const res = await window.supabaseClient.from('products').select('*').eq('id', idParam).single();
-            if (!res.error) product = res.data || res;
+            // Avoid using .single() for compatibility with some PostgREST configs
+            try {
+              const res = await window.supabaseClient.from('products').select('*').eq('id', idParam).limit(1);
+              if (!res.error && Array.isArray(res.data) && res.data.length) product = res.data[0];
+            } catch(e) { /* ignore and fallback */ }
           }
           if (!product && slugParam) {
             // Safely probe whether the 'slug' column exists to avoid PostgREST 400 errors
@@ -270,8 +260,8 @@
               const hasSlug = await _checkProductsHasColumn('slug');
               if (hasSlug) {
                 try {
-                  const res = await window.supabaseClient.from('products').select('*').eq('slug', slugParam).single();
-                  if (!res.error) product = res.data || res;
+                  const res = await window.supabaseClient.from('products').select('*').eq('slug', slugParam).limit(1);
+                  if (!res.error && Array.isArray(res.data) && res.data.length) product = res.data[0];
                 } catch (e) {
                   // Query failed despite column existing; ignore and continue to fallback
                   console.warn('Product lookup by slug failed:', e);
@@ -279,34 +269,61 @@
                 }
               } else {
                 console.info('Skipping slug lookup: products.slug column not present');
-                // If the DB doesn't expose a slug column, create a friendly
-                // representation from the provided slugParam so the product page
-                // still 'represents' the requested item instead of a generic sample.
+                // If the DB doesn't expose a slug column, attempt fallbacks before
+                // creating a prettified placeholder: 1) parse numeric id from slug
+                // and try lookup by id; 2) try a name ilike search using slug text.
                 try {
-                  // Example slug forms: "ipnowo:281", "ipnowo-281", "iphone-12-pro"
-                  function prettifySlug(s) {
-                    if (!s) return s;
-                    // Replace separators with space, remove numeric id suffixes after ':' or '-'
-                    let out = String(s).trim();
-                    // If form is prefix:digits, show prefix and the id in parentheses
-                    const m = out.match(/^([^:\-]+)[:\-]?(\d+)?$/i);
-                    if (m) {
-                      const namePart = m[1].replace(/[-_]+/g, ' ');
-                      if (m[2]) return namePart.replace(/\b\w/g, c => c.toUpperCase()) + ' (ID ' + m[2] + ')';
-                      return namePart.replace(/\b\w/g, c => c.toUpperCase());
+                  // Try to extract a trailing numeric id like 'prefix:123' or 'prefix-123'
+                  const idMatch = String(slugParam).match(/[:\-](\d+)$/);
+                  if (idMatch && idMatch[1]) {
+                    try {
+                      const idCandidate = idMatch[1];
+                      const r = await window.supabaseClient.from('products').select('*').eq('id', idCandidate).limit(1);
+                      if (!r.error && Array.isArray(r.data) && r.data.length) {
+                        product = r.data[0];
+                      }
+                    } catch (e) {
+                      console.warn('Error looking up product by extracted id from slug:', e);
                     }
-                    // Generic fallback: convert dashes/underscores/colons to spaces and title-case
-                    out = out.replace(/[:_\-]+/g, ' ');
-                    return out.replace(/\b\w/g, c => c.toUpperCase());
                   }
 
-                  // Build a minimal product object derived from the slug
-                  const prettyName = prettifySlug(slugParam);
-                  if (prettyName) {
-                    product = { id: slugParam, name: prettyName, price: null, description: 'Representing product: ' + prettyName, image_url: 'https://placehold.co/600x400' };
+                  // If not found by id, try searching by a humanized slug name
+                  if (!product) {
+                    const human = String(slugParam).replace(/[:_\-]+/g, ' ').replace(/\s+/g, ' ').trim();
+                    if (human) {
+                      try {
+                        const q = `%${human.replace(/%/g,'')}%`;
+                        const rr = await window.supabaseClient.from('products').select('*').ilike('name', q).limit(1);
+                        if (!rr.error && Array.isArray(rr.data) && rr.data.length) {
+                          product = rr.data[0];
+                        }
+                      } catch (e) {
+                        console.warn('Error searching product by humanized slug name:', e);
+                      }
+                    }
+                  }
+
+                  // Still not found: fall back to a prettified placeholder (original behavior)
+                  if (!product) {
+                    function prettifySlug(s) {
+                      if (!s) return s;
+                      let out = String(s).trim();
+                      const m = out.match(/^([^:\-]+)[:\-]?(\d+)?$/i);
+                      if (m) {
+                        const namePart = m[1].replace(/[-_]+/g, ' ');
+                        if (m[2]) return namePart.replace(/\b\w/g, c => c.toUpperCase()) + ' (ID ' + m[2] + ')';
+                        return namePart.replace(/\b\w/g, c => c.toUpperCase());
+                      }
+                      out = out.replace(/[:_\-]+/g, ' ');
+                      return out.replace(/\b\w/g, c => c.toUpperCase());
+                    }
+                    const prettyName = prettifySlug(slugParam);
+                    if (prettyName) {
+                      product = { id: slugParam, name: prettyName, price: null, description: 'Representing product: ' + prettyName, image_url: 'assets/images/placeholder.svg' };
+                    }
                   }
                 } catch (e) {
-                  console.warn('Error creating slug-derived product representation:', e);
+                  console.warn('Error creating slug-derived or fallback product representation:', e);
                 }
               }
             } catch (e) {
@@ -329,12 +346,12 @@
       // fallback placeholder
       if (!product) {
         const fallbackId = idParam || slugParam || nameParam || 'unknown';
-        product = { id: fallbackId, name: 'Sample Product', price: 387000, description: 'Product description goes here. Replace with real data.', image_url: 'https://placehold.co/600x400' };
+  product = { id: fallbackId, name: 'Sample Product', price: 387000, description: 'Product description goes here. Replace with real data.', image_url: 'assets/images/placeholder.svg' };
       }
       main.innerHTML = `
         <div class="product-detail-grid">
           <div class="product-gallery">
-            <img src="${product.image_url || 'https://placehold.co/600x400'}" class="product-gallery-img clickable-img" alt="${product.name}" id="mainProductImg" />
+            <img src="${product.image_url || 'assets/images/placeholder.svg'}" class="product-gallery-img clickable-img" alt="${product.name}" id="mainProductImg" />
           </div>
           <div class="product-info">
             <h1 class="product-page-title">${product.name}</h1>
@@ -519,7 +536,7 @@
 
       // --- Product Image Gallery Modal Logic ---
       // Example: product.images = [url1, url2, ...] or fallback to [image_url]
-      let images = Array.isArray(product.images) && product.images.length ? product.images : [product.image_url || 'https://placehold.co/600x400'];
+  let images = Array.isArray(product.images) && product.images.length ? product.images : [product.image_url || 'assets/images/placeholder.svg'];
       let currentImgIdx = 0;
       const modal = document.getElementById('imageGalleryModal');
       const mainImg = document.getElementById('galleryMainImg');
@@ -594,32 +611,7 @@
       });
     })();
   </script>
-  <script>
-    // Menu open/close logic (for product page)
-    document.addEventListener('DOMContentLoaded', function() {
-      var menuBtn = document.getElementById('menuBtn');
-      var menuDrawer = document.getElementById('menuDrawer');
-      var closeMenuDrawer = document.getElementById('closeMenuDrawer');
-      if (menuBtn && menuDrawer) {
-        menuBtn.addEventListener('click', function() {
-          menuDrawer.classList.add('open');
-          document.body.classList.add('menu-drawer-open');
-        });
-      }
-      if (closeMenuDrawer && menuDrawer) {
-        closeMenuDrawer.addEventListener('click', function() {
-          menuDrawer.classList.remove('open');
-          document.body.classList.remove('menu-drawer-open');
-        });
-      }
-      // Also close the menu if a menu link is clicked
-      document.querySelectorAll('#menuDrawer .menu-link').forEach(function(link){
-        link.addEventListener('click', function(){
-          if (menuDrawer) { menuDrawer.classList.remove('open'); document.body.classList.remove('menu-drawer-open'); }
-        });
-      });
-    });
-  </script>
+  
   <!-- Bottom fixed navigation (mobile style) -->
   <nav class="bottom-nav" aria-hidden="false">
     <a href="index.html" class="bottom-nav-item">
@@ -638,7 +630,7 @@
       <span class="nav-ico">🔔</span>
       <span class="nav-label">Notifications</span>
     </a>
-    <a href="login.html" class="bottom-nav-item">
+    <a href="account.html" class="bottom-nav-item">
       <span class="nav-ico">👤</span>
       <span class="nav-label">My Account</span>
     </a>

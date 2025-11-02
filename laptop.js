@@ -64,16 +64,91 @@
     if (!row || typeof row !== 'object') return false;
     const CATEGORY_FIELDS = ['category','categories','category_name','cat','type','tags'];
     const LAPTOP_KEYWORDS = ['laptop','laptops','macbook','notebook','notebooks','chromebook'];
+    const EXCLUDE_KEYWORDS = [
+      'accessory', 'accessories',
+      'cooling pad', 'cooler', 'cooling',
+      'stand', 'holder',
+      'case', 'bag', 
+      'charger', 'adapter',
+      'mouse', 'keyboard',
+      'skin', 'sticker',
+      'sleeve', 'protector',
+      'dock', 'docking'
+    ];
+    
     const name = (row.name || row.title || row.product_name || '').toString().toLowerCase();
-    for (const kw of LAPTOP_KEYWORDS) if (name.includes(kw)) return true;
-    for (const f of CATEGORY_FIELDS) {
-      if (!row.hasOwnProperty(f)) continue;
-      const v = row[f];
-      if (!v) continue;
-      if (typeof v === 'string' && LAPTOP_KEYWORDS.some(kw => v.toLowerCase().includes(kw))) return true;
-      if (Array.isArray(v) && LAPTOP_KEYWORDS.some(kw => v.join(' ').toLowerCase().includes(kw))) return true;
+    const description = (row.description || '').toString().toLowerCase();
+    
+    // First check if it contains any excluded keywords in name or description
+    for (const ex of EXCLUDE_KEYWORDS) {
+      if (name.includes(ex) || description.includes(ex)) {
+        return false;
+      }
     }
-    return false;
+    
+    // Check if price is too low (likely an accessory)
+    const price = parseFloat(row.price || row.amount || 0);
+    if (price > 0 && price < 50000) { // If price is less than 50,000 naira, it's probably an accessory
+      return false;
+    }
+    
+    // Must be an actual laptop (not an accessory)
+    let isLaptop = false;
+    
+    // Check name for laptop keywords - but must not be an accessory reference
+    for (const kw of LAPTOP_KEYWORDS) {
+      if (name.includes(kw) && !name.includes('for ' + kw) && !name.includes(kw + ' accessory')) {
+        isLaptop = true;
+        break;
+      }
+    }
+    
+    // Check category fields if not found in name
+    if (!isLaptop) {
+      for (const f of CATEGORY_FIELDS) {
+        if (!row.hasOwnProperty(f)) continue;
+        const v = row[f];
+        if (!v) continue;
+        
+        if (typeof v === 'string') {
+          const vLower = v.toLowerCase();
+          if (LAPTOP_KEYWORDS.some(kw => vLower.includes(kw)) && !EXCLUDE_KEYWORDS.some(ex => vLower.includes(ex))) {
+            isLaptop = true;
+            break;
+          }
+        }
+        
+        if (Array.isArray(v)) {
+          const vStr = v.join(' ').toLowerCase();
+          if (LAPTOP_KEYWORDS.some(kw => vStr.includes(kw)) && !EXCLUDE_KEYWORDS.some(ex => vStr.includes(ex))) {
+            isLaptop = true;
+            break;
+          }
+        }
+      }
+    }
+    
+    return isLaptop;
+  }
+
+  // Prefer querying the new Supabase project via REST for laptop matches
+  const LAPTOP_SUPABASE_URL = 'https://ahzfkfxqtdtkrwlxvimp.supabase.co';
+  const LAPTOP_SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFoemZrZnhxdGR0a3J3bHh2aW1wIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE4MTcyMDksImV4cCI6MjA3NzM5MzIwOX0.us--sBWAKTPJrd4gPKMPLBgtkJVhAcrUEQoD9YTnJww';
+  const LAPTOP_REST_BASE = String(LAPTOP_SUPABASE_URL || '').replace(/\/$/, '') + '/rest/v1';
+
+  async function restFetchTableForKeyword(table, keyword) {
+    try {
+      if (!LAPTOP_REST_BASE || !LAPTOP_SUPABASE_ANON_KEY) return [];
+      const q = encodeURIComponent(`name.ilike.*${keyword}*,category.ilike.*${keyword}*`);
+      const url = `${LAPTOP_REST_BASE}/${encodeURIComponent(table)}?select=*&or=(${q})&limit=500`;
+      const res = await fetch(url, { headers: { 'apikey': LAPTOP_SUPABASE_ANON_KEY, 'Authorization': 'Bearer ' + LAPTOP_SUPABASE_ANON_KEY } });
+      if (!res.ok) return [];
+      const data = await res.json();
+      if (!Array.isArray(data)) return [];
+      return data.map(d => Object.assign({}, d, { __source: table, __table: table }));
+    } catch (e) {
+      return [];
+    }
   }
 
   function render(products){
@@ -138,6 +213,28 @@
   }
 
   async function loadLaptops(){
+    // First, try the new project's REST endpoint to avoid creating another
+    // supabase auth client. If REST returns data, use it; otherwise fall
+    // back to the existing SDK-based logic below.
+    try {
+      const tables = ['product5','products','product2'];
+      const keyword = 'laptop';
+      let restRows = [];
+      for (const t of tables) {
+        try {
+          const r = await restFetchTableForKeyword(t, keyword);
+          if (Array.isArray(r) && r.length) restRows = restRows.concat(r);
+        } catch(e){}
+      }
+      if (restRows.length) {
+        // normalize and render
+        const normalized = restRows.map(r => ({ id: (r.__source ? (r.__source + '|' + (r.id || r.product_id || r.uuid || '')) : (r.id || r.product_id || r.uuid)), name: r.name || r.title || r.product_name || r.product, price: r.price || r.amount || r.unit_price, image_url: r.image_url || r.image || (Array.isArray(r.images) && r.images[0]) || r.photo, slug: r.slug || r.handle || r.id, source: r.__source }));
+        window.laptopProducts = normalized;
+        render(normalized);
+        return;
+      }
+    } catch(e) { /* ignore REST errors and fall back to SDK */ }
+
     // Prefer supabase client if available
     if (window.supabaseClient && typeof window.supabaseClient.from === 'function') {
       try {

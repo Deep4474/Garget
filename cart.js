@@ -318,7 +318,7 @@ function renderCartItems(){
     const src = normalizeImageUrl(
       it.image_url || it.image || (Array.isArray(it.image_urls) && it.image_urls[0]) || (Array.isArray(it.images) && it.images[0]) || (Array.isArray(it.photos) && it.photos[0]) || it.photo || it.img || it.thumbnail || it.thumb || it.imageUrl || it.dataImage || ''
     );
-    return Object.assign({}, it, { _cart_img: src || 'https://placehold.co/80x80' });
+  return Object.assign({}, it, { _cart_img: src || 'assets/images/placeholder.svg' });
   });
 
   // Render top-three recently added as a separate section
@@ -331,7 +331,7 @@ function renderCartItems(){
       <div class="recently-title">Recently added</div>
       ${topThree.map(it=>`
         <div class="cart-item" data-product-id="${it.id}">
-          <img src="${it._cart_img}" alt="${(it.name||'Product').replace(/"/g,'') }" class="cart-item-img" onerror="this.onerror=null;this.src='https://placehold.co/80x80'" />
+          <img src="${it._cart_img}" alt="${(it.name||'Product').replace(/"/g,'') }" class="cart-item-img" onerror="this.onerror=null;this.src='assets/images/placeholder.svg'" />
           <div class="cart-item-details">
             <div class="cart-item-header">
               <div class="cart-item-name">${it.name}</div>
@@ -355,7 +355,7 @@ function renderCartItems(){
   // Render the rest of items (excluding the topTwo)
   html += `<div class="all-cart-items">${rest.map(it=>`
     <div class="cart-item" data-product-id="${it.id}">
-      <img src="${it._cart_img}" alt="${(it.name||'Product').replace(/"/g,'') }" class="cart-item-img" onerror="this.onerror=null;this.src='https://placehold.co/80x80'" />
+  <img src="${it._cart_img}" alt="${(it.name||'Product').replace(/"/g,'') }" class="cart-item-img" onerror="this.onerror=null;this.src='assets/images/placeholder.svg'" />
       <div class="cart-item-details">
         <div class="cart-item-header">
           <div class="cart-item-name">${it.name}</div>
@@ -692,7 +692,7 @@ document.addEventListener('click', function(e){
 
   // final sane defaults
   if (!prod.name) prod.name = 'Product';
-  if (!prod.image_url) prod.image_url = 'https://placehold.co/80x80';
+  if (!prod.image_url) prod.image_url = 'assets/images/placeholder.svg';
   if (!prod.price) prod.price = Number(prod.price) || 0;
 
   try { console.debug('[add-cart] adding', { id: prod.id, name: prod.name, price: prod.price, image_url: prod.image_url }); addToCart(prod); } catch(err){ console.error('add-cart handler error', err); }

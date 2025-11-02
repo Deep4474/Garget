@@ -1,89 +1,189 @@
-// Improved tablet loader: queries both `products` and `product2` and uses safe probing + heuristics
-(function(){
-  const grid = document.getElementById('tabletsGrid') || document.getElementById('phonesGrid');
+(() => {
+  // Constants for tablet identification
+  const TABLET_KEYWORDS = [
+    // Generic tablet terms
+    'tablet', 'tab', '2-in-1 tablet', 'android tablet', 'windows tablet',
+    
+    // Apple tablets
+    'ipad', 'ipad pro', 'ipad air', 'ipad mini',
+    
+    // Samsung tablets
+    'galaxy tab', 'samsung tab', 'tab s', 'tab a', 'tab e',
+    
+    // Other major brands
+    'surface', 'surface pro', 'surface go',
+    'xiaomi pad', 'mi pad', 'redmi pad',
+    'huawei matepad', 'mediapad',
+    'lenovo tab', 'yoga tab',
+    'realme pad', 'oppo pad',
+    'nokia t20', 'nokia t21'
+  ];
 
-  // ensure supabase client exists (reuse global pattern)
-  if (typeof window.supabaseClient === 'undefined' || !window.supabaseClient) {
-    if (window.SUPABASE_URL && window.SUPABASE_ANON_KEY && typeof supabase !== 'undefined' && typeof supabase.createClient === 'function') {
-      try { window.supabaseClient = supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY); } catch(e){}
+  const formatPrice = (value) => {
+    if (!value) return '₦0.00';
+    return new Intl.NumberFormat('en-NG', { 
+      style: 'currency', 
+      currency: 'NGN' 
+    }).format(value);
+  };
+
+  const isTabletProduct = (product) => {
+    if (!product) return false;
+    
+    // Strictly exclude non-tablet items
+    const excludeKeywords = [
+      // Mobile phones
+      'phone', 'smartphone', 'mobile phone', 'gsm',
+      
+      // Computers
+      'laptop', 'notebook', 'desktop', 'computer', 'pc',
+      
+      // Accessories - General
+      'accessories', 'charger', 'adapter', 'power bank',
+      
+      // Accessories - Protection
+      'case', 'cover', 'screen protector', 'tempered glass', 'pouch', 'sleeve',
+      
+      // Accessories - Input
+      'keyboard', 'stylus', 'pen', 'pencil', 'mouse', 'touchpad',
+      
+      // Accessories - Support
+      'stand', 'mount', 'holder', 'dock', 'docking station',
+      
+      // Parts
+      'replacement', 'spare', 'part', 'battery', 'screen', 'display'
+    ];
+    
+    const searchText = [
+      product.name || '',
+      product.category || '',
+      product.description || '',
+      product.subcategory || '',
+      product.product_type || '',
+      (Array.isArray(product.tags) ? product.tags.join(' ') : product.tags || '')
+    ].join(' ').toLowerCase().trim();
+    
+    // Special case 1: if category is explicitly "tablet", it's a tablet
+    const category = (product.category || '').toLowerCase().trim();
+    if (category === 'tablet' || category === 'tablets') {
+      console.log('[tablet] Included by category:', product.name);
+      return true;
     }
-  }
 
-  function formatPrice(v){
-    const n = Number(v);
-    if (!isFinite(n)) return '';
-    return new Intl.NumberFormat('en-NG',{ style: 'currency', currency: 'NGN' }).format(n);
-  }
-
-  const CATEGORY_FIELDS = ['category','categories','category_name','cat','type','tags'];
-  const TABLET_KEYWORDS = ['tablet','tablets','ipad','tab','galaxy tab','ipad pro'];
-
-  function matchesTablet(row) {
-    if (!row || typeof row !== 'object') return false;
-    const name = (row.name || row.title || row.product_name || '').toString().toLowerCase();
-    for (const kw of TABLET_KEYWORDS) if (name.includes(kw)) return true;
-    for (const f of CATEGORY_FIELDS) {
-      if (!row.hasOwnProperty(f)) continue;
-      const v = row[f];
-      if (!v) continue;
-      if (typeof v === 'string' && TABLET_KEYWORDS.some(kw => v.toLowerCase().includes(kw))) return true;
-      if (Array.isArray(v) && TABLET_KEYWORDS.some(kw => v.join(' ').toLowerCase().includes(kw))) return true;
+    // Special case 2: check product type
+    const productType = (product.product_type || '').toLowerCase().trim();
+    if (productType === 'tablet' || productType === 'tablets') {
+      console.log('[tablet] Included by product type:', product.name);
+      return true;
     }
+
+    // Special case 3: check subcategory
+    const subcategory = (product.subcategory || '').toLowerCase().trim();
+    if (subcategory === 'tablet' || subcategory === 'tablets') {
+      console.log('[tablet] Included by subcategory:', product.name);
+      return true;
+    }
+
+    // Check for accessories and other non-tablet items
+    if (excludeKeywords.some(keyword => searchText.includes(keyword))) {
+      console.log('[tablet] Excluded product:', product.name, '- matched exclusion keyword');
+      return false;
+    }
+    
+    // Look for tablet keywords
+    const isTablet = TABLET_KEYWORDS.some(keyword => searchText.includes(keyword.toLowerCase()));
+    
+    // Additional checks to ensure it's really a tablet
+    if (isTablet) {
+      // Check product name directly for stronger match
+      const name = (product.name || '').toLowerCase().trim();
+      const hasStrongMatch = TABLET_KEYWORDS.some(keyword => 
+        name.includes(keyword.toLowerCase()) || 
+        name.match(new RegExp(`\\b${keyword.toLowerCase()}\\b`))
+      );
+      
+      if (hasStrongMatch) {
+        console.log('[tablet] Found tablet product (strong match):', product.name);
+        return true;
+      }
+      
+      // Check if price suggests it's a tablet (avoid accessories)
+      const price = Number(product.price || product.amount || 0);
+      if (price > 50000) { // Tablets usually cost more than 50,000 NGN
+        console.log('[tablet] Found tablet product (price validated):', product.name);
+        return true;
+      }
+      
+      // Special case 4: Check for specific model numbers
+      const modelPattern = /(?:sm-[tp]\d{3}|a\d{4}|m\d{4}|ipad\d{1,2}|\bth\d{4}\b)/i;
+      if (modelPattern.test(searchText)) {
+        console.log('[tablet] Found tablet product (model number match):', product.name);
+        return true;
+      }
+      
+      console.log('[tablet] Possible tablet but needs verification:', product.name);
+    }
+    
+    // If we got here and no strong match was found, it's probably not a tablet
     return false;
-  }
+  };
 
-  function render(products){
+  const render = (products) => {
+    const grid = document.getElementById('productsGrid');
     if (!grid) return;
+    
     if (!Array.isArray(products) || products.length === 0) {
       grid.innerHTML = '<div class="ap-loading">No tablets found.</div>';
       return;
     }
 
-    // dedupe for this render pass (prefer stable id, else name+source)
     const seen = new Set();
-    const rows = [];
+    const uniqueProducts = [];
     for (const p of products) {
       const idKey = p.id || p.product_id || p.uuid || null;
       const nameKey = (p.name || p.title || '').trim().toLowerCase();
-      const key = idKey ? (String(idKey) + '|' + (p.__source || '')) : (nameKey + '|' + (p.__source || ''));
+      const key = idKey ? `${String(idKey)}|${p.__source || ''}` : `${nameKey}|${p.__source || ''}`;
       if (!key) continue;
       if (seen.has(key)) continue;
       seen.add(key);
-      rows.push(p);
+      uniqueProducts.push(p);
     }
 
-    grid.innerHTML = rows.map(p => {
+    grid.innerHTML = uniqueProducts.map(p => {
       const img = p.image_url || p.image || 'assets/images/tablet.png';
       const title = (p.name || p.title || p.product_name || 'Untitled').replace(/</g,'&lt;');
       const price = formatPrice(p.price || p.amount || 0);
       const slug = p.slug || p.id || '';
       const pid = p.id || p.product_id || slug || '';
-  const _srcLabel = p.source || p.__source || p.__table || '';
-  const sourceBadge = (_srcLabel && _srcLabel !== 'product5') ? `<div class="source-badge">${_srcLabel}</div>` : '';
+      const _srcLabel = p.source || p.__source || p.__table || '';
+      const sourceBadge = (_srcLabel && _srcLabel !== 'product5') ? `<div class="source-badge">${_srcLabel}</div>` : '';
       const isProduct5 = (p.source === 'product5' || p.__source === 'product5' || p.__table === 'product5');
-      const productHref = isProduct5 ? ('new-product.html' + (img ? ('?image_url=' + encodeURIComponent(img) + '&name=' + encodeURIComponent(p.name || '')) : '')) : ('product.html' + (slug ? ('?id=' + encodeURIComponent(slug)) : ''));
+      const productHref = isProduct5 
+        ? `new-product.html${img ? `?image_url=${encodeURIComponent(img)}&name=${encodeURIComponent(p.name || '')}` : ''}`
+        : `product.html${slug ? `?id=${encodeURIComponent(slug)}` : ''}`;
+
       return `
         <article class="product-card" data-product-id="${pid}" data-slug="${slug}" data-href="${productHref}">
           <div class="product-overlay">
             <button class="icon-btn heart" data-action="wishlist" title="Add to wishlist">❤</button>
             <button class="icon-btn compare" data-action="compare" title="Compare">⇄</button>
           </div>
-          <div class="product-thumb-wrap"><img class="product-img" src="${img}" alt="${title}" onerror="this.onerror=null;this.src='assets/images/tablet.png'" /></div>
+          <div class="product-thumb-wrap">
+            <img class="product-img" src="${img}" alt="${title}" onerror="this.onerror=null;this.src='assets/images/tablet.png'" />
+          </div>
           <h3 class="product-name product-title">${title}</h3>
           <div class="price product-price">${price}</div>
           ${sourceBadge}
-          ${ isProduct5 ? `
-            <div class="product-card-actions"></div>
-          ` : `
-            <div class="product-addbar" data-action="addbar"><span class="add-text">Add to cart</span></div>
-          ` }
+          ${isProduct5 
+            ? '<div class="product-card-actions"></div>'
+            : '<div class="product-addbar" data-action="addbar"><span class="add-text">Add to cart</span></div>'
+          }
         </article>
       `;
     }).join('\n');
 
     grid.querySelectorAll('.product-card').forEach(card => {
-      card.addEventListener('click', function(e){
-        // ignore clicks on overlay controls or addbar so these do not navigate
+      card.addEventListener('click', (e) => {
         if (e.target.closest('.icon-btn') || e.target.closest('.product-addbar')) return;
         const href = card.getAttribute('data-href');
         if (href) {
@@ -91,106 +191,91 @@
         }
       });
     });
+  };
 
-    // No delegated share-product handler: product5 cards navigate to new-product via data-href
-  }
+  const loadTablets = async () => {
+    const grid = document.getElementById('productsGrid');
+    if (!grid) return;
 
-  async function loadTablets(){
-    if (window.supabaseClient && typeof window.supabaseClient.from === 'function') {
-      try {
-  const tables = ['product5','products','product2'];
-  const _tableExistsCache = {};
-  async function tableExists(client, table) {
-    if (!client || typeof client.from !== 'function') return false;
-    if (_tableExistsCache.hasOwnProperty(table)) return _tableExistsCache[table];
+    grid.innerHTML = '<div class="loading-spinner">Loading tablets...</div>';
+
+    // Prefer the dedicated Supabase project's REST endpoint first
+    const TABLET_SUPABASE_URL = 'https://ahzfkfxqtdtkrwlxvimp.supabase.co';
+    const TABLET_SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFoemZrZnhxdGR0a3J3bHh2aW1wIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE4MTcyMDksImV4cCI6MjA3NzM5MzIwOX0.us--sBWAKTPJrd4gPKMPLBgtkJVhAcrUEQoD9YTnJww';
+    const TABLET_REST_BASE = String(TABLET_SUPABASE_URL || '').replace(/\/$/, '') + '/rest/v1';
     try {
-      const probe = await client.from(table).select('id').limit(1);
-      if (probe && probe.error) {
-        const msg = String(probe.error.message || '').toLowerCase();
-        if (probe.error.code === 'PGRST205' || /does not exist/.test(msg)) { _tableExistsCache[table] = false; return false; }
-      }
-      _tableExistsCache[table] = true; return true;
-    } catch(e) { _tableExistsCache[table] = false; return false; }
-  }
-        const candidateFields = ['category','categories','category_name','cat','type','tags'];
-        let rows = [];
-
-  const effectiveTables = [];
-  for (const t of tables) { try { if (await tableExists(window.supabaseClient, t)) effectiveTables.push(t); } catch(e){} }
-  for (const t of effectiveTables) {
-          // probe present fields and detect array-typed fields to avoid using .ilike on arrays
-          const knownArrayFields = new Set(['tags','images','image_urls','categories','variants','attributes']);
-          let presentFields = new Set();
-          let arrayFields = new Set();
+      if (TABLET_REST_BASE && TABLET_SUPABASE_ANON_KEY) {
+        const url = `${TABLET_REST_BASE}/products?select=*&order=created_at.desc&limit=1000`;
+        const res = await fetch(url, { headers: { 'apikey': TABLET_SUPABASE_ANON_KEY, 'Authorization': 'Bearer ' + TABLET_SUPABASE_ANON_KEY, 'Accept': 'application/json' } });
+        if (res && res.ok) {
           try {
-            const sample = await window.supabaseClient.from(t).select('*').limit(1);
-            if (!sample.error && Array.isArray(sample.data) && sample.data.length) {
-              const first = sample.data[0] || {};
-              Object.keys(first).forEach(k => {
-                presentFields.add(k);
-                try { if (Array.isArray(first[k])) arrayFields.add(k); } catch(e){}
-              });
+            const rows = await res.json();
+            if (Array.isArray(rows) && rows.length) {
+              const tabletProducts = rows.filter(isTabletProduct).map(p => ({ ...p, __source: 'products', __table: 'products' }));
+              console.log('[tablet] REST: found', tabletProducts.length, 'products');
+              render(tabletProducts);
+              return;
             }
-          } catch(e){}
-
-          // prefer server-side flattened column if present (tags_text), avoid known array-like fields
-          const serverPrefer = (presentFields.size === 0 || presentFields.has('tags_text')) ? ['tags_text'] : [];
-          const candidatePresent = candidateFields.filter(f => presentFields.has(f) && !arrayFields.has(f) && !knownArrayFields.has(f));
-          const fieldsToTry = serverPrefer.concat(candidatePresent);
-          if (fieldsToTry.length) {
-            for (const field of fieldsToTry) {
-              for (const kw of TABLET_KEYWORDS) {
-                try {
-                  const res = await window.supabaseClient.from(t).select('*').ilike(field, `%${kw}%`).limit(1000);
-                  if (res && res.error) {
-                    console.warn(`[tablet] supabase query error table=${t} field=${field}:`, res.error);
-                  }
-                  if (res && !res.error && Array.isArray(res.data) && res.data.length) rows = rows.concat(res.data.map(r => Object.assign({}, r, { __source: t, __table: t })));
-                } catch(e) {
-                  // ignore network/other errors per-field
-                }
-              }
-            }
-          }
+          } catch (e) { /* parse error, fall back to SDK */ }
         }
-
-        // dedupe by id+source and normalize
-        const seen = new Set();
-        const unique = [];
-        for (const r of rows) {
-          const idKey = r.id || r.product_id || r.uuid || null;
-          const nameKey = (r.name || r.title || '').trim().toLowerCase();
-          const key = idKey ? (String(idKey) + '|' + (r.__source||'')) : (nameKey + '|' + (r.__source||''));
-          if (!key) continue;
-          if (seen.has(key)) continue;
-          seen.add(key);
-          unique.push(r);
-        }
-
-        if (!unique.length) {
-          grid.innerHTML = '<div class="ap-loading">No tablets found (no category matches).</div>';
-          return;
-        }
-
-        const normalized = unique.map(r => ({ id: (r.__source ? (r.__source + '|' + (r.id || r.product_id || r.uuid || '')) : (r.id || r.product_id || r.uuid)), name: r.name || r.title || r.product_name || r.product, price: r.price || r.amount || r.unit_price, image_url: r.image_url || r.image || (Array.isArray(r.images)&&r.images[0]) || r.photo, slug: r.slug || r.handle || r.id, source: r.__source }));
-        window.products = normalized;
-        render(normalized);
-        return;
-      } catch(e) { console.warn('tablet.js supabase load failed', e); }
+      }
+    } catch (e) {
+      console.warn('[tablet] REST fetch failed, falling back to SDK:', e && e.message ? e.message : e);
     }
 
-    // fallback mock
-    const mock = [
-      { id: 't1', name: 'Mock Tablet A', price: 120000, image_url: 'assets/images/tablet.png' },
-      { id: 't2', name: 'Mock Tablet B', price: 180000, image_url: 'assets/images/tablet2.png' }
-    ];
-    render(mock);
-  }
+    if (typeof window.supabaseClient === 'undefined' || !window.supabaseClient) {
+      if (window.SUPABASE_URL && window.SUPABASE_ANON_KEY && typeof supabase !== 'undefined' && typeof supabase.createClient === 'function') {
+        try {
+          window.supabaseClient = supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
+        } catch(e) {
+          console.error('Failed to initialize Supabase client:', e);
+          grid.innerHTML = '<div class="error-message">Failed to load products</div>';
+          return;
+        }
+      }
+    }
 
-  // initial load
+    let products = [];
+
+    try {
+      if (window.supabaseClient && typeof window.supabaseClient.from === 'function') {
+        const candidateFields = ['category', 'name', 'description', 'subcategory', 'type', 'tags'];
+        const orConditions = [];
+        
+        for (const field of candidateFields) {
+          for (const keyword of TABLET_KEYWORDS) {
+            orConditions.push(`${field}.ilike.%${keyword}%`);
+          }
+        }
+        
+        const res = await window.supabaseClient
+          .from('products')
+          .select('*')
+          .or(orConditions.join(','))
+          .limit(1000);
+          
+        if (res && !res.error && Array.isArray(res.data)) {
+          const tabletProducts = res.data.filter(isTabletProduct);
+          products = tabletProducts.map(p => ({ ...p, __source: 'products', __table: 'products' }));
+        }
+      }
+    } catch (e) {
+      console.warn('tablet.js supabase load failed:', e);
+      products = [
+        { id: 't1', name: 'Mock Tablet A', price: 120000, image_url: 'assets/images/tablet.png' },
+        { id: 't2', name: 'Mock Tablet B', price: 180000, image_url: 'assets/images/tablet2.png' }
+      ];
+    }
+
+    console.log('[tablet] Found tablet products:', products.length);
+    products.forEach(p => console.log('[tablet] Product:', p.name, 'Category:', p.category));
+    
+    render(products);
+  };
+
   if (document.readyState === 'complete' || document.readyState === 'interactive') {
-    setTimeout(() => { loadTablets().catch(()=>{}); }, 8);
+    setTimeout(() => loadTablets().catch(console.error), 8);
   } else {
-    document.addEventListener('DOMContentLoaded', function(){ loadTablets().catch(()=>{}); });
+    document.addEventListener('DOMContentLoaded', () => loadTablets().catch(console.error));
   }
 })();

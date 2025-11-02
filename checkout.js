@@ -52,8 +52,14 @@
     const email = document.getElementById('checkoutEmail').value.trim();
     const phone = document.getElementById('checkoutPhone').value.trim();
     const address = document.getElementById('checkoutAddress').value.trim();
-    const pick = document.getElementById('checkoutPickOption').value;
+    const deliveryOption = document.getElementById('checkoutPickOption').value;
     const state = document.getElementById('checkoutState').value;
+    
+    // Validate delivery option
+    if (deliveryOption !== 'Hub to Hub' && deliveryOption !== 'Hub to Door') {
+        if (status) status.textContent = 'Please select a valid delivery option.';
+        return;
+    }
     const { items, total } = loadCart();
     if (!items.length){ if (status) status.textContent = 'Cart is empty.'; return; }
     if (!name || !email){ if (status) status.textContent = 'Name and email required.'; return; }
@@ -71,11 +77,158 @@
       email: email,
       phone: phone,
       address: address,
-      pick_option: pick,
+      delivery_option: deliveryOption,
       state: state,
       order_total: total || 0,
       status: 'pending'
     };
+
+    // Require authentication: RLS on the DB will reject anonymous inserts.
+    // Try to get the currently signed-in user; if none, prompt and redirect to login.
+      try {
+        let currentUser = null;
+        if (window.supabaseClient && window.supabaseClient.auth && typeof window.supabaseClient.auth.getUser === 'function') {
+          const result = await window.supabaseClient.auth.getUser();
+          currentUser = result && result.data && result.data.user ? result.data.user : null;
+        }
+
+        // If there's no Supabase user, allow a locally-registered user to place an order
+        // by saving a guest order to localStorage. This avoids forcing a redirect to login
+        // for users who registered locally (stored userEmail/userName in localStorage).
+        if (!currentUser) {
+          const localEmail = localStorage.getItem('userEmail') || '';
+          const localName = localStorage.getItem('userName') || '';
+          if (localEmail) {
+            // Try to send the order to Supabase anonymously using the anon key.
+            // If that fails (RLS/network), fall back to saving the order locally.
+            let client = null;
+            if (window.supabaseClient && typeof window.supabaseClient.from === 'function') client = window.supabaseClient;
+            else if (window.SUPABASE_URL && window.SUPABASE_ANON_KEY && typeof supabase !== 'undefined' && typeof supabase.createClient === 'function') {
+              try { client = supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY); } catch(e) { client = null; }
+            }
+
+            if (client) {
+              try {
+                const shipping = { name: name || localName, phone: phone, address: address, state: state, delivery_option: deliveryOption };
+                const billing = { email: email || localEmail };
+                const orderRow = {
+                  user_id: null,
+                  status: 'pending',
+                  total: Number(total) || 0,
+                  currency: 'NGN',
+                  shipping: shipping,
+                  billing: billing,
+                  delivery_option: deliveryOption,
+                  metadata: {
+                    items_count: (items || []).length || 0,
+                    primary_product_name: (items && items.length) ? (items[0].name || items[0].product_name || null) : null
+                  }
+                };
+
+                const { data: orderData, error: orderError } = await client.from('orders').insert([orderRow], { returning: 'representation' });
+                if (!orderError && orderData && orderData[0] && orderData[0].id) {
+                  const orderId = orderData[0].id;
+                  const orderItems = (items || []).map(it => {
+                    const price = Number(it.price) || 0;
+                    const qty = Number(it.qty) || 1;
+                    return {
+                      order_id: orderId,
+                      product_id: it.id || it.product_id || null,
+                      name: it.name || it.product_name || '',
+                      sku: it.sku || null,
+                      price: price,
+                      qty: qty,
+                      line_total: price * qty,
+                      metadata: {}
+                    };
+                  });
+                  if (orderItems.length) {
+                    try {
+                      const { error: oiError } = await client.from('order_items').insert(orderItems, { returning: 'minimal' });
+                      if (oiError) {
+                        console.warn('Failed to insert order_items for guest order', oiError);
+                      }
+                    } catch(e) { console.warn('order_items insert failed', e); }
+                  }
+
+                  if (status) status.textContent = 'Order created successfully! — Order ID: ' + orderId;
+                  localStorage.removeItem(CART_KEY);
+                  window.dispatchEvent(new Event('cart:updated'));
+                  setTimeout(() => { window.location.href = 'index.html'; }, 1500);
+                  return;
+                }
+                // if insert failed, we'll fall back to local save below
+              } catch(e) {
+                console.warn('Supabase guest insert failed, falling back to local save', e);
+              }
+            }
+
+            // Save locally as fallback
+            const guestOrdersKey = 'lmg_guest_orders_v1';
+            const guestOrdersRaw = localStorage.getItem(guestOrdersKey);
+            let guestOrders = guestOrdersRaw ? JSON.parse(guestOrdersRaw) : [];
+            const guestOrder = {
+              id: 'local_' + Date.now(),
+              created_at: new Date().toISOString(),
+              user_name: name || localName,
+              email: email || localEmail,
+              phone: phone,
+              address: address,
+              pick_option: pick,
+              state: state,
+              items: items,
+              total: total || 0,
+              status: 'pending_local'
+            };
+            guestOrders.push(guestOrder);
+            try { localStorage.setItem(guestOrdersKey, JSON.stringify(guestOrders)); } catch (err) { console.warn('Could not save guest order locally', err); }
+            if (status) status.textContent = 'Order saved locally (guest). Order ID: ' + guestOrder.id;
+            localStorage.removeItem(CART_KEY);
+            window.dispatchEvent(new Event('cart:updated'));
+            setTimeout(() => { window.location.href = 'index.html'; }, 1500);
+            return;
+          }
+
+          // No local user either — ask them to sign in and redirect
+          if (status) status.textContent = 'Please sign in to place your order.';
+          setTimeout(() => { window.location.href = 'login.html'; }, 900);
+          return;
+        }
+      } catch (e) {
+        console.warn('Could not determine auth state', e);
+        // Best-effort fallback: if a local user exists, save guest order locally
+        const localEmail = localStorage.getItem('userEmail') || '';
+        const localName = localStorage.getItem('userName') || '';
+        if (localEmail) {
+          const guestOrdersKey = 'lmg_guest_orders_v1';
+          const guestOrdersRaw = localStorage.getItem(guestOrdersKey);
+          let guestOrders = guestOrdersRaw ? JSON.parse(guestOrdersRaw) : [];
+          const guestOrder = {
+            id: 'local_' + Date.now(),
+            created_at: new Date().toISOString(),
+            user_name: name || localName,
+            email: email || localEmail,
+            phone: phone,
+            address: address,
+            delivery_option: deliveryOption,
+            state: state,
+            items: items,
+            total: total || 0,
+            status: 'pending_local'
+          };
+          guestOrders.push(guestOrder);
+          try { localStorage.setItem(guestOrdersKey, JSON.stringify(guestOrders)); } catch (err) { console.warn('Could not save guest order locally', err); }
+          if (status) status.textContent = 'Order saved locally (guest). Order ID: ' + guestOrder.id;
+          localStorage.removeItem(CART_KEY);
+          window.dispatchEvent(new Event('cart:updated'));
+          setTimeout(() => { window.location.href = 'index.html'; }, 1500);
+          return;
+        }
+
+        if (status) status.textContent = 'Please sign in to place your order.';
+        setTimeout(() => { window.location.href = 'login.html'; }, 900);
+        return;
+      }
 
     // Map cart items to a compact structure suitable for storing in a JSONB column
     if (ORDER_ITEMS_COLUMN) {
@@ -96,71 +249,87 @@
   console.log('Order payload', payload);
       try {
         if (window.supabaseClient && typeof window.supabaseClient.from === 'function') {
-          // Prepare items as JSONB to store inside orders table (client will insert only into orders)
-          const itemsForOrder = (items || []).map(it => (it.product_name || it.name || '').trim()).filter(Boolean);
-          console.log('Order items for orders table', itemsForOrder);
+          // Build an orders row matching the DB migration (use JSONB for shipping/billing)
+          const shipping = {
+            name: name,
+            phone: phone,
+            address: address,
+            state: state,
+            delivery_option: deliveryOption
+          };
+          const billing = {
+            email: email
+          };
 
-          // Build order row payload. Add summary fields items_count and primary_product_name
-          const orderRow = Object.assign({}, payload, {
-            items: itemsForOrder, // will be sent as JSON/JSONB
-            items_count: itemsForOrder.length || 0,
-            primary_product_name: itemsForOrder.length ? itemsForOrder[0] : null
+          const orderRow = {
+            user_id: null, // let the DB trigger set from JWT (if present)
+            status: payload.status || 'pending',
+            total: Number(total) || 0,
+            currency: 'NGN',
+            shipping: shipping,
+            billing: billing,
+            delivery_option: pick,
+            metadata: {
+              items_count: (items || []).length || 0,
+              primary_product_name: (items && items.length) ? (items[0].name || items[0].product_name || null) : null
+            }
+          };
+
+          // Insert order and get its id
+          const { data: orderData, error: orderError } = await window.supabaseClient.from('orders').insert([orderRow], { returning: 'representation' });
+          if (orderError || !orderData || !orderData[0] || !orderData[0].id) {
+            console.error('Failed to create order', orderError);
+            if (status) status.textContent = 'Failed to create order: ' + (orderError?.message || JSON.stringify(orderError));
+            return;
+          }
+          const orderId = orderData[0].id;
+
+          // Map cart items to order_items rows
+          const orderItems = (items || []).map(it => {
+            const price = Number(it.price) || 0;
+            const qty = Number(it.qty) || 1;
+            return {
+              order_id: orderId,
+              product_id: it.id || it.product_id || null,
+              name: it.name || it.product_name || '',
+              sku: it.sku || null,
+              price: price,
+              qty: qty,
+              line_total: price * qty,
+              metadata: {}
+            };
           });
 
-          // Try direct insert into orders table
-          try {
-            const { data: insertData, error: insertError } = await window.supabaseClient.from('orders').insert([orderRow], { returning: 'minimal' });
-            if (insertError) {
-              console.warn('Direct insert to orders failed, falling back to RPC if available', insertError);
-              // fallback to RPC if configured
-              if (typeof window.supabaseClient.rpc === 'function') {
-                const itemsForRpc = itemsForOrder; // same shape expected by our RPC
-                const { data: orderId, error } = await window.supabaseClient.rpc('insert_order_with_items', {
-                  p_user_name: payload.user_name,
-                  p_email: payload.email,
-                  p_phone: payload.phone,
-                  p_address: payload.address,
-                  p_pick_option: payload.pick_option,
-                  p_state: payload.state,
-                  p_order_total: payload.order_total,
-                  p_status: payload.status,
-                  p_items: itemsForRpc
-                });
-                if (error) throw error;
-                // success via RPC
-                if (status) status.textContent = 'Order created successfully! — Items: ' + (itemsForOrder.join(', ') || '');
-                localStorage.removeItem(CART_KEY);
-                window.dispatchEvent(new Event('cart:updated'));
-                // redirect home shortly so user sees message
-                setTimeout(() => { window.location.href = 'index.html'; }, 1500);
-              } else {
-                throw insertError;
-              }
-            } else {
-              // success via direct insert
-              if (status) status.textContent = 'Order created successfully! — Items: ' + (itemsForOrder.join(', ') || '');
-              localStorage.removeItem(CART_KEY);
-              window.dispatchEvent(new Event('cart:updated'));
-              // redirect home shortly so user sees message
-              setTimeout(() => { window.location.href = 'index.html'; }, 1500);
+          // Insert order items
+          if (orderItems.length) {
+            const { data: oiData, error: oiError } = await window.supabaseClient.from('order_items').insert(orderItems, { returning: 'minimal' });
+            if (oiError) {
+              console.error('Failed to insert order items, attempting to delete order to rollback', oiError);
+              // Attempt best-effort rollback: delete the order we created. This will only succeed
+              // if the same JWT/role can delete the order. Otherwise the order may remain.
+              try { await window.supabaseClient.from('orders').delete().eq('id', orderId); } catch (delErr) { console.warn('Rollback delete failed', delErr); }
+              if (status) status.textContent = 'Failed to save order items: ' + (oiError?.message || JSON.stringify(oiError));
+              return;
             }
-          } catch (e) {
-            console.error('Error inserting order:', e);
-            if (status) status.textContent = 'Error placing order: ' + (e.message || JSON.stringify(e));
           }
+
+          // Success
+          if (status) status.textContent = 'Order created successfully! — Order ID: ' + orderId;
+          localStorage.removeItem(CART_KEY);
+          window.dispatchEvent(new Event('cart:updated'));
+          setTimeout(() => { window.location.href = 'index.html'; }, 1500);
 
         } else {
           // no supabase - simulate success
           if (status) status.textContent = 'Order saved locally (supabase not configured).';
           localStorage.removeItem(CART_KEY);
           window.dispatchEvent(new Event('cart:updated'));
-          // redirect home shortly so user sees message
           setTimeout(() => { window.location.href = 'index.html'; }, 1500);
         }
-    } catch (err) {
-      console.error(err);
-      if (status) status.textContent = 'Error placing order.';
-    }
+      } catch (err) {
+        console.error(err);
+        if (status) status.textContent = 'Error placing order: ' + (err?.message || JSON.stringify(err));
+      }
   }
 
   document.addEventListener('DOMContentLoaded', function(){
