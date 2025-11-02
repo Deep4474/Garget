@@ -61,19 +61,20 @@
 
   // Global image error handler
   const PLACEHOLDER_IMAGES = {
-    phone: '/assets/images/smartphone.png',
-    laptop: '/assets/images/laptop-thumb.png',
-    tablet: '/assets/images/tablet-thumb.png',
-    tv: '/assets/images/tv.png',
-    accessory: '/assets/images/placeholder.svg'
+    phone: 'assets/images/smartphone.png',
+    laptop: 'assets/images/laptop-thumb.png',
+    tablet: 'assets/images/tablet-thumb.png',
+    tv: 'assets/images/tv.png',
+    accessory: 'assets/images/placeholder.svg'
   };
   
-  // Function to ensure paths start with forward slash and handle missing images
+  // Function to handle image paths and fallbacks
   function getImagePath(path, category = 'accessory') {
     if (!path || path.includes('example.com')) {
       return PLACEHOLDER_IMAGES[category.toLowerCase()] || PLACEHOLDER_IMAGES.accessory;
     }
-    return path.startsWith('/') ? path : '/' + path;
+    // Remove leading slash for relative paths
+    return path.startsWith('/') ? path.substring(1) : path;
   }
 
   document.addEventListener('error', function(e) {
